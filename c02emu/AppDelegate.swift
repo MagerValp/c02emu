@@ -10,6 +10,7 @@
 import Cocoa
 import SpriteKit
 
+
 extension SKNode {
     class func unarchiveFromFile(file : NSString) -> SKNode? {
         if let path = NSBundle.mainBundle().pathForResource(file, ofType: "sks") {
@@ -33,6 +34,15 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     @IBOutlet weak var skView: SKView!
     
     func applicationDidFinishLaunching(aNotification: NSNotification) {
+        let statePtr = c02emuCreate()
+        let state = statePtr.memory
+        NSLog("stack: \(state.cpu.stack)")
+        NSLog("pc: \(state.cpu.pc)")
+        c02emuReset(statePtr)
+        NSLog("stack: \(state.cpu.stack)")
+        NSLog("pc: \(state.cpu.pc)")
+        c02emuDestroy(statePtr)
+        
         /* Pick a size for the scene */
         if let scene = GameScene.unarchiveFromFile("GameScene") as? GameScene {
             /* Set the scale mode to scale to fit the window */

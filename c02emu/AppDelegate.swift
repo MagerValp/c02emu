@@ -32,21 +32,17 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     
     @IBOutlet weak var window: NSWindow!
     @IBOutlet weak var skView: SKView!
+    var emuState: COpaquePointer = nil
     
     func applicationDidFinishLaunching(aNotification: NSNotification) {
-        let statePtr = c02emuCreate()
-        let state = statePtr.memory
-        NSLog("stack: \(state.cpu.stack)")
-        NSLog("pc: \(state.cpu.pc)")
-        c02emuReset(statePtr)
-        NSLog("stack: \(state.cpu.stack)")
-        NSLog("pc: \(state.cpu.pc)")
-        c02emuDestroy(statePtr)
+        self.emuState = c02emuCreate()
+        c02emuReset(self.emuState)
         
         /* Pick a size for the scene */
         if let scene = GameScene.unarchiveFromFile("GameScene") as? GameScene {
             /* Set the scale mode to scale to fit the window */
             scene.scaleMode = .AspectFit
+            scene.emuState = self.emuState
             
             self.skView!.presentScene(scene)
             
@@ -59,6 +55,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
     
     func applicationShouldTerminateAfterLastWindowClosed(sender: NSApplication) -> Bool {
+        c02emuDestroy(self.emuState)
+        self.emuState = nil
         return true
     }
 }

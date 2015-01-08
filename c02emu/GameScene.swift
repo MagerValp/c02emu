@@ -15,15 +15,9 @@ class GameScene: SKScene {
     var counter = 0
     var charTextures: [SKTexture!]!
     var charAtlas: SKTextureAtlas!
+    var emuState: COpaquePointer = nil
     
     override func didMoveToView(view: SKView) {
-        /* Setup your scene here */
-        let myLabel = SKLabelNode(fontNamed:"Chalkduster")
-        myLabel.text = "Hello, World!"
-        myLabel.fontSize = 65
-        myLabel.fontColor = SKColor.greenColor()
-        myLabel.position = CGPoint(x:CGRectGetMidX(self.frame), y:CGRectGetMidY(self.frame))
-        
         self.charAtlas = SKTextureAtlas(named: "Charset")
         self.charTextures = []
         for i in 0..<256 {
@@ -44,33 +38,18 @@ class GameScene: SKScene {
         }
         
         self.screenCharNodesSetup = true
-        
-        self.addChild(myLabel)
     }
     
     override func mouseDown(theEvent: NSEvent) {
-        /* Called when a mouse click occurs */
-        
         let location = theEvent.locationInNode(self)
-        
-        NSLog("location: \(location)")
-        
-        let sprite = SKSpriteNode(imageNamed:"Spaceship")
-        sprite.position = location
-        sprite.setScale(0.5)
-        
-        let action = SKAction.rotateByAngle(CGFloat(M_PI), duration:1)
-        sprite.runAction(SKAction.repeatActionForever(action))
-        
-        self.addChild(sprite)
+        NSLog("mouse click location: \(location)")
     }
     
     override func update(currentTime: CFTimeInterval) {
-        /* Called before each frame is rendered */
-        
         if self.screenCharNodesSetup {
+            let output = c02emuGetOutput(self.emuState)
             for i in 0..<80 * 50 {
-                screenCharNodes[i].texture = self.charTextures[(i + self.counter) & 0xff]
+                screenCharNodes[i].texture = self.charTextures[Int(output.display.data[i])]
             }
             self.counter++
         }

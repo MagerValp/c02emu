@@ -14,24 +14,23 @@
 typedef uint8_t Byte;
 typedef uint16_t Addr;
 
+/// Opaque state structure.
+typedef struct _c02EmuState C02EmuState;
+
+/// Display modes.
+typedef enum {
+    C02EMU_DISPLAY_MODE_TEXT_80X50=0
+} C02EmuDisplayMode;
+
+/// Emulator output data.
 typedef struct {
-    struct _cpu {
-        Byte a, x, y, status, stack;
-        Addr pc;
-    } cpu;
-    struct _mem {
-        Byte ram[256 * 4096];
-        Byte rom[4096];
-    } mem;
-    struct _io {
-        struct _mmu {
-            Byte page[16];
-        } mmu;
-    } io;
-} C02EmuState;
+    struct _output_display {
+        C02EmuDisplayMode mode;
+        Byte *data;
+    } display;
+} C02EmuOutput;
 
-
-/// Create an emulator state struct and allocate all needed resources.
+/// Create emulator state and allocate all needed resources.
 ///
 /// @return Emulator state struct, or NULL.
 C02EmuState *c02emuCreate(void);
@@ -56,7 +55,7 @@ void c02emuReset(C02EmuState *state);
 /// The reasons that c02emuRun may return.
 typedef enum {
     C02EMU_FRAME_READY=1
-} C02ReturnReason;
+} C02EmuReturnReason;
 
 /// Execute until a stopping condition occurs.
 ///
@@ -64,7 +63,12 @@ typedef enum {
 ///
 /// @param state    Emulator state.
 /// @return The reason that the emulator stopped.
-C02ReturnReason c02emuRun(C02EmuState *state);
+C02EmuReturnReason c02emuRun(C02EmuState *state);
 
+/// Access emulator output.
+///
+/// @param state    Emulator state.
+/// @return Data required for rendering the display.
+const C02EmuOutput c02emuGetOutput(C02EmuState *state);
 
 #endif /* defined(__c02emu__c02emu__) */

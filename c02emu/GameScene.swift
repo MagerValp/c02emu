@@ -14,14 +14,27 @@ class GameScene: SKScene {
     var screenCharNodesSetup = false
     var counter = 0
     var charTextures: [SKTexture!]!
-    var charAtlas: SKTextureAtlas!
     var emuState: COpaquePointer = nil
     
     override func didMoveToView(view: SKView) {
-        self.charAtlas = SKTextureAtlas(named: "Charset")
+        let charsetImage80x50 = NSImage(named: "Charset-80x50")!
+        let charWidth = Int(charsetImage80x50.size.width) / 32
+        let charHeight = Int(charsetImage80x50.size.height) / 8
+        var charsetProperties80x50 = [String:NSImage]()
+        for i in 0..<256 {
+            let x = (i % 32) * charWidth
+            let y = (7 - i / 32) * charHeight
+            let charRect = CGRect(x: x, y: y, width: charWidth, height: charHeight)
+            let charImage = NSImage(size: NSSize(width: charWidth, height: charHeight))
+            charImage.lockFocus()
+            charsetImage80x50.drawAtPoint(NSPoint(x: 0, y: 0), fromRect: charRect, operation: .CompositeCopy, fraction: 1.0)
+            charImage.unlockFocus()
+            charsetProperties80x50[String(format:"char_%03d", i)] = charImage
+        }
+        let atlas80x50 = SKTextureAtlas(dictionary: charsetProperties80x50)
         self.charTextures = []
         for i in 0..<256 {
-            let texture = self.charAtlas.textureNamed(String(format:"char_%03d", i))
+            let texture = atlas80x50.textureNamed(String(format:"char_%03d", i))
             texture.filteringMode = .Nearest
             self.charTextures.append(texture)
         }
@@ -49,7 +62,7 @@ class GameScene: SKScene {
         if self.screenCharNodesSetup {
             let output = c02emuGetOutput(self.emuState)
             for i in 0..<80 * 50 {
-                screenCharNodes[i].texture = self.charTextures[Int(output.display.data[i])]
+                self.screenCharNodes[i].texture = self.charTextures[Int(output.display.data[i])]
             }
             self.counter++
         }

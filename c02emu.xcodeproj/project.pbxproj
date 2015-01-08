@@ -13,7 +13,6 @@
 		6673C4191A5C709700D17696 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6673C4181A5C709700D17696 /* Images.xcassets */; };
 		6673C41C1A5C709700D17696 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6673C41A1A5C709700D17696 /* MainMenu.xib */; };
 		6673C4281A5C709700D17696 /* c02emuTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6673C4271A5C709700D17696 /* c02emuTests.swift */; };
-		6673C4321A5D3EBF00D17696 /* Charset.atlas in Resources */ = {isa = PBXBuildFile; fileRef = 6673C4311A5D3EBF00D17696 /* Charset.atlas */; };
 		668D3C451A5DBF0F00D9C4B9 /* c02emu.c in Sources */ = {isa = PBXBuildFile; fileRef = 668D3C431A5DBF0F00D9C4B9 /* c02emu.c */; };
 /* End PBXBuildFile section */
 
@@ -38,7 +37,6 @@
 		6673C4211A5C709700D17696 /* c02emuTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = c02emuTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		6673C4261A5C709700D17696 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		6673C4271A5C709700D17696 /* c02emuTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = c02emuTests.swift; sourceTree = "<group>"; };
-		6673C4311A5D3EBF00D17696 /* Charset.atlas */ = {isa = PBXFileReference; lastKnownFileType = folder.skatlas; path = Charset.atlas; sourceTree = "<group>"; };
 		668D3C431A5DBF0F00D9C4B9 /* c02emu.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = c02emu.c; path = emu/c02emu.c; sourceTree = "<group>"; };
 		668D3C441A5DBF0F00D9C4B9 /* c02emu.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = c02emu.h; path = emu/c02emu.h; sourceTree = "<group>"; };
 		668D3C461A5DF42C00D9C4B9 /* c02emu-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "c02emu-Bridging-Header.h"; sourceTree = "<group>"; };
@@ -88,7 +86,6 @@
 				6673C4161A5C709700D17696 /* GameScene.sks */,
 				668D3C461A5DF42C00D9C4B9 /* c02emu-Bridging-Header.h */,
 				6673C4181A5C709700D17696 /* Images.xcassets */,
-				6673C4311A5D3EBF00D17696 /* Charset.atlas */,
 				6673C41A1A5C709700D17696 /* MainMenu.xib */,
 				668D3C421A5DBE9E00D9C4B9 /* Emulator Core */,
 				6673C4101A5C709700D17696 /* Supporting Files */,
@@ -212,7 +209,6 @@
 			files = (
 				6673C4171A5C709700D17696 /* GameScene.sks in Resources */,
 				6673C4191A5C709700D17696 /* Images.xcassets in Resources */,
-				6673C4321A5D3EBF00D17696 /* Charset.atlas in Resources */,
 				6673C41C1A5C709700D17696 /* MainMenu.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

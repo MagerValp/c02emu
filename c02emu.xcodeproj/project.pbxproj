@@ -13,6 +13,7 @@
 		6673C4191A5C709700D17696 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6673C4181A5C709700D17696 /* Images.xcassets */; };
 		6673C41C1A5C709700D17696 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6673C41A1A5C709700D17696 /* MainMenu.xib */; };
 		6673C4281A5C709700D17696 /* c02emuTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6673C4271A5C709700D17696 /* c02emuTests.swift */; };
+		6673C4321A5D3EBF00D17696 /* Charset.atlas in Resources */ = {isa = PBXBuildFile; fileRef = 6673C4311A5D3EBF00D17696 /* Charset.atlas */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -36,6 +37,7 @@
 		6673C4211A5C709700D17696 /* c02emuTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = c02emuTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		6673C4261A5C709700D17696 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		6673C4271A5C709700D17696 /* c02emuTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = c02emuTests.swift; sourceTree = "<group>"; };
+		6673C4311A5D3EBF00D17696 /* Charset.atlas */ = {isa = PBXFileReference; lastKnownFileType = folder.skatlas; path = Charset.atlas; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -81,6 +83,7 @@
 				6673C4141A5C709700D17696 /* GameScene.swift */,
 				6673C4161A5C709700D17696 /* GameScene.sks */,
 				6673C4181A5C709700D17696 /* Images.xcassets */,
+				6673C4311A5D3EBF00D17696 /* Charset.atlas */,
 				6673C41A1A5C709700D17696 /* MainMenu.xib */,
 				6673C4101A5C709700D17696 /* Supporting Files */,
 			);
@@ -194,6 +197,7 @@
 			files = (
 				6673C4171A5C709700D17696 /* GameScene.sks in Resources */,
 				6673C4191A5C709700D17696 /* Images.xcassets in Resources */,
+				6673C4321A5D3EBF00D17696 /* Charset.atlas in Resources */,
 				6673C41C1A5C709700D17696 /* MainMenu.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

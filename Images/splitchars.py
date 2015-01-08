@@ -32,7 +32,7 @@ def main(argv):
         for dy in xrange(0, 8):
             char.append(lines[y * 8 + dy][x * 4 * 8:(x + 1) * 4 * 8])
         w = png.Writer(width=8, height=8, alpha=True)
-        with open(u"%s%02x.png" % (args.outprefix, i), u"w") as f:
+        with open(u"%s%03d.png" % (args.outprefix, i), u"w") as f:
             w.write(f, char)
     
     return 0

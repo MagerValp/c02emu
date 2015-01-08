@@ -14,6 +14,7 @@ class GameScene: SKScene {
     var screenCharNodesSetup = false
     var counter = 0
     var charTextures: [SKTexture!]!
+    var charAtlas: SKTextureAtlas!
     
     override func didMoveToView(view: SKView) {
         /* Setup your scene here */
@@ -23,20 +24,23 @@ class GameScene: SKScene {
         myLabel.fontColor = SKColor.greenColor()
         myLabel.position = CGPoint(x:CGRectGetMidX(self.frame), y:CGRectGetMidY(self.frame))
         
+        self.charAtlas = SKTextureAtlas(named: "Charset")
+        self.charTextures = []
+        for i in 0..<256 {
+            let texture = self.charAtlas.textureNamed(String(format:"char_%03d", i))
+            texture.filteringMode = .Nearest
+            self.charTextures.append(texture)
+        }
         screenCharNodes = []
         for y in 0..<50 {
             for x in 0..<80 {
                 let i = (y % 8) * 32 + x % 32
-                let sprite = SKSpriteNode(imageNamed:String(format:"charset_%02x", i))
+                let sprite = SKSpriteNode(texture: self.charTextures[i])
                 sprite.anchorPoint = CGPointZero
-                sprite.position = self.convertPointFromView(CGPoint(x: x*8, y: 400 - y*8 - 8))
+                sprite.position = CGPoint(x: x*8, y: 400 - y*8 - 8)
                 self.addChild(sprite)
                 screenCharNodes.append(sprite)
             }
-        }
-        charTextures = []
-        for i in 0..<256 {
-            charTextures.append(SKTexture(imageNamed: String(format:"charset_%02x", i)))
         }
         
         self.screenCharNodesSetup = true

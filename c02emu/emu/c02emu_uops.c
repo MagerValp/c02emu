@@ -31,8 +31,9 @@
 
 
 #define SETNZ(VAL) do { \
-    if ((VAL) == 0) { SEZ(); } else { CLZ(); } \
-    if ((VAL) & 0x80) { SEN(); } else { CLN(); } \
+    Byte v = (VAL); \
+    if (v == 0) { SEZ(); } else { CLZ(); } \
+    if (v & 0x80) { SEN(); } else { CLN(); } \
 } while (0)
 
 

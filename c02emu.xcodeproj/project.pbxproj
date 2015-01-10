@@ -15,6 +15,7 @@
 		6673C4191A5C709700D17696 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6673C4181A5C709700D17696 /* Images.xcassets */; };
 		6673C41C1A5C709700D17696 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6673C41A1A5C709700D17696 /* MainMenu.xib */; };
 		6673C4281A5C709700D17696 /* c02emuTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6673C4271A5C709700D17696 /* c02emuTests.swift */; };
+		66DE98E51A61B68400AD860C /* rom.bin in CopyFiles */ = {isa = PBXBuildFile; fileRef = 66DE98E41A61B68400AD860C /* rom.bin */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -25,7 +26,27 @@
 			remoteGlobalIDString = 6673C40C1A5C709700D17696;
 			remoteInfo = c02emu;
 		};
+		66DE98E11A61B4D900AD860C /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 6673C4051A5C709700D17696 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 66DE98DD1A61B49A00AD860C;
+			remoteInfo = c02emuROM;
+		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		66DE98E31A61B65A00AD860C /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 7;
+			files = (
+				66DE98E51A61B68400AD860C /* rom.bin in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		6609A1201A6166C300CA5B87 /* c02emu_util.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = c02emu_util.h; path = emu/c02emu_util.h; sourceTree = "<group>"; };
@@ -48,6 +69,7 @@
 		668D3C431A5DBF0F00D9C4B9 /* c02emu.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = c02emu.c; path = emu/c02emu.c; sourceTree = "<group>"; };
 		668D3C441A5DBF0F00D9C4B9 /* c02emu.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = c02emu.h; path = emu/c02emu.h; sourceTree = "<group>"; };
 		668D3C461A5DF42C00D9C4B9 /* c02emu-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "c02emu-Bridging-Header.h"; sourceTree = "<group>"; };
+		66DE98E41A61B68400AD860C /* rom.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; name = rom.bin; path = ../Software/ROM/rom.bin; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -104,6 +126,7 @@
 		6673C4101A5C709700D17696 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				66DE98E41A61B68400AD860C /* rom.bin */,
 				6673C4111A5C709700D17696 /* Info.plist */,
 			);
 			name = "Supporting Files";
@@ -144,6 +167,23 @@
 		};
 /* End PBXGroup section */
 
+/* Begin PBXLegacyTarget section */
+		66DE98DD1A61B49A00AD860C /* c02emuROM */ = {
+			isa = PBXLegacyTarget;
+			buildArgumentsString = "$(ACTION)";
+			buildConfigurationList = 66DE98E01A61B49A00AD860C /* Build configuration list for PBXLegacyTarget "c02emuROM" */;
+			buildPhases = (
+			);
+			buildToolPath = ./build.sh;
+			buildWorkingDirectory = /Users/pelle/Dropbox/prog/c02emu/Software/ROM;
+			dependencies = (
+			);
+			name = c02emuROM;
+			passBuildSettingsInEnvironment = 1;
+			productName = c02emuROM;
+		};
+/* End PBXLegacyTarget section */
+
 /* Begin PBXNativeTarget section */
 		6673C40C1A5C709700D17696 /* c02emu */ = {
 			isa = PBXNativeTarget;
@@ -152,10 +192,12 @@
 				6673C4091A5C709700D17696 /* Sources */,
 				6673C40A1A5C709700D17696 /* Frameworks */,
 				6673C40B1A5C709700D17696 /* Resources */,
+				66DE98E31A61B65A00AD860C /* CopyFiles */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				66DE98E21A61B4D900AD860C /* PBXTargetDependency */,
 			);
 			name = c02emu;
 			productName = c02emu;
@@ -196,6 +238,9 @@
 						CreatedOnToolsVersion = 6.1;
 						TestTargetID = 6673C40C1A5C709700D17696;
 					};
+					66DE98DD1A61B49A00AD860C = {
+						CreatedOnToolsVersion = 6.2;
+					};
 				};
 			};
 			buildConfigurationList = 6673C4081A5C709700D17696 /* Build configuration list for PBXProject "c02emu" */;
@@ -213,6 +258,7 @@
 			targets = (
 				6673C40C1A5C709700D17696 /* c02emu */,
 				6673C4201A5C709700D17696 /* c02emuTests */,
+				66DE98DD1A61B49A00AD860C /* c02emuROM */,
 			);
 		};
 /* End PBXProject section */
@@ -264,6 +310,11 @@
 			isa = PBXTargetDependency;
 			target = 6673C40C1A5C709700D17696 /* c02emu */;
 			targetProxy = 6673C4221A5C709700D17696 /* PBXContainerItemProxy */;
+		};
+		66DE98E21A61B4D900AD860C /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 66DE98DD1A61B49A00AD860C /* c02emuROM */;
+			targetProxy = 66DE98E11A61B4D900AD860C /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -419,6 +470,32 @@
 			};
 			name = Release;
 		};
+		66DE98DE1A61B49A00AD860C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DEBUGGING_SYMBOLS = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		66DE98DF1A61B49A00AD860C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -448,6 +525,14 @@
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
+		};
+		66DE98E01A61B49A00AD860C /* Build configuration list for PBXLegacyTarget "c02emuROM" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				66DE98DE1A61B49A00AD860C /* Debug */,
+				66DE98DF1A61B49A00AD860C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
 		};
 /* End XCConfigurationList section */
 	};

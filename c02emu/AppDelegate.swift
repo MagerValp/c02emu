@@ -36,6 +36,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     
     func applicationDidFinishLaunching(aNotification: NSNotification) {
         emuState = c02emuCreate()
+        let romData = NSData(contentsOfURL: NSBundle.mainBundle().URLForResource("rom", withExtension: "bin")!)!
+        c02emuLoadROM(emuState, romData.bytes, UInt(romData.length))
         c02emuReset(emuState)
         
         /* Pick a size for the scene */

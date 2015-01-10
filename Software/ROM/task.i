@@ -1,0 +1,5 @@
+NUM_TASKS	= 8
+TASK_RUNNING	= 0
+TASK_FREE	= $ff
+TASK_WAIT_SEM	= $ff ^ 1
+TASK_WAIT_VBL	= $ff ^ 2

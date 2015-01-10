@@ -59,6 +59,7 @@ class GameScene: SKScene {
     }
     
     override func update(currentTime: CFTimeInterval) {
+        let reason = c02emuRun(emuState)
         if screenCharNodesSetup {
             let output = c02emuGetOutput(emuState)
             for i in 0..<80 * 50 {

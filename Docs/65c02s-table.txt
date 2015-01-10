@@ -1,0 +1,32 @@
+BRK	ORA	NOP	NOP	TSB	ORA	ASL	RMB0	PHP	ORA	ASL	NOP	TSB	ORA	ASL	BBR0
+7	izx 6	imm 2		zp 5	zp 3	zp 5	zp 5	3	imm 2	2		abs 6	abs 4	abs 6	rel 2*
+BPL	ORA	ORA	NOP	TRB	ORA	ASL	RMB1	CLC	ORA	INC	NOP	TRB	ORA	ASL	BBR1
+rel 2*	izy 5*	izp 5		zp 5	zpx 4	zpx 6	zp 5	2	aby 4*	2		abs 6	abx 4*	abx 6*	rel 2*
+JSR	AND	NOP	NOP	BIT	AND	ROL	RMB2	PLP	AND	ROL	NOP	BIT	AND	ROL	BBR2
+abs 6	izx 6	imm 2		zp 3	zp 3	zp 5	zp 5	4	imm 2	2		abs 4	abs 4	abs 6	rel 2*
+BMI	AND	AND	NOP	BIT	AND	ROL	RMB3	SEC	AND	DEC	NOP	BIT	AND	ROL	BBR3
+rel 2*	izy 5*	izp 5		zpx 4	zpx 4	zpx 6	zp 5	2	aby 4*	2		abx 4*	abx 4*	abx 6*	rel 2*
+RTI	EOR	NOP	NOP	NOP	EOR	LSR	RMB4	PHA	EOR	LSR	NOP	JMP	EOR	LSR	BBR4
+6	izx 6	imm 2		zp 3	zp 3	zp 5	zp 5	3	imm 2	2		abs 3	abs 4	abs 6	rel 2*
+BVC	EOR	EOR	NOP	NOP	EOR	LSR	RMB5	CLI	EOR	PHY	NOP	NOP	EOR	LSR	BBR5
+rel 2*	izy 5*	izp 5		zpx 4	zpx 4	zpx 6	zp 5	2	aby 4*	3			abx 4*	abx 6*	rel 2*
+RTS	ADC	NOP	NOP	STZ	ADC	ROR	RMB6	PLA	ADC	ROR	NOP	JMP	ADC	ROR	BBR6
+6	izx 6	imm 2		zp 3	zp 3	zp 5	zp 5	4	imm 2	2		ind 6	abs 4	abs 6	rel 2*
+BVS	ADC	ADC	NOP	STZ	ADC	ROR	RMB7	SEI	ADC	PLY	NOP	JMP	ADC	ROR	BBR7
+rel 2*	izy 5*	izp 5		zpx 4	zpx 4	zpx 6	zp 5	2	aby 4*	4		iax 6	abx 4*	abx 6*	rel 2*
+BRA	STA	NOP	NOP	STY	STA	STX	SMB0	DEY	BIT	TXA	NOP	STY	STA	STX	BBS0
+rel 3*	izx 6	imm 2		zp 3	zp 3	zp 3	zp 5	2	imm 2	2		abs 4	abs 4	abs 4	rel 2*
+BCC	STA	STA	NOP	STY	STA	STX	SMB1	TYA	STA	TXS	NOP	STZ	STA	STZ	BBS1
+rel 2*	izy 6	izp 5		zpx 4	zpx 4	zpy 4	zp 5	2	aby 5	2		abs 4	abx 5	abx 5	rel 2*
+LDY	LDA	LDX	NOP	LDY	LDA	LDX	SMB2	TAY	LDA	TAX	NOP	LDY	LDA	LDX	BBS2
+imm 2	izx 6	imm 2		zp 3	zp 3	zp 3	zp 5	2	imm 2	2		abs 4	abs 4	abs 4	rel 2*
+BCS	LDA	LDA	NOP	LDY	LDA	LDX	SMB3	CLV	LDA	TSX	NOP	LDY	LDA	LDX	BBS3
+rel 2*	izy 5*	izp 5		zpx 4	zpx 4	zpy 4	zp 5	2	aby 4*	2		abx 4*	abx 4*	aby 4*	rel 2*
+CPY	CMP	NOP	NOP	CPY	CMP	DEC	SMB4	INY	CMP	DEX	WAI	CPY	CMP	DEC	BBS4
+imm 2	izx 6	imm 2		zp 3	zp 3	zp 5	zp 5	2	imm 2	2	3	abs 4	abs 4	abs 6	rel 2*
+BNE	CMP	CMP	NOP	NOP	CMP	DEC	SMB5	CLD	CMP	PHX	STP	NOP	CMP	DEC	BBS5
+rel 2*	izy 5*	izp 5		zpx 4	zpx 4	zpx 6	zp 5	2	aby 4*	3	3		abx 4*	abx 6*	rel 2*
+CPX	SBC	NOP	NOP	CPX	SBC	INC	SMB6	INX	SBC	NOP	NOP	CPX	SBC	INC	BBS6
+imm 2	izx 6	imm 2		zp 3	zp 3	zp 5	zp 5	2	imm 2	2		abs 4	abs 4	abs 6	rel 2*
+BEQ	SBC	SBC	NOP	NOP	SBC	INC	SMB7	SED	SBC	PLX	NOP	NOP	SBC	INC	BBS7
+rel 2*	izy 5*	izp 5		zpx 4	zpx 4	zpx 6	zp 5	2	aby 4*	4			abx 4*	abx 6*	rel 2*

@@ -54,7 +54,8 @@ void c02emuReset(C02EmuState *state);
 
 /// The reasons that c02emuRun may return.
 typedef enum {
-    C02EMU_FRAME_READY=1
+    C02EMU_FRAME_READY=1,
+    C02EMU_CPU_STOPPED,
 } C02EmuReturnReason;
 
 /// Execute until a stopping condition occurs.

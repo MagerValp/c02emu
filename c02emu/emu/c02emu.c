@@ -11,58 +11,13 @@
 #include "c02emu.h"
 
 
-
-#pragma mark • Declarations
-
-
-typedef uint32_t LongAddr;
-
-#define flag_c 0x01
-#define flag_z 0x02
-#define flag_i 0x04
-#define flag_d 0x08
-#define flag_b 0x10
-#define flag_1 0x20
-#define flag_v 0x40
-#define flag_n 0x80
-
-struct _c02EmuState {
-    struct _state_cpu {
-        Byte a, x, y, status, stack;
-        Addr pc;
-    } cpu;
-    struct _state_mem {
-        Byte ram[256 * 4096];
-        Byte rom[4096];
-    } mem;
-    struct _io {
-        struct _state_io_mmu {
-            Byte page[16];
-        } mmu;
-        struct _state_io_display {
-            Byte page;
-            Byte ram[256 * 256];
-        } display;
-    } io;
-};
-
-
-
-#pragma mark • Private function prototypes
-
-
-static LongAddr mmu_addr(C02EmuState *state, Addr addr);
-static Byte raw_mem_read(C02EmuState *state, Addr addr);
-static void raw_mem_write(C02EmuState *state, Addr addr, Byte byte);
-static Byte raw_read_io(C02EmuState *state, Addr addr);
-static void raw_write_io(C02EmuState *state, Addr addr, Byte byte);
-
-static Byte raw_io_mmu_read(C02EmuState *state, Addr addr);
-static void raw_io_mmu_write(C02EmuState *state, Addr addr, Byte byte);
-
-static Addr display_addr(C02EmuState *state, Addr addr);
-static Byte raw_io_display_read(C02EmuState *state, Addr addr);
-static void raw_io_display_write(C02EmuState *state, Addr addr, Byte byte);
+// Include both headers and implementation, as the declarations are static.
+#include "c02emu_private.h"
+#include "c02emu_private.c"
+#include "c02emu_uops.h"
+#include "c02emu_uops.c"
+#include "c02emu_optable.h"
+#include "c02emu_optable.c"
 
 
 
@@ -90,6 +45,10 @@ C02EmuState *c02emuCreate(void) {
     
     c02emuReset(state);
     
+    state->cycle_counter = 0;
+    state->frame_counter = 0;
+    state->vbl_counter = cycles_per_frame(state->frame_counter);
+    
     return state;
 }
 
@@ -115,11 +74,66 @@ void c02emuReset(C02EmuState *state) {
     state->io.mmu.page[0x0f] = 0xff;
     state->cpu.pc = raw_mem_read(state, 0xfffc) | (raw_mem_read(state, 0xfffd) << 8);
     state->cpu.status |= flag_i;
+    state->cpu.op.cycle = C02EMU_OP_DONE;
+    state->cpu.op.uop_list = NULL;
 }
 
 
 C02EmuReturnReason c02emuRun(C02EmuState *state) {
-    return C02EMU_FRAME_READY;
+    Byte op;
+    
+    for (;;) {
+        
+        // This is a simple instruction decoding state machine, with
+        // op.cycle as the state. If op.cycle < 0 no instruction is
+        // currently executing, otherwise we're executing uops from
+        // op.uop_list.
+        
+        if (state->cpu.op.cycle == C02EMU_OP_DONE) {
+            
+            if (!(state->cpu.status & flag_i)) {
+                // Evaluate IRQs.
+            }
+            // Evaluate NMIs.
+            
+            op = raw_mem_read(state, (state->cpu.pc)++);
+            state->cpu.op.opcode = op;
+            state->cpu.op.uop_list = op_table[op];
+            state->cpu.op.cycle = C02EMU_OP_CYCLE_1;
+            state->cpu.op.address_fixup = false;
+            state->cpu.op.decimal_fixup = false;
+            
+        } else if(state->cpu.op.cycle == C02EMU_OP_STOPPED) {
+        
+            if (!state->cpu.op.stop_notified) {
+                state->cpu.op.stop_notified = true;
+                return C02EMU_CPU_STOPPED;
+            }
+        
+        } else if(state->cpu.op.cycle == C02EMU_OP_WAITING) {
+            
+            if (!(state->cpu.status & flag_i)) {
+                // Evaluate IRQs.
+            } else {
+                // Evaluate IRQs, but continue at PC instead of jumping to vector.
+            }
+            // Evaluate NMIs.
+            
+        } else {
+            
+            state->cpu.op.uop_list[state->cpu.op.cycle](state);
+            if (state->cpu.op.cycle != C02EMU_OP_DONE) {
+                state->cpu.op.cycle += 1;
+            }
+        }
+        
+        state->cycle_counter += 1;
+        if (state->cycle_counter >= state->vbl_counter) {
+            state->frame_counter += 1;
+            state->vbl_counter += cycles_per_frame(state->frame_counter);
+            return C02EMU_FRAME_READY;
+        }
+    }
 }
 
 
@@ -128,130 +142,4 @@ const C02EmuOutput c02emuGetOutput(C02EmuState *state) {
     output.display.mode = C02EMU_DISPLAY_MODE_TEXT_80X50;
     output.display.data = state->io.display.ram;
     return output;
-}
-
-
-#pragma mark • Private functions
-
-
-// Memory access and address decoding.
-
-
-static LongAddr mmu_addr(C02EmuState *state, Addr addr) {
-    unsigned int sourcePage = addr >> 12;
-    Byte mmuPage = state->io.mmu.page[sourcePage];
-    return (mmuPage << 12) | (addr & 0x0fff);
-}
-
-
-static Byte raw_mem_read(C02EmuState *state, Addr addr) {
-    unsigned int region = addr & 0xf000;
-    
-    if (region == 0xe000 && state->io.mmu.page[0x0e] == 0xfe) {
-        // Reads from $exxx access I/O if MMU page is $fe.
-        return raw_read_io(state, addr);
-    
-    } else if (region == 0xf000 && state->io.mmu.page[0x0f] == 0xff) {
-        // Reads from $fxxx access ROM if MMU page is $ff.
-        return state->mem.rom[addr & 0x0fff];
-    
-    } else {
-        return state->mem.ram[mmu_addr(state, addr)];
-    }
-}
-
-
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wunused-function"
-static void raw_mem_write(C02EmuState *state, Addr addr, Byte byte) {
-#pragma clang diagnostic pop
-    unsigned int region = addr & 0xf000;
-    
-    if (region == 0xf000 || (region == 0xe000 && state->io.mmu.page[0x0e] == 0xfe)) {
-        // Writes to $fxxx always go to I/O.
-        // Writes to $exxx go to I/O if MMU page is $fe.
-        raw_write_io(state, addr, byte);
-        return;
-        
-    } else {
-        state->mem.ram[mmu_addr(state, addr)] = byte;
-        return;
-    }
-}
-
-
-// I/O access.
-
-
-static Byte raw_read_io(C02EmuState *state, Addr addr) {
-    switch (addr & 0x0f00) {
-        case 0x0000:
-            return raw_io_mmu_read(state, addr);
-            
-        case 0x0200:
-        case 0x0300:
-            return raw_io_display_read(state, addr);
-            
-        default:
-            return 0xff;
-    }
-}
-
-
-static void raw_write_io(C02EmuState *state, Addr addr, Byte byte) {
-    switch (addr & 0x0f00) {
-        case 0x0000:
-            raw_io_mmu_write(state, addr, byte);
-            return;
-            
-        case 0x0200:
-        case 0x0300:
-            raw_io_display_write(state, addr, byte);
-            return;
-            
-        default:
-            return;
-    }
-}
-
-
-// MMU.
-
-
-static Byte raw_io_mmu_read(C02EmuState *state, Addr addr) {
-    return state->io.mmu.page[addr & 0x000f];
-}
-
-
-static void raw_io_mmu_write(C02EmuState *state, Addr addr, Byte byte) {
-    state->io.mmu.page[addr & 0x000f] = byte;
-}
-
-
-// Display.
-
-
-static Addr display_addr(C02EmuState *state, Addr addr) {
-    addr &= 0x00ff;
-    addr |= state->io.display.page << 8;
-    addr &= sizeof(state->io.display.ram) - 1;
-    return addr;
-}
-
-
-static Byte raw_io_display_read(C02EmuState *state, Addr addr) {
-    if (addr & 0x0100) {
-        return state->io.display.page;
-    } else {
-        return state->io.display.ram[display_addr(state, addr)];
-    }
-}
-
-
-static void raw_io_display_write(C02EmuState *state, Addr addr, Byte byte) {
-    if (addr & 0x0100) {
-        state->io.display.page = byte;
-    } else {
-        state->io.display.ram[display_addr(state, addr)] = byte;
-    }
 }

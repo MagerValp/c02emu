@@ -32,17 +32,17 @@ class GameScene: SKScene {
             charsetProperties80x50[String(format:"char_%03d", i)] = charImage
         }
         let atlas80x50 = SKTextureAtlas(dictionary: charsetProperties80x50)
-        self.charTextures = []
+        charTextures = []
         for i in 0..<256 {
             let texture = atlas80x50.textureNamed(String(format:"char_%03d", i))
             texture.filteringMode = .Nearest
-            self.charTextures.append(texture)
+            charTextures.append(texture)
         }
         screenCharNodes = []
         for y in 0..<50 {
             for x in 0..<80 {
                 let i = (y % 8) * 32 + x % 32
-                let sprite = SKSpriteNode(texture: self.charTextures[i])
+                let sprite = SKSpriteNode(texture: charTextures[i])
                 sprite.anchorPoint = CGPointZero
                 sprite.position = CGPoint(x: x*8, y: 400 - y*8 - 8)
                 self.addChild(sprite)
@@ -50,7 +50,7 @@ class GameScene: SKScene {
             }
         }
         
-        self.screenCharNodesSetup = true
+        screenCharNodesSetup = true
     }
     
     override func mouseDown(theEvent: NSEvent) {
@@ -59,12 +59,12 @@ class GameScene: SKScene {
     }
     
     override func update(currentTime: CFTimeInterval) {
-        if self.screenCharNodesSetup {
-            let output = c02emuGetOutput(self.emuState)
+        if screenCharNodesSetup {
+            let output = c02emuGetOutput(emuState)
             for i in 0..<80 * 50 {
-                self.screenCharNodes[i].texture = self.charTextures[Int(output.display.data[i])]
+                screenCharNodes[i].texture = charTextures[Int(output.display.data[i])]
             }
-            self.counter++
+            counter++
         }
     }
 }

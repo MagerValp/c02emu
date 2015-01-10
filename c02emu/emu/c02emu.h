@@ -45,7 +45,7 @@ void c02emuDestroy(C02EmuState *state);
 /// @param state    Emulator state.
 /// @param data     ROM image.
 /// @param size     Size of ROM image in bytes.
-void c02emuLoadROM(C02EmuState *state, Byte *data, size_t size);
+void c02emuLoadROM(C02EmuState *state, const void *data, size_t size);
 
 /// Reset emulated machine.
 ///

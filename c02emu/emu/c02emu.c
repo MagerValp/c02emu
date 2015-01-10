@@ -19,6 +19,8 @@
 #include "c02emu_optable.h"
 #include "c02emu_optable.c"
 
+#include "c02emu_util.h"
+
 
 
 #pragma mark • Public functions
@@ -38,7 +40,7 @@ C02EmuState *c02emuCreate(void) {
     state->cpu.pc = 0x0000;
     
     memset(state->mem.ram, 0x00, sizeof(state->mem.ram));
-    memset(state->mem.rom, 0xcb, sizeof(state->mem.rom));
+    memset(state->mem.rom, 0xdb, sizeof(state->mem.rom));
     
     memset(state->io.display.ram, 0xff, sizeof(state->io.display.ram));
     state->io.display.page = 0x00;
@@ -58,7 +60,7 @@ void c02emuDestroy(C02EmuState *state) {
 }
 
 
-void c02emuLoadROM(C02EmuState *state, Byte *data, size_t size) {
+void c02emuLoadROM(C02EmuState *state, const void *data, size_t size) {
     if (size > sizeof(state->mem.rom)) {
         size = sizeof(state->mem.rom);
     }
@@ -85,9 +87,7 @@ C02EmuReturnReason c02emuRun(C02EmuState *state) {
     for (;;) {
         
         // This is a simple instruction decoding state machine, with
-        // op.cycle as the state. If op.cycle < 0 no instruction is
-        // currently executing, otherwise we're executing uops from
-        // op.uop_list.
+        // op.cycle keeping track of the current step.
         
         if (state->cpu.op.cycle == C02EMU_OP_DONE) {
             
@@ -122,7 +122,7 @@ C02EmuReturnReason c02emuRun(C02EmuState *state) {
         } else {
             
             state->cpu.op.uop_list[state->cpu.op.cycle](state);
-            if (state->cpu.op.cycle != C02EMU_OP_DONE) {
+            if (state->cpu.op.cycle < C02EMU_OP_DONE) {
                 state->cpu.op.cycle += 1;
             }
         }
@@ -142,4 +142,18 @@ const C02EmuOutput c02emuGetOutput(C02EmuState *state) {
     output.display.mode = C02EMU_DISPLAY_MODE_TEXT_80X50;
     output.display.data = state->io.display.ram;
     return output;
+}
+
+
+C02EmuCPURegs *c02emuCPURegs(C02EmuState *state) {
+    return (C02EmuCPURegs *)&state->cpu;
+}
+
+
+Byte c02emuCPURead(C02EmuState *state, Addr addr) {
+    return raw_mem_read(state, addr);
+}
+
+void c02emuCPUWrite(C02EmuState *state, Addr addr, Byte byte) {
+    raw_mem_write(state, addr, byte);
 }

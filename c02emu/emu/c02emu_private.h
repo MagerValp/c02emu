@@ -29,8 +29,6 @@ typedef uint32_t LongAddr;
 #define cycles_per_frame(FRAME_CTR) ((FRAME_CTR % 3) == 0 ? 133334 : 133333)
 
 typedef enum {
-    C02EMU_OP_STOPPED=-2,
-    C02EMU_OP_WAITING=-1,
     C02EMU_OP_CYCLE_1=0,    // Cycle 1 value is 0, and so on, to correctly index op table.
     C02EMU_OP_CYCLE_2,
     C02EMU_OP_CYCLE_3,
@@ -39,6 +37,8 @@ typedef enum {
     C02EMU_OP_CYCLE_6,
     C02EMU_OP_CYCLE_7,
     C02EMU_OP_DONE,
+    C02EMU_OP_STOPPED,
+    C02EMU_OP_WAITING,
 } C02EmuOpCycle;
 
 

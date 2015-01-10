@@ -11,6 +11,7 @@
 
 
 #import "c02emu.h"
+#import "c02emu_util.h"
 
 
 #endif

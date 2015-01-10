@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		6609A11D1A605D1D00CA5B87 /* c02emu.c in Sources */ = {isa = PBXBuildFile; fileRef = 668D3C431A5DBF0F00D9C4B9 /* c02emu.c */; settings = {COMPILER_FLAGS = "-ferror-limit=100"; }; };
+		6609A11E1A61424800CA5B87 /* c02emu.c in Sources */ = {isa = PBXBuildFile; fileRef = 668D3C431A5DBF0F00D9C4B9 /* c02emu.c */; };
 		6673C4131A5C709700D17696 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6673C4121A5C709700D17696 /* AppDelegate.swift */; };
 		6673C4151A5C709700D17696 /* GameScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6673C4141A5C709700D17696 /* GameScene.swift */; };
 		6673C4171A5C709700D17696 /* GameScene.sks in Resources */ = {isa = PBXBuildFile; fileRef = 6673C4161A5C709700D17696 /* GameScene.sks */; };
@@ -27,6 +28,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		6609A1201A6166C300CA5B87 /* c02emu_util.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = c02emu_util.h; path = emu/c02emu_util.h; sourceTree = "<group>"; };
 		661BAC701A5FB3BC00202909 /* c02emu_uops.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = c02emu_uops.c; path = emu/c02emu_uops.c; sourceTree = "<group>"; };
 		661BAC711A5FB41600202909 /* c02emu_private.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = c02emu_private.c; path = emu/c02emu_private.c; sourceTree = "<group>"; };
 		661BAC721A5FB41600202909 /* c02emu_private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = c02emu_private.h; path = emu/c02emu_private.h; sourceTree = "<group>"; };
@@ -135,6 +137,7 @@
 				661BAC741A5FB51D00202909 /* c02emu_uops.h */,
 				661BAC751A5FB6C200202909 /* c02emu_optable.c */,
 				661BAC761A5FB6C200202909 /* c02emu_optable.h */,
+				6609A1201A6166C300CA5B87 /* c02emu_util.h */,
 			);
 			name = "Emulator Core";
 			sourceTree = "<group>";
@@ -250,6 +253,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				6673C4281A5C709700D17696 /* c02emuTests.swift in Sources */,
+				6609A11E1A61424800CA5B87 /* c02emu.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -313,6 +317,7 @@
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
+				SWIFT_OBJC_BRIDGING_HEADER = "c02emu/c02emu-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
@@ -349,6 +354,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = macosx;
+				SWIFT_OBJC_BRIDGING_HEADER = "c02emu/c02emu-Bridging-Header.h";
 			};
 			name = Release;
 		};
@@ -361,7 +367,6 @@
 				INFOPLIST_FILE = c02emu/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_OBJC_BRIDGING_HEADER = "c02emu/c02emu-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
@@ -375,7 +380,6 @@
 				INFOPLIST_FILE = c02emu/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_OBJC_BRIDGING_HEADER = "c02emu/c02emu-Bridging-Header.h";
 			};
 			name = Release;
 		};

@@ -202,6 +202,11 @@ static void u_##OP##_ad(C02EmuState *state) { \
     op_##OP(state, raw_mem_read(state, AD)); \
 }
 
+#define SYNTHESIZE_w_ad(OP) \
+static void u_##OP##_ad(C02EmuState *state) { \
+    op_##OP(state, AD); \
+}
+
 #define SYNTHESIZE_rmw_ad(OP) \
 static void u_##OP##_ad(C02EmuState *state) { \
     op_##OP(state, AD); \
@@ -239,12 +244,12 @@ static void u_##OP##_ady(C02EmuState *state) { \
 
 #define SYNTHESIZE_w_adx(OP) \
 static void u_##OP##_adx(C02EmuState *state) { \
-    op_##OP(state, raw_mem_read(state, AD + X)); \
+    op_##OP(state, AD + X); \
 }
 
 #define SYNTHESIZE_w_ady(OP) \
 static void u_##OP##_ady(C02EmuState *state) { \
-    op_##OP(state, raw_mem_read(state, AD + Y)); \
+    op_##OP(state, AD + Y); \
 }
 
 #define SYNTHESIZE_alx(OP) \
@@ -252,9 +257,19 @@ static void u_##OP##_alx(C02EmuState *state) { \
     op_##OP(state, raw_mem_read(state, (ADL + X) & 0xff)); \
 }
 
+#define SYNTHESIZE_w_alx(OP) \
+static void u_##OP##_alx(C02EmuState *state) { \
+    op_##OP(state, (ADL + X) & 0xff); \
+}
+
 #define SYNTHESIZE_aly(OP) \
 static void u_##OP##_aly(C02EmuState *state) { \
     op_##OP(state, raw_mem_read(state, (ADL + Y) & 0xff)); \
+}
+
+#define SYNTHESIZE_w_aly(OP) \
+static void u_##OP##_aly(C02EmuState *state) { \
+    op_##OP(state, (ADL + Y) & 0xff); \
 }
 
 
@@ -1032,10 +1047,10 @@ static void op_STA(C02EmuState *state, Addr addr) {
     raw_mem_write(state, addr, A);
     OP_DONE();
 }
-SYNTHESIZE_ad(STA)
+SYNTHESIZE_w_ad(STA)
 SYNTHESIZE_w_adx(STA)
 SYNTHESIZE_w_ady(STA)
-SYNTHESIZE_alx(STA)
+SYNTHESIZE_w_alx(STA)
 
 
 static void u_STP_imp(C02EmuState *state) {
@@ -1049,25 +1064,25 @@ static void op_STX(C02EmuState *state, Addr addr) {
     raw_mem_write(state, addr, X);
     OP_DONE();
 }
-SYNTHESIZE_ad(STX)
-SYNTHESIZE_aly(STX)
+SYNTHESIZE_w_ad(STX)
+SYNTHESIZE_w_aly(STX)
 
 
 static void op_STY(C02EmuState *state, Addr addr) {
     raw_mem_write(state, addr, Y);
     OP_DONE();
 }
-SYNTHESIZE_ad(STY)
-SYNTHESIZE_alx(STY)
+SYNTHESIZE_w_ad(STY)
+SYNTHESIZE_w_alx(STY)
 
 
 static void op_STZ(C02EmuState *state, Addr addr) {
     raw_mem_write(state, addr, 0);
     OP_DONE();
 }
-SYNTHESIZE_ad(STZ)
+SYNTHESIZE_w_ad(STZ)
 SYNTHESIZE_w_adx(STZ)
-SYNTHESIZE_alx(STZ)
+SYNTHESIZE_w_alx(STZ)
 
 
 static void op_TAX(C02EmuState *state) {

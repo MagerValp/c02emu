@@ -496,10 +496,10 @@ static void u_BRK_p(C02EmuState *state) {
     u_push(state, P | flag_b);
 }
 static void u_BRK_adl(C02EmuState *state) {
-    PC |= raw_mem_read(state, 0xfffe);
+    PC = (PC & 0xff00) | raw_mem_read(state, 0xfffe);
 }
 static void u_BRK_adh(C02EmuState *state) {
-    PC |= raw_mem_read(state, 0xffff) << 8;
+    PC = (PC & 0x00ff) | (raw_mem_read(state, 0xffff) << 8);
     OP_DONE();
 }
 
@@ -926,19 +926,19 @@ static void u_RTI_p(C02EmuState *state) {
     P = u_pull(state);
 }
 static void u_RTI_pcl(C02EmuState *state) {
-    PC |= u_pull(state);
+    PC = (PC & 0xff00) | u_pull(state);
 }
 static void u_RTI_pch(C02EmuState *state) {
-    PC |= u_pull(state) << 8;
+    PC = (PC & 0x00ff) | (u_pull(state) << 8);
     OP_DONE();
 }
 
 
 static void u_RTS_pcl(C02EmuState *state) {
-    PC |= u_pull(state);
+    PC = (PC & 0xff00) | u_pull(state);
 }
 static void u_RTS_pch(C02EmuState *state) {
-    PC |= u_pull(state) << 8;
+    PC = (PC & 0x00ff) | (u_pull(state) << 8);
 }
 static void u_RTS_incpc(C02EmuState *state) {
     raw_mem_read(state, PC++);

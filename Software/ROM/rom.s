@@ -21,13 +21,13 @@ reset:
 	ldx #$0d
 @reset_mmu:
 	txa
-	sta $e000,x
+	sta $f000,x
 	dex
 	bpl @reset_mmu
 	lda #$fe
-	sta $e00e
+	sta $f00e
 	lda #$ff
-	sta $e00f
+	sta $f00f
 	
 	ldx #0
 	txa

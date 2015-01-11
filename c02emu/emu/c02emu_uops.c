@@ -833,7 +833,7 @@ static void u_PLY_imp(C02EmuState *state) {
 
 
 static void u_PLP_imp(C02EmuState *state) {
-    P = u_pull(state);
+    P = u_pull(state) | flag_1;
     OP_DONE();
 }
 
@@ -923,7 +923,7 @@ SYNTHESIZE_rmw_adlx(ROR)
 
 
 static void u_RTI_p(C02EmuState *state) {
-    P = u_pull(state);
+    P = u_pull(state) | flag_1;
 }
 static void u_RTI_pcl(C02EmuState *state) {
     PC = (PC & 0xff00) | u_pull(state);

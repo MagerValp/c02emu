@@ -82,11 +82,11 @@ struct _c02EmuState {
         Byte ram[256 * 4096];
         Byte rom[4096];
     } mem;
-    struct _io {
-        struct _state_io_mmu {
+    struct {
+        struct {
             Byte page[16];
         } mmu;
-        struct _state_io_display {
+        struct {
             Byte page;
             Byte ram[256 * 256];
         } display;
@@ -95,6 +95,11 @@ struct _c02EmuState {
     uint64_t cycle_counter;
     uint64_t frame_counter;
     uint64_t vbl_counter;
+    
+    struct {
+        bool trace_cpu;
+        bool trace_ram;
+    } monitor;
 };
 
 
@@ -110,6 +115,9 @@ static void raw_io_mmu_write(C02EmuState *state, Addr addr, Byte byte);
 static Addr display_addr(C02EmuState *state, Addr addr);
 static Byte raw_io_display_read(C02EmuState *state, Addr addr);
 static void raw_io_display_write(C02EmuState *state, Addr addr, Byte byte);
+
+static Byte raw_io_debug_read(C02EmuState *state, Addr addr);
+static void raw_io_debug_write(C02EmuState *state, Addr addr, Byte byte);
 
 
 #endif /* defined(__c02emu__c02emu_private__) */

@@ -51,6 +51,9 @@ C02EmuState *c02emuCreate(void) {
     state->frame_counter = 0;
     state->vbl_counter = cycles_per_frame(state->frame_counter);
     
+    state->monitor.trace_cpu = false;
+    state->monitor.trace_ram = false;
+    
     return state;
 }
 
@@ -96,8 +99,28 @@ C02EmuReturnReason c02emuRun(C02EmuState *state) {
             }
             // Evaluate NMIs.
             
+            if (state->monitor.trace_cpu) {
+                fputs("  PC   A  X  Y  S  nv1bdizc\n", stderr);
+                fprintf(stderr, ".;%04x %02x %02x %02x %02x %d%d1%d%d%d%d%d\n",
+                        state->cpu.pc,
+                        state->cpu.a,
+                        state->cpu.x,
+                        state->cpu.y,
+                        state->cpu.stack,
+                        (state->cpu.status & flag_n) >> 7,
+                        (state->cpu.status & flag_v) >> 6,
+                        (state->cpu.status & flag_b) >> 4,
+                        (state->cpu.status & flag_d) >> 3,
+                        (state->cpu.status & flag_i) >> 2,
+                        (state->cpu.status & flag_z) >> 1,
+                        (state->cpu.status & flag_c));
+            }
+            
             op = raw_mem_read(state, (state->cpu.pc)++);
             state->cpu.op.opcode = op;
+            if (state->monitor.trace_cpu) {
+                fprintf(stderr, "PC = %04x OP = %02x\n", (state->cpu.pc - 1) & 0xffff, op);
+            }
             state->cpu.op.uop_list = op_table[op];
             state->cpu.op.cycle = C02EMU_OP_CYCLE_1;
             state->cpu.op.address_fixup = false;

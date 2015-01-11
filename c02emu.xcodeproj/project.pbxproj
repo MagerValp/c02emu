@@ -16,6 +16,7 @@
 		6673C41C1A5C709700D17696 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6673C41A1A5C709700D17696 /* MainMenu.xib */; };
 		6673C4281A5C709700D17696 /* c02emuTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6673C4271A5C709700D17696 /* c02emuTests.swift */; };
 		66DE98E51A61B68400AD860C /* rom.bin in CopyFiles */ = {isa = PBXBuildFile; fileRef = 66DE98E41A61B68400AD860C /* rom.bin */; };
+		66DE98E91A6324BF00AD860C /* 6502_functional_test.bin in Resources */ = {isa = PBXBuildFile; fileRef = 66DE98E81A6324BF00AD860C /* 6502_functional_test.bin */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -70,6 +71,7 @@
 		668D3C441A5DBF0F00D9C4B9 /* c02emu.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = c02emu.h; path = emu/c02emu.h; sourceTree = "<group>"; };
 		668D3C461A5DF42C00D9C4B9 /* c02emu-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "c02emu-Bridging-Header.h"; sourceTree = "<group>"; };
 		66DE98E41A61B68400AD860C /* rom.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; name = rom.bin; path = ../Software/ROM/rom.bin; sourceTree = "<group>"; };
+		66DE98E81A6324BF00AD860C /* 6502_functional_test.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; name = 6502_functional_test.bin; path = ../Software/Test/6502_65C02_functional_tests/6502_functional_test.bin; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -144,6 +146,7 @@
 		6673C4251A5C709700D17696 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				66DE98E81A6324BF00AD860C /* 6502_functional_test.bin */,
 				6673C4261A5C709700D17696 /* Info.plist */,
 			);
 			name = "Supporting Files";
@@ -278,6 +281,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				66DE98E91A6324BF00AD860C /* 6502_functional_test.bin in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

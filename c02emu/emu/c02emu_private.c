@@ -11,6 +11,7 @@
 
 
 #include "c02emu_private.h"
+#include <stdio.h>
 
 
 // Memory access and address decoding.
@@ -23,39 +24,51 @@ static LongAddr mmu_addr(C02EmuState *state, Addr addr) {
 }
 
 
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wunused-function"
 static Byte raw_mem_read(C02EmuState *state, Addr addr) {
-#pragma clang diagnostic pop
+    Byte byte;
     unsigned int region = addr & 0xf000;
     
     if (region == 0xe000 && state->io.mmu.page[0x0e] == 0xfe) {
         // Reads from $exxx access I/O if MMU page is $fe.
-        return raw_read_io(state, addr);
+        byte = raw_read_io(state, addr);
+        if (state->monitor.trace_ram) {
+            fprintf(stderr, "I/O %04x R %02x\n", addr, byte);
+        }
         
     } else if (region == 0xf000 && state->io.mmu.page[0x0f] == 0xff) {
         // Reads from $fxxx access ROM if MMU page is $ff.
-        return state->mem.rom[addr & 0x0fff];
+        byte = state->mem.rom[addr & 0x0fff];
+        if (state->monitor.trace_ram) {
+            fprintf(stderr, "ROM %04x R %02x\n", addr, byte);
+        }
         
     } else {
-        return state->mem.ram[mmu_addr(state, addr)];
+        byte = state->mem.ram[mmu_addr(state, addr)];
+        if (state->monitor.trace_ram) {
+            fprintf(stderr, "RAM %04x R %02x\n", addr, byte);
+        }
     }
+    
+    return byte;
 }
 
 
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wunused-function"
 static void raw_mem_write(C02EmuState *state, Addr addr, Byte byte) {
-#pragma clang diagnostic pop
     unsigned int region = addr & 0xf000;
     
     if (region == 0xf000 || (region == 0xe000 && state->io.mmu.page[0x0e] == 0xfe)) {
+        if (state->monitor.trace_ram) {
+            fprintf(stderr, "I/O %04x W %02x\n", addr, byte);
+        }
         // Writes to $fxxx always go to I/O.
         // Writes to $exxx go to I/O if MMU page is $fe.
         raw_write_io(state, addr, byte);
         return;
         
     } else {
+        if (state->monitor.trace_ram) {
+            fprintf(stderr, "RAM %04x W %02x\n", addr, byte);
+        }
         state->mem.ram[mmu_addr(state, addr)] = byte;
         return;
     }
@@ -74,6 +87,9 @@ static Byte raw_read_io(C02EmuState *state, Addr addr) {
         case 0x0300:
             return raw_io_display_read(state, addr);
             
+        case 0x0f00:
+            return raw_io_debug_read(state, addr);
+            
         default:
             return 0xff;
     }
@@ -91,6 +107,10 @@ static void raw_write_io(C02EmuState *state, Addr addr, Byte byte) {
             raw_io_display_write(state, addr, byte);
             return;
             
+        case 0x0f00:
+            raw_io_debug_write(state, addr, byte);
+            return;
+        
         default:
             return;
     }
@@ -136,6 +156,21 @@ static void raw_io_display_write(C02EmuState *state, Addr addr, Byte byte) {
     } else {
         state->io.display.ram[display_addr(state, addr)] = byte;
     }
+}
+
+
+// Debug.
+
+
+#include <stdio.h>
+
+static Byte raw_io_debug_read(C02EmuState *state, Addr addr) {
+    return 0;
+}
+
+
+static void raw_io_debug_write(C02EmuState *state, Addr addr, Byte byte) {
+    fputc(byte, stderr);
 }
 
 

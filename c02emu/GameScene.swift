@@ -45,6 +45,7 @@ class GameScene: SKScene {
                 let sprite = SKSpriteNode(texture: charTextures[i])
                 sprite.anchorPoint = CGPointZero
                 sprite.position = CGPoint(x: x*8, y: 400 - y*8 - 8)
+                sprite.size = CGSize(width: 8, height: 8)
                 self.addChild(sprite)
                 screenCharNodes.append(sprite)
             }

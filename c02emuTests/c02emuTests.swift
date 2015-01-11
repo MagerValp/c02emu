@@ -133,6 +133,20 @@ class c02emuTests: XCTestCase {
 
     }
     
+    func testEORFlags() {
+        setProgramBytes([0xa9, 0x00])       // lda #0
+        setProgramBytes([0x48])             // pha
+        setProgramBytes([0x28])             // plp
+        setProgramBytes([0xa9, 0xc3])       // lda #$c3
+        setProgramBytes([0x49, 0xc3, 0xe3]) // eor #$c3
+        setProgramBytes([0xdb])             // stp
+        c02emuReset(emuState)
+        c02emuRun(emuState)
+        let regs = c02emuCPURegs(emuState)
+        XCTAssertEqual(regs.memory.a, UInt8(0), "A")
+        XCTAssertEqual(regs.memory.status & 0xdf, UInt8(0x02), "S")
+    }
+    
     func test6502FuncTest() {
         var frame = 0
         

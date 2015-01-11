@@ -344,7 +344,7 @@ SYNTHESIZE_alx(ADC)
 
 static void op_AND(C02EmuState *state, Byte byte) {
     A &= byte;
-    SETNZ(byte);
+    SETNZ(A);
     OP_DONE();
 }
 SYNTHESIZE_imm(AND)
@@ -624,7 +624,7 @@ SYNTHESIZE_imp(DEY)
 
 static void op_EOR(C02EmuState *state, Byte byte) {
     A ^= byte;
-    SETNZ(byte);
+    SETNZ(A);
     OP_DONE();
 }
 SYNTHESIZE_imm(EOR)
@@ -704,7 +704,7 @@ static void u_JSR_pch(C02EmuState *state) {
 
 static void op_LDA(C02EmuState *state, Byte byte) {
     A = byte;
-    SETNZ(byte);
+    SETNZ(A);
     OP_DONE();
 }
 SYNTHESIZE_imm(LDA)
@@ -727,7 +727,7 @@ SYNTHESIZE_aly(LDX)
 
 static void op_LDY(C02EmuState *state, Byte byte) {
     Y = byte;
-    SETNZ(byte);
+    SETNZ(Y);
     OP_DONE();
 }
 SYNTHESIZE_imm(LDY)
@@ -777,7 +777,7 @@ SYNTHESIZE_alx(NOP)
 
 static void op_ORA(C02EmuState *state, Byte byte) {
     A |= byte;
-    SETNZ(byte);
+    SETNZ(A);
     OP_DONE();
 }
 SYNTHESIZE_imm(ORA)

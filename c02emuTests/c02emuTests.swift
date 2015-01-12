@@ -158,6 +158,88 @@ class c02emuTests: XCTestCase {
         XCTAssertEqual(regs.memory.status & 0xdf, UInt8(0x02), "S")
     }
     
+    func testDecimalADC() {
+        setProgramBytes([0xf8])             // sed
+        setProgramBytes([0x38])             // sec
+        setProgramBytes([0xa9, 0x99])       // lda #$99
+        setProgramBytes([0x69, 0x99])       // adc #$99
+        setProgramBytes([0x8d, 0x02, 0xef]) // sta $ef02
+        setProgramBytes([0xdb])             // stp
+        c02emuReset(emuState)
+        c02emuRun(emuState)
+        let regs = c02emuCPURegs(emuState)
+        XCTAssertEqual(regs.memory.a, UInt8(0x99), "A")
+        XCTAssertEqual(regs.memory.status | 0x20, UInt8(0x6d), "S")
+    }
+
+    func testDecimalSBC() {
+        setProgramBytes([0xf8])             // sed
+        setProgramBytes([0x18])             // clc
+        setProgramBytes([0xa9, 0x99])       // lda #$99
+        setProgramBytes([0xe9, 0x00])       // sbc #$00
+        setProgramBytes([0x8d, 0x02, 0xef]) // sta $ef02
+        setProgramBytes([0xdb])             // stp
+        c02emuReset(emuState)
+        c02emuRun(emuState)
+        let regs = c02emuCPURegs(emuState)
+        XCTAssertEqual(regs.memory.a, UInt8(0x98), "A")
+        XCTAssertEqual(regs.memory.status | 0x20, UInt8(0xad), "S")
+    }
+
+    func testDEX() {
+        setProgramBytes([0xa2, 0x03])       // ldx #$03
+        setProgramBytes([0xca])             // dex
+        setProgramBytes([0xca])             // dex
+        setProgramBytes([0xca])             // dex
+        setProgramBytes([0xca])             // dex
+        setProgramBytes([0x8d, 0x02, 0xef]) // sta $ef02
+        setProgramBytes([0xdb])             // stp
+        c02emuReset(emuState)
+        c02emuRun(emuState)
+        let regs = c02emuCPURegs(emuState)
+        XCTAssertEqual(regs.memory.x, UInt8(0xff), "X")
+        XCTAssertEqual(regs.memory.status | 0x20, UInt8(0xa4), "S")
+    }
+    
+    func testBRAForward() {
+        setProgramBytes([0x80, 0x7f])       // bra $0481
+        for i in 0..<254 {
+            setProgramBytes([0xdb])             // stp
+        }
+        c02emuReset(emuState)
+        c02emuRun(emuState)
+        let regs = c02emuCPURegs(emuState)
+        XCTAssertEqual(regs.memory.pc, UInt16(0x482), "PC")
+    }
+    
+    func testBRABackward() {
+        setProgramBytes([0x4c, 0x00, 0x05]) // jmp $0500
+        for i in 0..<253 {
+            setProgramBytes([0xdb])             // stp
+        }
+        setProgramBytes([0x80, 0x80])       // bra $0482
+        c02emuReset(emuState)
+        c02emuRun(emuState)
+        let regs = c02emuCPURegs(emuState)
+        XCTAssertEqual(regs.memory.pc, UInt16(0x483), "PC")
+    }
+    
+    func testzpx() {
+        setProgramBytes([0xa9, 0x55])       // lda #$55
+        setProgramBytes([0x85, 0x80])       // sta $80
+        setProgramBytes([0xa2, 0x00])       // ldx #$00
+        setProgramBytes([0xa9, 0xaa])       // lda #$aa
+        setProgramBytes([0x15, 0x80])       // ora $80,x
+        setProgramBytes([0x36, 0x80])       // rol $80,x
+        setProgramBytes([0x8d, 0x02, 0xef]) // sta $ef02
+        setProgramBytes([0xdb])             // stp
+        c02emuReset(emuState)
+        c02emuRun(emuState)
+        let regs = c02emuCPURegs(emuState)
+        XCTAssertEqual(regs.memory.a, UInt8(0xff), "A")
+        XCTAssertEqual(regs.memory.status | 0x20, UInt8(0xa4), "S")
+    }
+    
     func test6502FuncTest() {
         var frame = 0
         

@@ -281,6 +281,11 @@ static void op_ADC(C02EmuState *state, Byte byte) {
     uint16_t result, lo;
     Byte carry = P & flag_c;
     
+    if (state->cpu.op.decimal_fixup == true) {
+        OP_DONE();
+        return;
+    }
+    
     if (P & flag_d) {
         lo = (A & 0x0f) + (byte & 0x0f) + carry;
         if (lo > 9) {
@@ -329,6 +334,7 @@ static void op_ADC(C02EmuState *state, Byte byte) {
     } else {
         CLC();
     }
+    
     if (state->cpu.op.decimal_fixup == false && (P & flag_d)) {
         state->cpu.op.decimal_fixup = true;
     } else {
@@ -951,6 +957,11 @@ static void op_SBC(C02EmuState *state, Byte byte) {
     uint16_t hi, lo;
     Byte carry = P & flag_c;
     
+    if (state->cpu.op.decimal_fixup == true) {
+        OP_DONE();
+        return;
+    }
+    
     result = A - byte - 1 + carry;
     if (P & flag_d) {
         lo = (A & 0x0f) - (byte & 0x0f) - 1 + carry;
@@ -997,7 +1008,12 @@ static void op_SBC(C02EmuState *state, Byte byte) {
         A = result;
         SETNZ(A);
     }
-    OP_DONE();
+    
+    if (state->cpu.op.decimal_fixup == false && (P & flag_d)) {
+        state->cpu.op.decimal_fixup = true;
+    } else {
+        OP_DONE();
+    }
 }
 SYNTHESIZE_imm(SBC)
 SYNTHESIZE_ad(SBC)

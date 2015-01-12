@@ -56,11 +56,6 @@ class c02emuTests: XCTestCase {
     }
     
 //    func testCPURegLoad() {
-//        // IRQ
-//        setProgramBytes([0xdb, 0xdb, 0xdb]) // stp/stp/stp
-//        // NMI
-//        setProgramBytes([0xdb, 0xdb, 0xdb]) // stp/stp/stp
-//        // RES
 //        setProgramBytes([0xA2, 0x7F, 0x9a]) // ldx #$7f, txs
 //        setProgramBytes([0xA9, 0x12])       // lda #$12
 //        setProgramBytes([0xA2, 0x34])       // ldx #$34
@@ -101,6 +96,22 @@ class c02emuTests: XCTestCase {
         setProgramBytes([0xdb])             // stp
         c02emuReset(emuState)
 
+        let reason = c02emuRun(emuState)
+        XCTAssertEqual(reason.value, C02EMU_CPU_STOPPED.value, "reason")
+    }
+    
+    func testDebugTrap() {
+        setProgramBytes([0xa2, 0xff, 0x9a]) // ldx #$ff, txs
+        setProgramBytes([0xa9, 0x12])       // lda #$12
+        setProgramBytes([0x48])             // pha
+        setProgramBytes([0xa2, 0x34])       // ldx #$34
+        setProgramBytes([0xda])             // phx
+        setProgramBytes([0xa0, 0x56])       // ldy #$56
+        setProgramBytes([0x5a])             // phy
+        setProgramBytes([0x8d, 0x02, 0xef]) // sta $ef02
+        setProgramBytes([0xdb])             // stp
+        c02emuReset(emuState)
+        
         let reason = c02emuRun(emuState)
         XCTAssertEqual(reason.value, C02EMU_CPU_STOPPED.value, "reason")
     }

@@ -165,7 +165,8 @@ success macro
     endif
     if report = 1
 trap    macro
-        jsr report_error
+        sta $ef02
+        ;jsr report_error
         endm
 trap_eq macro
         bne skip\?
@@ -210,7 +211,8 @@ skip\?
 ; please observe that during the test the stack gets invalidated
 ; therefore a RTS inside the success macro is not possible
 success macro
-        jsr report_success
+        db $db
+        ;jsr report_success
         endm
     endif
 

@@ -170,7 +170,50 @@ static Byte raw_io_debug_read(C02EmuState *state, Addr addr) {
 
 
 static void raw_io_debug_write(C02EmuState *state, Addr addr, Byte byte) {
-    fputc(byte, stderr);
+    switch (addr & 0xff) {
+        case 0x00:
+            fputc(byte, stderr);
+            break;
+            
+        case 0x02:
+            fputs("\nDebug trap registers:\n", stderr);
+            fputs("  PC   A  X  Y  S  nv1bdizc\n", stderr);
+            fprintf(stderr, ".;%04x %02x %02x %02x %02x %d%d1%d%d%d%d%d\n",
+                    state->cpu.pc,
+                    state->cpu.a,
+                    state->cpu.x,
+                    state->cpu.y,
+                    state->cpu.stack,
+                    (state->cpu.status & flag_n) >> 7,
+                    (state->cpu.status & flag_v) >> 6,
+                    (state->cpu.status & flag_b) >> 4,
+                    (state->cpu.status & flag_d) >> 3,
+                    (state->cpu.status & flag_i) >> 2,
+                    (state->cpu.status & flag_z) >> 1,
+                    (state->cpu.status & flag_c));
+            fputs("Stack:\n", stderr);
+            fprintf(stderr, "01%02x", state->cpu.stack);
+            for (Addr a = (0x0100 | state->cpu.stack) + 1; a < 0x200; a++) {
+                fprintf(stderr, " %02x", raw_mem_read(state, a));
+            }
+            fputs("\n", stderr);
+            fputs("ZP:\n", stderr);
+            fputs("000c", stderr);
+            for (Addr a = 0; a < 7; a++) {
+                fprintf(stderr, " %02x", raw_mem_read(state, 0x000c + a));
+            }
+            fputs("\n", stderr);
+            fputs("ABS:\n", stderr);
+            fputs("0200", stderr);
+            for (Addr a = 0; a < 8; a++) {
+                fprintf(stderr, " %02x", raw_mem_read(state, 0x0200 + a));
+            }
+            fputs("\n", stderr);
+            break;
+            
+        default:
+            break;
+    }
 }
 
 

@@ -178,7 +178,7 @@
 			buildPhases = (
 			);
 			buildToolPath = ./build.sh;
-			buildWorkingDirectory = /Users/pelle/Dropbox/prog/c02emu/Software/ROM;
+			buildWorkingDirectory = Software/ROM;
 			dependencies = (
 			);
 			name = c02emuROM;

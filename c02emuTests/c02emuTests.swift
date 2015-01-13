@@ -254,11 +254,20 @@ class c02emuTests: XCTestCase {
             //NSLog("Frame: \(frame++)")
         }
     }
-//    func testPerformanceExample() {
-//        // This is an example of a performance test case.
-//        self.measureBlock() {
-//            // Put the code you want to measure the time of here.
-//        }
-//    }
+    
+    func testCPUEmulationPerformance() {
+        let bundle = NSBundle(forClass: self.dynamicType)
+        if let romData = NSData(contentsOfURL: bundle.URLForResource("6502_functional_test", withExtension: "bin")!) {
+            loadBin(0x0400, data: romData.bytes, length: romData.length)
+        } else {
+            XCTAssertTrue(false, "Couldn't load 6502_functional_test.bin")
+        }
+        self.measureBlock() {
+            c02emuReset(self.emuState)
+            for i in 0..<120 {
+                XCTAssertEqual(c02emuRun(self.emuState).value, C02EMU_FRAME_READY.value, "Should run until frame ready")
+            }
+        }
+    }
     
 }

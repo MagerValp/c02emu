@@ -99,11 +99,6 @@ C02EmuReturnReason c02emuRun(C02EmuState *state) {
         
         if (state->cpu.op.cycle == C02EMU_OP_DONE) {
             
-            if (!(state->cpu.status & flag_i)) {
-                // Evaluate IRQs.
-            }
-            // Evaluate NMIs.
-            
             if (state->monitor.trace_cpu) {
                 fputs("  PC   A  X  Y  S  nv1bdizc\n", stderr);
                 fprintf(stderr, ".;%04x %02x %02x %02x %02x %d%d1%d%d%d%d%d\n",
@@ -121,15 +116,23 @@ C02EmuReturnReason c02emuRun(C02EmuState *state) {
                         (state->cpu.status & flag_c));
             }
             
-            op = raw_mem_read(state, (state->cpu.pc)++);
-            state->cpu.op.opcode = op;
-            if (state->monitor.trace_cpu) {
-                fprintf(stderr, "PC = %04x OP = %02x\n", (state->cpu.pc - 1) & 0xffff, op);
+            if (state->cpu.op.irq_active) {
+                op = 0;
+                if (state->monitor.trace_cpu) {
+                    fprintf(stderr, "PC = %04x IRQ\n", state->cpu.pc);
+                }
+                state->cpu.op.uop_list = irq_op_table[OP_IRQ];
+            } else {
+                op = raw_mem_read(state, (state->cpu.pc)++);
+                if (state->monitor.trace_cpu) {
+                    fprintf(stderr, "PC = %04x OP = %02x\n", (state->cpu.pc - 1) & 0xffff, op);
+                }
+                state->cpu.op.uop_list = op_table[op];
             }
-            state->cpu.op.uop_list = op_table[op];
             state->cpu.op.cycle = C02EMU_OP_CYCLE_1;
             state->cpu.op.address_fixup = false;
             state->cpu.op.decimal_fixup = false;
+            state->cpu.op.opcode = op;
             
         } else if(state->cpu.op.cycle == C02EMU_OP_STOPPED) {
         
@@ -148,6 +151,14 @@ C02EmuReturnReason c02emuRun(C02EmuState *state) {
             // Evaluate NMIs.
             
         } else {
+            
+            state->cpu.op.irq_active = false;
+            if (!(state->cpu.status & flag_i)) {
+                if (state->line_ctr == 0 /* && state->cycle_ctr == 0*/ ) {
+                    state->cpu.op.irq_active = true;
+                }
+            }
+            // Evaluate NMIs here.
             
             state->cpu.op.uop_list[state->cpu.op.cycle](state);
             if (state->cpu.op.cycle < C02EMU_OP_DONE) {

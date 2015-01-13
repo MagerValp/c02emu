@@ -66,6 +66,7 @@ struct _c02EmuState {
             bool stop_notified;
             bool address_fixup;
             bool decimal_fixup;
+            bool irq_active;
             Byte alu;
             union {
                 Addr w;

@@ -53,6 +53,7 @@ reset:
 	inx
 	bne @printmsg
 :	
+	cli
 	jmp *
 	
 	
@@ -60,11 +61,13 @@ reset:
 j_nmih:
 	jmp (vec_nmih)
 rom_nmih:
-	stp
+	inc $e24e
+	rti
 j_irqh:
 	jmp (vec_irqh)
 rom_irqh:
-	stp
+	inc $e24f
+	rti
 
 
 	.rodata

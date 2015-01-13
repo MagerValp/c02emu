@@ -26,6 +26,9 @@ typedef uint32_t LongAddr;
 #define flag_v 0x40
 #define flag_n 0x80
 
+#define C02EMU_CYCLES_PER_LINE 254
+#define C02EMU_LINES_PER_FRAME 525
+
 #define cycles_per_frame(FRAME_CTR) ((FRAME_CTR % 3) == 0 ? 133334 : 133333)
 
 typedef enum {
@@ -92,9 +95,9 @@ struct _c02EmuState {
         } display;
     } io;
     
-    uint64_t cycle_counter;
-    uint64_t frame_counter;
-    uint64_t vbl_counter;
+    unsigned int cycle_ctr;
+    unsigned int line_ctr;
+    unsigned int frame_ctr;
     
     struct {
         bool trace_cpu;

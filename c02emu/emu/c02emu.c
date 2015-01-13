@@ -47,9 +47,9 @@ C02EmuState *c02emuCreate(void) {
     
     c02emuReset(state);
     
-    state->cycle_counter = 0;
-    state->frame_counter = 0;
-    state->vbl_counter = cycles_per_frame(state->frame_counter);
+    state->cycle_ctr = 0;
+    state->line_ctr = 0;
+    state->frame_ctr = 0;
     
     state->monitor.trace_cpu = false;
     state->monitor.trace_ram = false;
@@ -155,11 +155,13 @@ C02EmuReturnReason c02emuRun(C02EmuState *state) {
             }
         }
         
-        state->cycle_counter += 1;
-        if (state->cycle_counter >= state->vbl_counter) {
-            state->frame_counter += 1;
-            state->vbl_counter += cycles_per_frame(state->frame_counter);
-            return C02EMU_FRAME_READY;
+        if (++state->cycle_ctr > C02EMU_CYCLES_PER_LINE) {
+            state->cycle_ctr = 0;
+            if (++state->line_ctr > C02EMU_LINES_PER_FRAME) {
+                state->line_ctr = 0;
+                state->frame_ctr += 1;
+                return C02EMU_FRAME_READY;
+            }
         }
     }
 }

@@ -145,6 +145,10 @@ static void u_push(C02EmuState *state, Byte byte) {
 #pragma mark Dummy access
 
 
+static void u_dum_sdec(C02EmuState *state) {
+    raw_mem_read(state, 0x0100 | S--);
+}
+
 static void u_dum_ad(C02EmuState *state) {
     raw_mem_read(state, AD);
 }
@@ -270,6 +274,60 @@ static void u_##OP##_aly(C02EmuState *state) { \
 #define SYNTHESIZE_w_aly(OP) \
 static void u_##OP##_aly(C02EmuState *state) { \
     op_##OP(state, (ADL + Y) & 0xff); \
+}
+
+
+
+#pragma mark IRQs
+
+
+static void u_IRQ_incpc(C02EmuState *state) {
+    raw_mem_read(state, PC++);
+}
+
+static void u_IRQ_pch(C02EmuState *state) {
+    u_push(state, PC >> 8);
+}
+
+static void u_IRQ_pcl(C02EmuState *state) {
+    u_push(state, PC & 0xff);
+}
+
+static void u_IRQ_p(C02EmuState *state) {
+    u_push(state, P & ~flag_b);
+    P = (P | flag_i) & ~flag_d;
+}
+
+static void u_IRQ_adl(C02EmuState *state) {
+    PC = (PC & 0xff00) | raw_mem_read(state, 0xfffe);
+}
+
+static void u_IRQ_adh(C02EmuState *state) {
+    PC = (PC & 0x00ff) | (raw_mem_read(state, 0xffff) << 8);
+    OP_DONE();
+}
+
+static void u_NMI_adl(C02EmuState *state) {
+    PC = (PC & 0xff00) | raw_mem_read(state, 0xfffa);
+}
+
+static void u_NMI_adh(C02EmuState *state) {
+    PC = (PC & 0x00ff) | (raw_mem_read(state, 0xfffb) << 8);
+    OP_DONE();
+}
+
+static void u_RESET_p(C02EmuState *state) {
+    u_dum_sdec(state);
+    P = (P | flag_i) & ~flag_d;
+}
+
+static void u_RESET_adl(C02EmuState *state) {
+    PC = (PC & 0xff00) | raw_mem_read(state, 0xfffc);
+}
+
+static void u_RESET_adh(C02EmuState *state) {
+    PC = (PC & 0x00ff) | (raw_mem_read(state, 0xfffd) << 8);
+    OP_DONE();
 }
 
 
@@ -489,24 +547,9 @@ static void u_BRA_rel(C02EmuState *state) {
 }
 
 
-static void u_BRK_incpc(C02EmuState *state) {
-    raw_mem_read(state, PC++);
-}
-static void u_BRK_pch(C02EmuState *state) {
-    u_push(state, PC >> 8);
-}
-static void u_BRK_pcl(C02EmuState *state) {
-    u_push(state, PC & 0xff);
-}
 static void u_BRK_p(C02EmuState *state) {
     u_push(state, P | flag_b);
-}
-static void u_BRK_adl(C02EmuState *state) {
-    PC = (PC & 0xff00) | raw_mem_read(state, 0xfffe);
-}
-static void u_BRK_adh(C02EmuState *state) {
-    PC = (PC & 0x00ff) | (raw_mem_read(state, 0xffff) << 8);
-    OP_DONE();
+    P = (P | flag_i) & ~flag_d;
 }
 
 

@@ -99,7 +99,7 @@ static void u_error(C02EmuState *state) {
 #define RMW_ZPX(OP)   { u_zp_ad,      u_dum_adlx,   u_rmw_adlx,   u_dum_adlx,   u_##OP##_adlx, CMAX6 }
 
 // Jump, IRQ, and return ops.
-#define BRK_IMP(OP)   { u_BRK_incpc,  u_BRK_pch,    u_BRK_pcl,    u_BRK_p,      u_BRK_adl,    u_BRK_adh,     CMAX7 }
+#define BRK_IMP(OP)   { u_IRQ_incpc,  u_IRQ_pch,    u_IRQ_pcl,    u_BRK_p,      u_IRQ_adl,    u_IRQ_adh,     CMAX7 }
 #define JMP_ABS(OP)   { u_abs_adl,    u_JMP_adh,    CMAX3 }
 #define JMP_IAX(OP)   { u_abs_adl,    u_abs_adh,    u_JMP_balx,   u_JMP_bahx,   u_JMP_bax,    CMAX6 }
 #define JMP_IND(OP)   { u_abs_adl,    u_abs_adh,    u_JMP_bal,    u_JMP_bah,    u_JMP_ba,     CMAX6 }
@@ -110,6 +110,13 @@ static void u_error(C02EmuState *state) {
 #define STOP_IMP(OP)  { u_dum_pc,     u_STP_imp,    CMAX3 }
 #define WAIT_IMP(OP)  { u_dum_pc,     u_WAI_imp,    CMAX3 }
 
+
+// Reset, NMI, IRQ.
+static C02EmuUop irq_op_table[3][7] = {
+    { u_dum_pc,     u_dum_pc,     u_dum_sdec,   u_dum_sdec,   u_RESET_p,    u_RESET_adl,  u_RESET_adh },
+    { u_dum_pc,     u_dum_pc,     u_IRQ_pch,    u_IRQ_pcl,    u_IRQ_p,      u_NMI_adl,    u_NMI_adh   },
+    { u_dum_pc,     u_dum_pc,     u_IRQ_pch,    u_IRQ_pcl,    u_IRQ_p,      u_IRQ_adl,    u_IRQ_adh   },
+};
 
 
 static C02EmuUop op_table[256][6] = {

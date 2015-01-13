@@ -32,12 +32,12 @@ C02EmuState *c02emuCreate(void) {
         return NULL;
     }
     
-    state->cpu.a = 0x00;
+    state->cpu.a = 0xaa;
     state->cpu.x = 0x00;
     state->cpu.y = 0x00;
-    state->cpu.status = flag_1;
-    state->cpu.stack = 0xff;
-    state->cpu.pc = 0x0000;
+    state->cpu.status = flag_1 | flag_z;
+    state->cpu.stack = 0x00;
+    state->cpu.pc = 0x00ff;
     
     memset(state->mem.ram, 0x00, sizeof(state->mem.ram));
     memset(state->mem.rom, 0xdb, sizeof(state->mem.rom));
@@ -77,10 +77,15 @@ void c02emuReset(C02EmuState *state) {
     }
     state->io.mmu.page[0x0e] = 0xfe;
     state->io.mmu.page[0x0f] = 0xff;
-    state->cpu.pc = raw_mem_read(state, 0xfffc) | (raw_mem_read(state, 0xfffd) << 8);
-    state->cpu.status |= flag_i;
-    state->cpu.op.cycle = C02EMU_OP_DONE;
-    state->cpu.op.uop_list = NULL;
+    
+    state->cpu.op.opcode = 0;
+    if (state->monitor.trace_cpu) {
+        fprintf(stderr, "PC = %04x RESET\n", state->cpu.pc);
+    }
+    state->cpu.op.uop_list = irq_op_table[OP_RESET];
+    state->cpu.op.cycle = C02EMU_OP_CYCLE_1;
+    state->cpu.op.address_fixup = false;
+    state->cpu.op.decimal_fixup = false;
 }
 
 

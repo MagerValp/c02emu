@@ -18,6 +18,7 @@
 		6673C4281A5C709700D17696 /* c02emuTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6673C4271A5C709700D17696 /* c02emuTests.swift */; };
 		66DE98E51A61B68400AD860C /* rom.bin in CopyFiles */ = {isa = PBXBuildFile; fileRef = 66DE98E41A61B68400AD860C /* rom.bin */; };
 		66DE98E91A6324BF00AD860C /* 6502_functional_test.bin in Resources */ = {isa = PBXBuildFile; fileRef = 66DE98E81A6324BF00AD860C /* 6502_functional_test.bin */; };
+		66FCD71B1A67DD07009A9421 /* EmulatorController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66FCD71A1A67DD07009A9421 /* EmulatorController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -74,6 +75,7 @@
 		668D3C461A5DF42C00D9C4B9 /* c02emu-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "c02emu-Bridging-Header.h"; sourceTree = "<group>"; };
 		66DE98E41A61B68400AD860C /* rom.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; name = rom.bin; path = ../Software/ROM/rom.bin; sourceTree = "<group>"; };
 		66DE98E81A6324BF00AD860C /* 6502_functional_test.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; name = 6502_functional_test.bin; path = ../Software/Test/6502_65C02_functional_tests/6502_functional_test.bin; sourceTree = "<group>"; };
+		66FCD71A1A67DD07009A9421 /* EmulatorController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EmulatorController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -118,6 +120,7 @@
 				6673C4121A5C709700D17696 /* AppDelegate.swift */,
 				6673C4141A5C709700D17696 /* GameScene.swift */,
 				6673C4161A5C709700D17696 /* GameScene.sks */,
+				66FCD71A1A67DD07009A9421 /* EmulatorController.swift */,
 				663A67F71A65B9DF0000F38E /* MonitorWindowController.swift */,
 				668D3C461A5DF42C00D9C4B9 /* c02emu-Bridging-Header.h */,
 				6673C4181A5C709700D17696 /* Images.xcassets */,
@@ -297,6 +300,7 @@
 			files = (
 				663A67F81A65B9DF0000F38E /* MonitorWindowController.swift in Sources */,
 				6609A11D1A605D1D00CA5B87 /* c02emu.c in Sources */,
+				66FCD71B1A67DD07009A9421 /* EmulatorController.swift in Sources */,
 				6673C4151A5C709700D17696 /* GameScene.swift in Sources */,
 				6673C4131A5C709700D17696 /* AppDelegate.swift in Sources */,
 			);

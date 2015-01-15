@@ -12,9 +12,8 @@ class GameScene: SKScene {
     
     var screenCharNodes: [SKSpriteNode!]!
     var screenCharNodesSetup = false
-    var counter = 0
     var charTextures: [SKTexture!]!
-    var emuState: COpaquePointer = nil
+    var emulator: EmulatorController! = nil
     
     override func didMoveToView(view: SKView) {
         let charsetImage80x50 = NSImage(named: "Charset-80x50")!
@@ -60,13 +59,12 @@ class GameScene: SKScene {
     }
     
     override func update(currentTime: CFTimeInterval) {
-        let reason = c02emuRun(emuState)
         if screenCharNodesSetup {
-            let output = c02emuGetOutput(emuState)
-            for i in 0..<80 * 50 {
-                screenCharNodes[i].texture = charTextures[Int(output.display.data[i])]
+            if let frame = emulator?.nextQueuedFrame() {
+                for i in 0..<80 * 50 {
+                    screenCharNodes[i].texture = charTextures[Int(frame.displayData[i])]
+                }
             }
-            counter++
         }
     }
 }

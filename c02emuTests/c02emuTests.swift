@@ -26,9 +26,9 @@ class c02emuTests: XCTestCase {
         //   RES vector set to $0400.
         rom = NSMutableData()
         rom.appendData(NSMutableData(length: 0x1000 - 6)!)
-        rom.appendBytes([0x03, 0x04] as [Byte], length: 2)
-        rom.appendBytes([0x00, 0x04] as [Byte], length: 2)
-        rom.appendBytes([0x06, 0x04] as [Byte], length: 2)
+        rom.appendBytes([0x03, 0x04] as [UInt8], length: 2)
+        rom.appendBytes([0x00, 0x04] as [UInt8], length: 2)
+        rom.appendBytes([0x06, 0x04] as [UInt8], length: 2)
         c02emuLoadROM(emuState, rom.bytes, UInt(rom.length))
         // Set program load PC to $0400.
         prgPtr = 0x0400
@@ -41,7 +41,7 @@ class c02emuTests: XCTestCase {
         super.tearDown()
     }
     
-    func setProgramBytes(bytes: Array<Byte>) {
+    func setProgramBytes(bytes: Array<UInt8>) {
         for byte in bytes {
             c02emuCPUWrite(emuState, prgPtr++, byte)
         }
@@ -49,7 +49,7 @@ class c02emuTests: XCTestCase {
     
     func loadBin(addr: Int, data: UnsafePointer<Void>, length: Int) {
         NSLog("Loading \(length) bytes at \(addr)")
-        let bytes = UnsafePointer<Byte>(data)
+        let bytes = UnsafePointer<UInt8>(data)
         for i in 0..<length {
             c02emuCPUWrite(emuState, UInt16(addr + i), bytes[i])
         }

@@ -44,6 +44,10 @@ typedef enum {
     C02EMU_OP_WAITING,
 } C02EmuOpCycle;
 
+typedef enum {
+    C02EMU_PHASE_CPU,
+    C02EMU_PHASE_IO,
+} C02EmuPhase;
 
 #ifdef __LITTLE_ENDIAN__
 #define BYTE_LH Byte l, h
@@ -96,6 +100,8 @@ struct _c02EmuState {
         } display;
     } io;
     
+    C02EmuPhase phase;
+    
     unsigned int cycle_ctr;
     unsigned int line_ctr;
     unsigned int frame_ctr;
@@ -106,6 +112,9 @@ struct _c02EmuState {
     } monitor;
 };
 
+
+static C02EmuReturnReason cpu_step_cycle(C02EmuState *state);
+static C02EmuReturnReason io_step_cycle(C02EmuState *state);
 
 static LongAddr mmu_addr(C02EmuState *state, Addr addr);
 static Byte raw_mem_read(C02EmuState *state, Addr addr);

@@ -66,6 +66,11 @@
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <menu key="submenu" title="Emulator" id="gb2-3T-mkg">
                         <items>
+                            <menuItem title="Pause" keyEquivalent="p" id="GB4-U7-YiG">
+                                <connections>
+                                    <action selector="togglePause:" target="u0R-x3-ePy" id="Rq9-YV-AQY"/>
+                                </connections>
+                            </menuItem>
                             <menuItem title="Monitor" keyEquivalent="m" id="OzX-1e-40a">
                                 <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
                                 <connections>
@@ -137,6 +142,7 @@
         </window>
         <customObject id="494" customClass="AppDelegate" customModule="c02emu" customModuleProvider="target">
             <connections>
+                <outlet property="emulator" destination="u0R-x3-ePy" id="cbc-f8-ob4"/>
                 <outlet property="skView" destination="539" id="540"/>
                 <outlet property="window" destination="371" id="532"/>
             </connections>
@@ -217,5 +223,6 @@
                 <outlet property="window" destination="eFL-wF-vl6" id="R9i-cy-5yC"/>
             </connections>
         </customObject>
+        <customObject id="u0R-x3-ePy" customClass="EmulatorController" customModule="c02emu" customModuleProvider="target"/>
     </objects>
 </document>

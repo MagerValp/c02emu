@@ -11,7 +11,6 @@ import SpriteKit
 class GameScene: SKScene {
     
     var screenCharNodes: [SKSpriteNode!]!
-    var screenCharNodesSetup = false
     var charTextures: [SKTexture!]!
     var emulator: EmulatorController! = nil
     
@@ -49,8 +48,6 @@ class GameScene: SKScene {
                 screenCharNodes.append(sprite)
             }
         }
-        
-        screenCharNodesSetup = true
     }
     
     override func mouseDown(theEvent: NSEvent) {
@@ -59,11 +56,9 @@ class GameScene: SKScene {
     }
     
     override func update(currentTime: CFTimeInterval) {
-        if screenCharNodesSetup {
-            if let frame = emulator?.nextQueuedFrame() {
-                for i in 0..<80 * 50 {
-                    screenCharNodes[i].texture = charTextures[Int(frame.displayData[i])]
-                }
+        if let frame = emulator?.nextQueuedFrame() {
+            for i in 0..<80 * 50 {
+                screenCharNodes[i].texture = charTextures[Int(frame.displayData[i])]
             }
         }
     }

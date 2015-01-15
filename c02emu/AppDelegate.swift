@@ -32,7 +32,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     
     @IBOutlet weak var window: NSWindow!
     @IBOutlet weak var skView: SKView!
-    var emulator = EmulatorController()
+    @IBOutlet weak var emulator: EmulatorController!
     
     func applicationDidFinishLaunching(aNotification: NSNotification) {
         

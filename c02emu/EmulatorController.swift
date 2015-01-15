@@ -21,12 +21,20 @@ struct EmulatorFrame {
     var displayData: [UInt8]!
 }
 
+enum EmulatorAction {
+    case Stop
+    case Run
+    case Pause
+}
+
 class EmulatorController: NSObject {
 
     let emuState: COpaquePointer
     var frameQueue = [EmulatorFrame]()
     let frameQueueMax = 6
     let frameDispatchQueue = dispatch_queue_create("se.automac.EmulatorController", nil)
+    
+    var action = EmulatorAction.Stop
     
     override init() {
         emuState = c02emuCreate()
@@ -42,6 +50,7 @@ class EmulatorController: NSObject {
     
     func start() {
         c02emuReset(emuState)
+        action = .Run
         run()
     }
     
@@ -49,19 +58,21 @@ class EmulatorController: NSObject {
     }
     
     func run() {
-        if frameQueue.count < frameQueueMax {
-            runLoop: for ;; {
-                switch c02emuRun(emuState).value {
-                case C02EMU_FRAME_READY.value:
-                    let frame = self.buildFrame()
-                    dispatch_sync(frameDispatchQueue, {
-                        self.frameQueue.append(frame)
-                    })
-                    break runLoop
-                case C02EMU_CPU_STOPPED.value:
-                    continue
-                default:
-                    assertionFailure("Unimplemented c02emuRun reason")
+        if action == .Run {
+            if frameQueue.count < frameQueueMax {
+                runLoop: for ;; {
+                    switch c02emuRun(emuState).value {
+                    case C02EMU_FRAME_READY.value:
+                        let frame = self.buildFrame()
+                        dispatch_sync(frameDispatchQueue, {
+                            self.frameQueue.append(frame)
+                        })
+                        break runLoop
+                    case C02EMU_CPU_STOPPED.value:
+                        continue
+                    default:
+                        assertionFailure("Unimplemented c02emuRun reason")
+                    }
                 }
             }
         }
@@ -93,7 +104,18 @@ class EmulatorController: NSObject {
             run()
             return frame
         } else {
+            run()
             return nil
+        }
+    }
+    
+    @IBAction func togglePause(sender: AnyObject) {
+        if action == .Run {
+            NSLog("pausing")
+            action = .Pause
+        } else if action == .Pause {
+            NSLog("running")
+            action = .Run
         }
     }
     

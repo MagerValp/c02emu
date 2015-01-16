@@ -49,6 +49,7 @@ class MonitorWindowController: NSObject, NSTextFieldDelegate {
     
     func print(str: String, attributes: [NSObject:AnyObject]?) {
         outputView.textStorage?.appendAttributedString(NSAttributedString(string: str, attributes: attributes))
+        outputView.scrollToEndOfDocument(self)
     }
     
     @IBAction func toggleWindow(sender: AnyObject) {

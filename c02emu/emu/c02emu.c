@@ -123,15 +123,4 @@ const C02EmuOutput c02emuGetOutput(C02EmuState *state) {
 }
 
 
-C02EmuCPURegs *c02emuCPURegs(C02EmuState *state) {
-    return (C02EmuCPURegs *)&state->cpu;
-}
-
-
-Byte c02emuCPURead(C02EmuState *state, Addr addr) {
-    return raw_mem_read(state, addr);
-}
-
-void c02emuCPUWrite(C02EmuState *state, Addr addr, Byte byte) {
-    raw_mem_write(state, addr, byte);
-}
+#include "c02emu_util.c"

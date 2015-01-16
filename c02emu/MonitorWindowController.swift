@@ -16,22 +16,39 @@ class MonitorWindowController: NSObject, NSTextFieldDelegate {
     @IBOutlet var outputView: NSTextView!
     @IBOutlet weak var emulator: EmulatorController!
     
-    var previousAction = EmulatorAction.Run
+    var previousAction: EmulatorController.Action = .Run
     
-    let font = NSFont(name: "menlo", size: 10.0)
-    var textAttr = [String: AnyObject]()
+    let regularFont = NSFont(name: "Menlo-Regular", size: 10.0)
+    let boldFont = NSFont(name: "Menlo-Bold", size: 10.0)
+    var commonAttr = NSMutableDictionary()
+    var promptAttr = NSMutableDictionary()
+    var inputAttr  = NSMutableDictionary()
+    var outputAttr = NSMutableDictionary()
+    var errorAttr  = NSMutableDictionary()
+    
     var commandHistory = [String]()
     var commandHistoryPosition = 0
     var commandBuffer = ""
     
     override func awakeFromNib() {
         inputField.delegate = self
-        textAttr[NSFontAttributeName] = font
         outputView.editable = false
+        
+        commonAttr[NSFontAttributeName] = regularFont
+        
+        promptAttr.addEntriesFromDictionary(commonAttr)
+        
+        inputAttr.addEntriesFromDictionary(commonAttr)
+        inputAttr[NSFontAttributeName] = boldFont
+        
+        outputAttr.addEntriesFromDictionary(commonAttr)
+        
+        errorAttr.addEntriesFromDictionary(commonAttr)
+        errorAttr[NSForegroundColorAttributeName] = NSColor.redColor()
     }
     
-    func print(s: String) {
-        outputView.textStorage?.appendAttributedString(NSAttributedString(string: s, attributes: textAttr))
+    func print(str: String, attributes: [NSObject:AnyObject]?) {
+        outputView.textStorage?.appendAttributedString(NSAttributedString(string: str, attributes: attributes))
     }
     
     @IBAction func toggleWindow(sender: AnyObject) {
@@ -43,6 +60,7 @@ class MonitorWindowController: NSObject, NSTextFieldDelegate {
                 previousAction = emulator.action
                 emulator.action = .Monitor
                 show()
+                executeCommand("__ENTER_MONITOR")
             }
         }
     }
@@ -64,10 +82,30 @@ class MonitorWindowController: NSObject, NSTextFieldDelegate {
             commandHistory.append(commandBuffer)
             commandHistoryPosition = commandHistory.count
             
-            print("> \(commandBuffer)\n")
+            print("> ", attributes: promptAttr)
+            print(commandBuffer, attributes: inputAttr)
+            print("\n", attributes: promptAttr)
             
-            print(emulator.monitor.parseCommand(commandBuffer).debugDescription)
-            print("\n")
+            executeCommand(commandBuffer)
+        }
+    }
+    
+    func executeCommand(commandBuffer: String) {
+        switch emulator.monitor.executeCommand(commandBuffer) {
+            
+        case .Output(let str):
+            print(str, attributes: outputAttr)
+            print("\n", attributes: outputAttr)
+            
+        case .Error(let str):
+            print(str, attributes: errorAttr)
+            print("\n", attributes: errorAttr)
+            
+        case .Action(let action):
+            if action == .ExitMonitor {
+                emulator.action = previousAction
+                hide()
+            }
         }
     }
     

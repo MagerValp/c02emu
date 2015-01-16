@@ -17,7 +17,17 @@ enum StringParserState: String {
 }
 
 class Monitor: NSObject {
-
+    
+    enum MonitorAction {
+        case ExitMonitor
+    }
+    
+    enum MonitorReturnValue {
+        case Error(String)
+        case Output(String)
+        case Action(MonitorAction)
+    }
+    
     weak var emulator: EmulatorController!
     
     init(emulator theEmulator: EmulatorController) {
@@ -91,5 +101,86 @@ class Monitor: NSObject {
         }
         
         return tokens
+    }
+    
+    func executeCommand(cmdBuffer: String) -> MonitorReturnValue {
+        output = []
+        if let cmdTokens = parseCommand(cmdBuffer) {
+            if cmdTokens.count == 0 {
+                return .Error("")
+            }
+            
+            let args: [String]? = cmdTokens.count > 1 ? Array(cmdTokens[1 ..< cmdTokens.count]) : nil
+            
+            switch cmdTokens[0] {
+                
+            case "__ENTER_MONITOR":
+                return cmdEnterMonitor(args)
+            
+            case "x":
+                return .Action(.ExitMonitor)
+                
+            case "r":
+                return cmdShowRegs(args)
+                
+            default:
+                return .Error("Unknown command (? for help)")
+                
+            }
+        } else {
+            return .Error("Syntax error")
+        }
+    }
+
+    var output = [String]()
+    
+    func outputOK() -> MonitorReturnValue {
+        return .Output("\n".join(output))
+    }
+    
+    func outputError() -> MonitorReturnValue {
+        return .Error("\n".join(output))
+    }
+    
+    let flag_c = 0x01
+    let flag_z = 0x02
+    let flag_i = 0x04
+    let flag_d = 0x08
+    let flag_b = 0x10
+    let flag_1 = 0x20
+    let flag_v = 0x40
+    let flag_n = 0x80
+    
+    
+    func cmdEnterMonitor(args: [String]?) -> MonitorReturnValue {
+        output.append(NSString(format: "***BREAK at frame %d line %d cycle %d",
+            emulator.state.display.frame,
+            emulator.state.display.line,
+            emulator.state.display.cycle))
+        return outputOK()
+    }
+    
+    func cmdShowRegs(args: [String]?) -> MonitorReturnValue {
+        output.append("PC   A  X  Y  S  nv1bdizc  IR  State")
+        let state = emulator.state
+        let status = NSString(format: "%d%d1%d%d%d%d%d",
+            (Int(state.cpu.status) & flag_n) >> 7,
+            (Int(state.cpu.status) & flag_v) >> 6,
+            (Int(state.cpu.status) & flag_b) >> 4,
+            (Int(state.cpu.status) & flag_d) >> 3,
+            (Int(state.cpu.status) & flag_i) >> 2,
+            (Int(state.cpu.status) & flag_z) >> 1,
+            (Int(state.cpu.status) & flag_c))
+        output.append(NSString(format: "%04x %02x %02x %02x %02x %@  %02x  %@",
+            state.cpu.pc,
+            state.cpu.a,
+            state.cpu.x,
+            state.cpu.y,
+            state.cpu.stack,
+            status,
+            state.cpu.ir,
+            state.cpu.state.description))
+        
+        return outputOK()
     }
 }

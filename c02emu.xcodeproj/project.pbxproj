@@ -53,6 +53,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		05C14B5C1A691ECA00ED6C22 /* c02emu_util.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = c02emu_util.c; path = emu/c02emu_util.c; sourceTree = "<group>"; };
 		6609A1201A6166C300CA5B87 /* c02emu_util.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = c02emu_util.h; path = emu/c02emu_util.h; sourceTree = "<group>"; };
 		661BAC701A5FB3BC00202909 /* c02emu_uops.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = c02emu_uops.c; path = emu/c02emu_uops.c; sourceTree = "<group>"; };
 		661BAC711A5FB41600202909 /* c02emu_private.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = c02emu_private.c; path = emu/c02emu_private.c; sourceTree = "<group>"; };
@@ -172,6 +173,7 @@
 				661BAC741A5FB51D00202909 /* c02emu_uops.h */,
 				661BAC751A5FB6C200202909 /* c02emu_optable.c */,
 				661BAC761A5FB6C200202909 /* c02emu_optable.h */,
+				05C14B5C1A691ECA00ED6C22 /* c02emu_util.c */,
 				6609A1201A6166C300CA5B87 /* c02emu_util.h */,
 			);
 			name = "Emulator Core";

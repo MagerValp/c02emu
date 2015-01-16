@@ -17,6 +17,20 @@ typedef uint16_t Addr;
 /// Opaque state structure.
 typedef struct _c02EmuState C02EmuState;
 
+/// CPU state.
+typedef enum {
+    C02EMU_OP_CYCLE_1=0,    // Cycle 1 value is 0, and so on, to correctly index op table.
+    C02EMU_OP_CYCLE_2,
+    C02EMU_OP_CYCLE_3,
+    C02EMU_OP_CYCLE_4,
+    C02EMU_OP_CYCLE_5,
+    C02EMU_OP_CYCLE_6,
+    C02EMU_OP_CYCLE_7,
+    C02EMU_OP_DONE,
+    C02EMU_OP_STOPPED,
+    C02EMU_OP_WAITING,
+} C02EmuOpCycle;
+
 /// Display modes.
 typedef enum {
     C02EMU_DISPLAY_MODE_TEXT_80X50=0

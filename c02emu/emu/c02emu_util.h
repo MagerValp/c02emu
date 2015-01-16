@@ -18,11 +18,22 @@ typedef struct {
     Addr pc;
 } C02EmuCPURegs;
 
+typedef struct {
+    uint8_t ir;
+    C02EmuOpCycle op_state;
+} C02EmuCPUState;
 
-C02EmuCPURegs *c02emuCPURegs(C02EmuState *state);
+typedef struct {
+    unsigned int cycle_ctr;
+    unsigned int line_ctr;
+    unsigned int frame_ctr;
+} C02EmuDisplayState;
+
+C02EmuCPURegs c02emuCPURegs(C02EmuState *state);
+C02EmuCPUState c02emuCPUState(C02EmuState *state);
+C02EmuDisplayState c02emuDisplayState(C02EmuState *state);
 
 Byte c02emuCPURead(C02EmuState *state, Addr addr);
-
 void c02emuCPUWrite(C02EmuState *state, Addr addr, Byte byte);
 
 

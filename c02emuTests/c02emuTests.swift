@@ -154,8 +154,8 @@ class c02emuTests: XCTestCase {
         c02emuReset(emuState)
         c02emuRun(emuState)
         let regs = c02emuCPURegs(emuState)
-        XCTAssertEqual(regs.memory.a, UInt8(0), "A")
-        XCTAssertEqual(regs.memory.status & 0xdf, UInt8(0x02), "S")
+        XCTAssertEqual(regs.a, UInt8(0), "A")
+        XCTAssertEqual(regs.status & 0xdf, UInt8(0x02), "S")
     }
     
     func testDecimalADC() {
@@ -168,8 +168,8 @@ class c02emuTests: XCTestCase {
         c02emuReset(emuState)
         c02emuRun(emuState)
         let regs = c02emuCPURegs(emuState)
-        XCTAssertEqual(regs.memory.a, UInt8(0x99), "A")
-        XCTAssertEqual(regs.memory.status | 0x20, UInt8(0x6d), "S")
+        XCTAssertEqual(regs.a, UInt8(0x99), "A")
+        XCTAssertEqual(regs.status | 0x20, UInt8(0x6d), "S")
     }
 
     func testDecimalSBC() {
@@ -182,8 +182,8 @@ class c02emuTests: XCTestCase {
         c02emuReset(emuState)
         c02emuRun(emuState)
         let regs = c02emuCPURegs(emuState)
-        XCTAssertEqual(regs.memory.a, UInt8(0x98), "A")
-        XCTAssertEqual(regs.memory.status | 0x20, UInt8(0xad), "S")
+        XCTAssertEqual(regs.a, UInt8(0x98), "A")
+        XCTAssertEqual(regs.status | 0x20, UInt8(0xad), "S")
     }
 
     func testDEX() {
@@ -197,8 +197,8 @@ class c02emuTests: XCTestCase {
         c02emuReset(emuState)
         c02emuRun(emuState)
         let regs = c02emuCPURegs(emuState)
-        XCTAssertEqual(regs.memory.x, UInt8(0xff), "X")
-        XCTAssertEqual(regs.memory.status | 0x20, UInt8(0xa4), "S")
+        XCTAssertEqual(regs.x, UInt8(0xff), "X")
+        XCTAssertEqual(regs.status | 0x20, UInt8(0xa4), "S")
     }
     
     func testBRAForward() {
@@ -209,7 +209,7 @@ class c02emuTests: XCTestCase {
         c02emuReset(emuState)
         c02emuRun(emuState)
         let regs = c02emuCPURegs(emuState)
-        XCTAssertEqual(regs.memory.pc, UInt16(0x482), "PC")
+        XCTAssertEqual(regs.pc, UInt16(0x482), "PC")
     }
     
     func testBRABackward() {
@@ -221,7 +221,7 @@ class c02emuTests: XCTestCase {
         c02emuReset(emuState)
         c02emuRun(emuState)
         let regs = c02emuCPURegs(emuState)
-        XCTAssertEqual(regs.memory.pc, UInt16(0x483), "PC")
+        XCTAssertEqual(regs.pc, UInt16(0x483), "PC")
     }
     
     func testzpx() {
@@ -236,8 +236,8 @@ class c02emuTests: XCTestCase {
         c02emuReset(emuState)
         c02emuRun(emuState)
         let regs = c02emuCPURegs(emuState)
-        XCTAssertEqual(regs.memory.a, UInt8(0xff), "A")
-        XCTAssertEqual(regs.memory.status | 0x20, UInt8(0xa4), "S")
+        XCTAssertEqual(regs.a, UInt8(0xff), "A")
+        XCTAssertEqual(regs.status | 0x20, UInt8(0xa4), "S")
     }
     
     func test6502FuncTest() {

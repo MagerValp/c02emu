@@ -218,6 +218,7 @@
         </window>
         <customObject id="Yqv-8t-5W9" customClass="MonitorWindowController" customModule="c02emu" customModuleProvider="target">
             <connections>
+                <outlet property="emulator" destination="u0R-x3-ePy" id="dTP-Xb-YGN"/>
                 <outlet property="inputField" destination="eud-at-yWu" id="dUb-W0-CfM"/>
                 <outlet property="outputView" destination="Ozx-gM-9ce" id="50C-lK-CVN"/>
                 <outlet property="window" destination="eFL-wF-vl6" id="R9i-cy-5yC"/>

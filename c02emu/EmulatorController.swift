@@ -25,11 +25,14 @@ enum EmulatorAction {
     case Stop
     case Run
     case Pause
+    case Monitor
 }
 
 class EmulatorController: NSObject {
 
     let emuState: COpaquePointer
+    let monitor: Monitor!
+    
     var frameQueue = [EmulatorFrame]()
     let frameQueueMax = 6
     let frameDispatchQueue = dispatch_queue_create("se.automac.EmulatorController", nil)
@@ -38,6 +41,8 @@ class EmulatorController: NSObject {
     
     override init() {
         emuState = c02emuCreate()
+        super.init()
+        monitor = Monitor(emulator: self)
     }
     
     deinit {

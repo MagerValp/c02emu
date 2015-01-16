@@ -14,6 +14,10 @@ class MonitorWindowController: NSObject, NSTextFieldDelegate {
     @IBOutlet weak var window: NSWindow!
     @IBOutlet weak var inputField: NSTextField!
     @IBOutlet var outputView: NSTextView!
+    @IBOutlet weak var emulator: EmulatorController!
+    
+    var previousAction = EmulatorAction.Run
+    
     let font = NSFont(name: "menlo", size: 10.0)
     var textAttr = [String: AnyObject]()
     var commandHistory = [String]()
@@ -24,14 +28,22 @@ class MonitorWindowController: NSObject, NSTextFieldDelegate {
         inputField.delegate = self
         textAttr[NSFontAttributeName] = font
         outputView.editable = false
-        //outputView.textStorage?.setAttributedString(NSAttributedString(string: "c02 monitor\n", attributes: textAttr))
+    }
+    
+    func print(s: String) {
+        outputView.textStorage?.appendAttributedString(NSAttributedString(string: s, attributes: textAttr))
     }
     
     @IBAction func toggleWindow(sender: AnyObject) {
         if window.visible {
+            emulator.action = previousAction
             hide()
         } else {
-            show()
+            if emulator.action == .Run || emulator.action == .Pause {
+                previousAction = emulator.action
+                emulator.action = .Monitor
+                show()
+            }
         }
     }
     
@@ -52,9 +64,10 @@ class MonitorWindowController: NSObject, NSTextFieldDelegate {
             commandHistory.append(commandBuffer)
             commandHistoryPosition = commandHistory.count
             
-            outputView.textStorage?.appendAttributedString(NSAttributedString(string: "> \(commandBuffer)\n", attributes: textAttr))
+            print("> \(commandBuffer)\n")
             
-            parseCommand(commandBuffer)
+            print(emulator.monitor.parseCommand(commandBuffer).debugDescription)
+            print("\n")
         }
     }
     
@@ -82,12 +95,5 @@ class MonitorWindowController: NSObject, NSTextFieldDelegate {
         }
         return true
     }
-    
-//    override func controlTextDidChange(obj: NSNotification) {
-//        NSLog("controlTextDidChange")
-//    }
-    
-    func parseCommand(command: String) {
-        
-    }
+
 }

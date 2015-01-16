@@ -10,6 +10,7 @@
 		6609A11D1A605D1D00CA5B87 /* c02emu.c in Sources */ = {isa = PBXBuildFile; fileRef = 668D3C431A5DBF0F00D9C4B9 /* c02emu.c */; settings = {COMPILER_FLAGS = "-ferror-limit=100"; }; };
 		6609A11E1A61424800CA5B87 /* c02emu.c in Sources */ = {isa = PBXBuildFile; fileRef = 668D3C431A5DBF0F00D9C4B9 /* c02emu.c */; };
 		663A67F81A65B9DF0000F38E /* MonitorWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 663A67F71A65B9DF0000F38E /* MonitorWindowController.swift */; };
+		666551ED1A684812007CE683 /* Monitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 666551EC1A684812007CE683 /* Monitor.swift */; };
 		6673C4131A5C709700D17696 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6673C4121A5C709700D17696 /* AppDelegate.swift */; };
 		6673C4151A5C709700D17696 /* GameScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6673C4141A5C709700D17696 /* GameScene.swift */; };
 		6673C4171A5C709700D17696 /* GameScene.sks in Resources */ = {isa = PBXBuildFile; fileRef = 6673C4161A5C709700D17696 /* GameScene.sks */; };
@@ -60,6 +61,7 @@
 		661BAC751A5FB6C200202909 /* c02emu_optable.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = c02emu_optable.c; path = emu/c02emu_optable.c; sourceTree = "<group>"; };
 		661BAC761A5FB6C200202909 /* c02emu_optable.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = c02emu_optable.h; path = emu/c02emu_optable.h; sourceTree = "<group>"; };
 		663A67F71A65B9DF0000F38E /* MonitorWindowController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MonitorWindowController.swift; sourceTree = "<group>"; };
+		666551EC1A684812007CE683 /* Monitor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Monitor.swift; sourceTree = "<group>"; };
 		6673C40D1A5C709700D17696 /* c02emu.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = c02emu.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6673C4111A5C709700D17696 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		6673C4121A5C709700D17696 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -121,6 +123,7 @@
 				6673C4141A5C709700D17696 /* GameScene.swift */,
 				6673C4161A5C709700D17696 /* GameScene.sks */,
 				66FCD71A1A67DD07009A9421 /* EmulatorController.swift */,
+				666551EC1A684812007CE683 /* Monitor.swift */,
 				663A67F71A65B9DF0000F38E /* MonitorWindowController.swift */,
 				668D3C461A5DF42C00D9C4B9 /* c02emu-Bridging-Header.h */,
 				6673C4181A5C709700D17696 /* Images.xcassets */,
@@ -302,6 +305,7 @@
 				6609A11D1A605D1D00CA5B87 /* c02emu.c in Sources */,
 				66FCD71B1A67DD07009A9421 /* EmulatorController.swift in Sources */,
 				6673C4151A5C709700D17696 /* GameScene.swift in Sources */,
+				666551ED1A684812007CE683 /* Monitor.swift in Sources */,
 				6673C4131A5C709700D17696 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

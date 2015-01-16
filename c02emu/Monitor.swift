@@ -123,6 +123,9 @@ class Monitor: NSObject {
             case "sc":
                 return cmdStepCycle(args)
             
+            case "si":
+                return cmdStepInstruction(args)
+                
             case "x":
                 return .Action(.ExitMonitor)
                 
@@ -202,5 +205,17 @@ class Monitor: NSObject {
     func cmdStepCycle(args: [String]?) -> MonitorReturnValue {
         emulator.step()
         return cmdShowRegs(nil)
+    }
+    
+    func cmdStepInstruction(args: [String]?) -> MonitorReturnValue {
+        emulator.step()
+        for ;; {
+            switch emulator.state.cpu.state {
+            case .Done, .Stopped, .Waiting:
+                return cmdShowRegs(nil)
+            default:
+                emulator.step()
+            }
+        }
     }
 }

@@ -116,12 +116,15 @@ class Monitor: NSObject {
                 
             case "__ENTER_MONITOR":
                 return cmdEnterMonitor(args)
-            
-            case "x":
-                return .Action(.ExitMonitor)
                 
             case "r":
                 return cmdShowRegs(args)
+                
+            case "sc":
+                return cmdStepCycle(args)
+            
+            case "x":
+                return .Action(.ExitMonitor)
                 
             default:
                 return .Error("Unknown command (? for help)")
@@ -140,6 +143,10 @@ class Monitor: NSObject {
     
     func outputError() -> MonitorReturnValue {
         return .Error("\n".join(output))
+    }
+    
+    func badArgs() -> MonitorReturnValue {
+        return .Error("Bad args (? for help)")
     }
     
     let flag_c = 0x01
@@ -161,6 +168,10 @@ class Monitor: NSObject {
     }
     
     func cmdShowRegs(args: [String]?) -> MonitorReturnValue {
+        if args != nil {
+            return badArgs()
+        }
+        
         output.append("PC   A  X  Y  S  nv1bdizc  IR  State")
         let state = emulator.state
         let status = NSString(format: "%d%d1%d%d%d%d%d",
@@ -182,5 +193,14 @@ class Monitor: NSObject {
             state.cpu.state.description))
         
         return outputOK()
+    }
+    
+//    func cmdStepCycle(args: [String]?) -> MonitorReturnValue {
+//        return outputOK()
+//    }
+    
+    func cmdStepCycle(args: [String]?) -> MonitorReturnValue {
+        emulator.step()
+        return cmdShowRegs(nil)
     }
 }

@@ -91,6 +91,29 @@ void c02emuReset(C02EmuState *state) {
 }
 
 
+C02EmuReturnReason c02emuStepCycle(C02EmuState *state) {
+    C02EmuReturnReason reason;
+    
+    if (state->phase == C02EMU_PHASE_CPU) {
+        state->phase = C02EMU_PHASE_IO;
+        reason = cpu_step_cycle(state);
+        if (reason != C02EMU_CYCLE_STEPPED) {
+            return reason;
+        }
+    }
+    
+    if (state->phase == C02EMU_PHASE_IO) {
+        state->phase = C02EMU_PHASE_CPU;
+        reason = io_step_cycle(state);
+        if (reason != C02EMU_CYCLE_STEPPED) {
+            return reason;
+        }
+    }
+    
+    return C02EMU_CYCLE_STEPPED;
+}
+
+
 C02EmuReturnReason c02emuRun(C02EmuState *state) {
     C02EmuReturnReason reason;
     

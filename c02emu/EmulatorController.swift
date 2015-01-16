@@ -76,13 +76,32 @@ class EmulatorController: NSObject {
                     case C02EMU_CPU_STOPPED.value:
                         continue
                     default:
-                        assertionFailure("Unimplemented c02emuRun reason")
+                        assertionFailure("Unexpected c02emuRun reason")
                     }
                 }
             }
         }
     }
-
+    
+    func step() {
+        stepLoop: for ;; {
+            switch c02emuStepCycle(emuState).value {
+            case C02EMU_FRAME_READY.value:
+                let frame = self.buildFrame()
+                dispatch_sync(frameDispatchQueue, {
+                    self.frameQueue.append(frame)
+                })
+                return
+            case C02EMU_CPU_STOPPED.value:
+                continue
+            case C02EMU_CYCLE_STEPPED.value:
+                return
+            default:
+                assertionFailure("Unexpected c02emuStep reason")
+            }
+        }
+    }
+    
     func buildFrame() -> Frame {
         var frame: Frame
         

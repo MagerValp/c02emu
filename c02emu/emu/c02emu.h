@@ -73,6 +73,14 @@ typedef enum {
     C02EMU_CYCLE_STEPPED,
 } C02EmuReturnReason;
 
+/// Execute until a single cycle has passed.
+///
+/// May return early, check return reason.
+///
+/// @param state    Emulator state.
+/// @return The reason that the emulator stopped.
+C02EmuReturnReason c02emuStepCycle(C02EmuState *state);
+
 /// Execute until a stopping condition occurs.
 ///
 /// Before it can run a state must be created, a ROM image must be loaded, and reset must be called.

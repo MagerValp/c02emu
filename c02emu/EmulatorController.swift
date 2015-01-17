@@ -9,7 +9,7 @@
 import Cocoa
 
 
-class EmulatorController: NSObject {
+class EmulatorController: NSObject, DisassemblerDelegate {
 
     enum DisplayMode: Int {
         case Text40x25 = 0
@@ -239,6 +239,10 @@ class EmulatorController: NSObject {
             
             return EmulatorState(cpu: cpuState, display: displayState)
         }
+    }
+    
+    func readMemory(addr: UInt16) -> UInt8 {
+        return c02emuCPURead(emuState, addr)
     }
     
 }

@@ -29,9 +29,11 @@ class Monitor: NSObject {
     }
     
     weak var emulator: EmulatorController!
+    var disassembler: Disassembler
     
     init(emulator theEmulator: EmulatorController) {
         emulator = theEmulator
+        disassembler = Disassembler(delegate: emulator)
     }
     
     func parseCommand(cmdBuffer: String) -> [String]? {
@@ -117,6 +119,9 @@ class Monitor: NSObject {
             case "__ENTER_MONITOR":
                 return cmdEnterMonitor(args)
                 
+            case "d":
+                return cmdDisassemble(args)
+            
             case "r":
                 return cmdShowRegs(args)
                 
@@ -212,10 +217,51 @@ class Monitor: NSObject {
         for ;; {
             switch emulator.state.cpu.state {
             case .Done, .Stopped, .Waiting:
-                return cmdShowRegs(nil)
+                cmdShowRegs(nil)
+                output.append(disassembler.disassemble(emulator.state.cpu.pc, to: emulator.state.cpu.pc + 1))
+                return outputOK()
             default:
                 emulator.step()
             }
+        }
+    }
+    
+    func cmdDisassemble(args: [String]?) -> MonitorReturnValue {
+        var from: UInt16 = emulator.state.cpu.pc
+        var to: UInt16 = emulator.state.cpu.pc &+ 32
+        
+        if let args = args {
+            if args.count > 2 {
+                return .Error("Usage: d [start] [end]")
+            }
+            if args.count >= 1 {
+                if let addr = argAsUInt16(args[0]) {
+                    from = addr
+                    if args.count >= 2 {
+                        if let addr = argAsUInt16(args[1]) {
+                            to = addr
+                        } else {
+                            return .Error("Expected address argument")
+                        }
+                    }
+                } else {
+                    return .Error("Expected address argument")
+                }
+            }
+        }
+        output.append(disassembler.disassemble(from, to: to))
+        return outputOK()
+    }
+    
+    func argAsUInt16(arg: String) -> UInt16? {
+        var value: UInt32 = 0
+        if NSScanner(string: arg).scanHexInt(&value) {
+            if value > 0xffff {
+                return nil
+            }
+            return UInt16(value & 0xffff)
+        } else {
+            return nil
         }
     }
 }

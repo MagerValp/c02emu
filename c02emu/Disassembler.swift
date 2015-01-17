@@ -190,7 +190,7 @@ class Disassembler: NSObject {
         var bytes = [UInt8]()
         var byte: UInt8
         var word: UInt16
-        var output = String(NSString(format: "%04x   ", pc & 0xffff))
+        var output: String = NSString(format: "%04x   ", pc & 0xffff)
         
         byte = readIncPC()
         bytes.append(byte)
@@ -200,15 +200,15 @@ class Disassembler: NSObject {
         let mode = addrModes[Int(byte)]
         let format = opFormat[mode]!
         
-        var operand = modePrefix[mode]!
+        var operand: String
         
         switch format {
         
         case .Byte:
             byte = readIncPC()
             bytes.append(byte)
-            output += NSString(format: "%02x ", byte)
-            operand += NSString(format: "%02x", byte)
+            output += NSString(format: "%02x    ", byte)
+            operand = NSString(format: "%02x", byte)
         
         case .Word:
             byte = readIncPC()
@@ -221,25 +221,22 @@ class Disassembler: NSObject {
             output += NSString(format: "%02x ", byte)
             word = word | (UInt16(byte) << 8)
             
-            operand += NSString(format: "%04x", word)
+            operand = NSString(format: "%04x", word)
         
         case .Relative:
             byte = readIncPC()
             bytes.append(byte)
-            output += NSString(format: "%02x ", byte)
+            output += NSString(format: "%02x    ", byte)
             word = UInt16((Int(pc) + Int(unsafeBitCast(byte, Int8.self))) & 0xffff)
-            operand += NSString(format: "%04x", word)
+            operand = NSString(format: "%04x", word)
 
         case .None:
-            break
+            output += "      "
+            operand = ""
         }
         
-        for i in bytes.count..<3 {
-            output += "   "
-        }
-        output += "  " + code + " " + operand + modeSuffix[mode]!
-        
-        return output
+        return output + "  " + code + " " + modePrefix[mode]! + operand + modeSuffix[mode]!
+
     }
     
     func readIncPC() -> UInt8 {

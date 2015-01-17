@@ -18,6 +18,8 @@
 		6673C41C1A5C709700D17696 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6673C41A1A5C709700D17696 /* MainMenu.xib */; };
 		6673C4281A5C709700D17696 /* c02emuTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6673C4271A5C709700D17696 /* c02emuTests.swift */; };
 		6691FD131A69938A00DFF540 /* Disassembler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6691FD121A69938A00DFF540 /* Disassembler.swift */; };
+		669FCCD01A6AD58800E6299F /* Emulator_Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 669FCCCF1A6AD58800E6299F /* Emulator_Tests.swift */; };
+		669FCCD71A6AD67000E6299F /* Disassembler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6691FD121A69938A00DFF540 /* Disassembler.swift */; };
 		66DE98E51A61B68400AD860C /* rom.bin in CopyFiles */ = {isa = PBXBuildFile; fileRef = 66DE98E41A61B68400AD860C /* rom.bin */; };
 		66DE98E91A6324BF00AD860C /* 6502_functional_test.bin in Resources */ = {isa = PBXBuildFile; fileRef = 66DE98E81A6324BF00AD860C /* 6502_functional_test.bin */; };
 		66FCD71B1A67DD07009A9421 /* EmulatorController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66FCD71A1A67DD07009A9421 /* EmulatorController.swift */; };
@@ -25,6 +27,13 @@
 
 /* Begin PBXContainerItemProxy section */
 		6673C4221A5C709700D17696 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 6673C4051A5C709700D17696 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 6673C40C1A5C709700D17696;
+			remoteInfo = c02emu;
+		};
+		669FCCD11A6AD58800E6299F /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 6673C4051A5C709700D17696 /* Project object */;
 			proxyType = 1;
@@ -78,6 +87,9 @@
 		668D3C441A5DBF0F00D9C4B9 /* c02emu.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = c02emu.h; path = emu/c02emu.h; sourceTree = "<group>"; };
 		668D3C461A5DF42C00D9C4B9 /* c02emu-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "c02emu-Bridging-Header.h"; sourceTree = "<group>"; };
 		6691FD121A69938A00DFF540 /* Disassembler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Disassembler.swift; sourceTree = "<group>"; };
+		669FCCCB1A6AD58800E6299F /* Emulator Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Emulator Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		669FCCCE1A6AD58800E6299F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		669FCCCF1A6AD58800E6299F /* Emulator_Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Emulator_Tests.swift; sourceTree = "<group>"; };
 		66DE98E41A61B68400AD860C /* rom.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; name = rom.bin; path = ../Software/ROM/rom.bin; sourceTree = "<group>"; };
 		66DE98E81A6324BF00AD860C /* 6502_functional_test.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; name = 6502_functional_test.bin; path = ../Software/Test/6502_65C02_functional_tests/6502_functional_test.bin; sourceTree = "<group>"; };
 		66FCD71A1A67DD07009A9421 /* EmulatorController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EmulatorController.swift; sourceTree = "<group>"; };
@@ -98,6 +110,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		669FCCC81A6AD58800E6299F /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -106,6 +125,7 @@
 			children = (
 				6673C40F1A5C709700D17696 /* c02emu */,
 				6673C4241A5C709700D17696 /* c02emuTests */,
+				669FCCCC1A6AD58800E6299F /* Emulator Tests */,
 				6673C40E1A5C709700D17696 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -115,6 +135,7 @@
 			children = (
 				6673C40D1A5C709700D17696 /* c02emu.app */,
 				6673C4211A5C709700D17696 /* c02emuTests.xctest */,
+				669FCCCB1A6AD58800E6299F /* Emulator Tests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -182,6 +203,23 @@
 			name = "Emulator Core";
 			sourceTree = "<group>";
 		};
+		669FCCCC1A6AD58800E6299F /* Emulator Tests */ = {
+			isa = PBXGroup;
+			children = (
+				669FCCCF1A6AD58800E6299F /* Emulator_Tests.swift */,
+				669FCCCD1A6AD58800E6299F /* Supporting Files */,
+			);
+			path = "Emulator Tests";
+			sourceTree = "<group>";
+		};
+		669FCCCD1A6AD58800E6299F /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				669FCCCE1A6AD58800E6299F /* Info.plist */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXLegacyTarget section */
@@ -239,6 +277,24 @@
 			productReference = 6673C4211A5C709700D17696 /* c02emuTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
+		669FCCCA1A6AD58800E6299F /* Emulator Tests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 669FCCD51A6AD58800E6299F /* Build configuration list for PBXNativeTarget "Emulator Tests" */;
+			buildPhases = (
+				669FCCC71A6AD58800E6299F /* Sources */,
+				669FCCC81A6AD58800E6299F /* Frameworks */,
+				669FCCC91A6AD58800E6299F /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				669FCCD21A6AD58800E6299F /* PBXTargetDependency */,
+			);
+			name = "Emulator Tests";
+			productName = "Emulator Tests";
+			productReference = 669FCCCB1A6AD58800E6299F /* Emulator Tests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -253,6 +309,10 @@
 					};
 					6673C4201A5C709700D17696 = {
 						CreatedOnToolsVersion = 6.1;
+						TestTargetID = 6673C40C1A5C709700D17696;
+					};
+					669FCCCA1A6AD58800E6299F = {
+						CreatedOnToolsVersion = 6.2;
 						TestTargetID = 6673C40C1A5C709700D17696;
 					};
 					66DE98DD1A61B49A00AD860C = {
@@ -276,6 +336,7 @@
 				6673C40C1A5C709700D17696 /* c02emu */,
 				6673C4201A5C709700D17696 /* c02emuTests */,
 				66DE98DD1A61B49A00AD860C /* c02emuROM */,
+				669FCCCA1A6AD58800E6299F /* Emulator Tests */,
 			);
 		};
 /* End PBXProject section */
@@ -296,6 +357,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				66DE98E91A6324BF00AD860C /* 6502_functional_test.bin in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		669FCCC91A6AD58800E6299F /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -325,6 +393,15 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		669FCCC71A6AD58800E6299F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				669FCCD01A6AD58800E6299F /* Emulator_Tests.swift in Sources */,
+				669FCCD71A6AD67000E6299F /* Disassembler.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -332,6 +409,11 @@
 			isa = PBXTargetDependency;
 			target = 6673C40C1A5C709700D17696 /* c02emu */;
 			targetProxy = 6673C4221A5C709700D17696 /* PBXContainerItemProxy */;
+		};
+		669FCCD21A6AD58800E6299F /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 6673C40C1A5C709700D17696 /* c02emu */;
+			targetProxy = 669FCCD11A6AD58800E6299F /* PBXContainerItemProxy */;
 		};
 		66DE98E21A61B4D900AD860C /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -492,6 +574,43 @@
 			};
 			name = Release;
 		};
+		669FCCD31A6AD58800E6299F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				COMBINE_HIDPI_IMAGES = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+					"$(inherited)",
+				);
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = "Emulator Tests/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/c02emu.app/Contents/MacOS/c02emu";
+			};
+			name = Debug;
+		};
+		669FCCD41A6AD58800E6299F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				COMBINE_HIDPI_IMAGES = YES;
+				COPY_PHASE_STRIP = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = "Emulator Tests/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/c02emu.app/Contents/MacOS/c02emu";
+			};
+			name = Release;
+		};
 		66DE98DE1A61B49A00AD860C /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -547,6 +666,14 @@
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
+		};
+		669FCCD51A6AD58800E6299F /* Build configuration list for PBXNativeTarget "Emulator Tests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				669FCCD31A6AD58800E6299F /* Debug */,
+				669FCCD41A6AD58800E6299F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
 		};
 		66DE98E01A61B49A00AD860C /* Build configuration list for PBXLegacyTarget "c02emuROM" */ = {
 			isa = XCConfigurationList;

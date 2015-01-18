@@ -36,7 +36,11 @@ class Emulator_Tests: XCTestCase, DisassemblerDelegate {
         let dis = Disassembler(delegate: self)
         arc4random_buf(&fakeRAM, UInt(fakeRAM.count))
         self.measureBlock() {
-            let result = dis.disassemble(0xf000, to: 0xffff)
+            let bytes: UInt16 = 0x1000
+            dis.disassemble(0xf000)
+            while dis.pc &- 0xf000 < bytes {
+                dis.disassemble()
+            }
         }
     }
     

@@ -162,31 +162,18 @@ class Disassembler: NSObject {
         .ZPY: .Byte,
     ]
     
-    var pc: UInt32 = 0
+    var pc: UInt16 = 0
     
     init(delegate: DisassemblerDelegate) {
         self.delegate = delegate
     }
     
-    func disassemble(from: UInt16, to: UInt16) -> String {
-        var output = [String]()
-        var end: UInt32
-        
-        pc = UInt32(from)
-        if to >= from {
-            end = UInt32(to)
-        } else {
-            end = UInt32(to) + 0x10000
-        }
-        while pc <= end {
-            let result = disassemblePC()
-            output.append(result)
-        }
-        
-        return "\n".join(output)
+    func disassemble(addr: UInt16) -> String {
+        pc = addr
+        return disassemble()
     }
     
-    func disassemblePC() -> String {
+    func disassemble() -> String {
         var bytes = [UInt8]()
         var byte: UInt8
         var word: UInt16

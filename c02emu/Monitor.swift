@@ -8,27 +8,28 @@
 
 import Cocoa
 
-enum StringParserState: String {
-    case Base = "Base"
-    case EscapedCharacter = "EscapedCharacter"
-    case DoubleQuotedString = "DoubleQuotedString"
-    case EscapedCharacterInQuotes = "EscapedCharacterInQuotes"
-    case SingleQuotedString = "SingleQuotedString"
+
+protocol MonitorDelegate {
+    func outputMessage(msg: String)
+    func outputError(msg: String)
+    func exitMonitor()
+    func willExecuteCommand()
+    func didExecuteCommand()
 }
+
 
 class Monitor: NSObject {
     
-    enum MonitorAction {
-        case ExitMonitor
+    enum StringParserState: String {
+        case Base = "Base"
+        case EscapedCharacter = "EscapedCharacter"
+        case DoubleQuotedString = "DoubleQuotedString"
+        case EscapedCharacterInQuotes = "EscapedCharacterInQuotes"
+        case SingleQuotedString = "SingleQuotedString"
     }
-    
-    enum MonitorReturnValue {
-        case Error(String)
-        case Output(String)
-        case Action(MonitorAction)
-    }
-    
+
     weak var emulator: EmulatorController!
+    var delegate: MonitorDelegate!
     var disassembler: Disassembler
     
     init(emulator theEmulator: EmulatorController) {
@@ -36,6 +37,14 @@ class Monitor: NSObject {
         disassembler = Disassembler(delegate: emulator)
     }
     
+    func outputLine(line: String) {
+        delegate.outputMessage(line + "\n")
+    }
+    
+    func outputErrorLine(line: String) {
+        delegate.outputError(line + "\n")
+    }
+
     func parseCommand(cmdBuffer: String) -> [String]? {
         let chars = Array(cmdBuffer)
         var state = StringParserState.Base
@@ -105,11 +114,11 @@ class Monitor: NSObject {
         return tokens
     }
     
-    func executeCommand(cmdBuffer: String) -> MonitorReturnValue {
-        output = []
+    func executeCommand(cmdBuffer: String) {
+        delegate.willExecuteCommand()
         if let cmdTokens = parseCommand(cmdBuffer) {
             if cmdTokens.count == 0 {
-                return .Error("")
+                outputErrorLine("")
             }
             
             let args: [String]? = cmdTokens.count > 1 ? Array(cmdTokens[1 ..< cmdTokens.count]) : nil
@@ -117,44 +126,37 @@ class Monitor: NSObject {
             switch cmdTokens[0] {
                 
             case "__ENTER_MONITOR":
-                return cmdEnterMonitor(args)
+                cmdEnterMonitor(args)
                 
             case "d":
-                return cmdDisassemble(args)
+                cmdDisassemble(args)
             
             case "r":
-                return cmdShowRegs(args)
+                cmdShowRegs(args)
                 
             case "sc":
-                return cmdStepCycle(args)
+                cmdStepCycle(args)
             
             case "si":
-                return cmdStepInstruction(args)
+                cmdStepInstruction(args)
                 
             case "x":
-                return .Action(.ExitMonitor)
+                delegate.exitMonitor()
                 
             default:
-                return .Error("Unknown command (? for help)")
+                outputErrorLine("Unknown command (? for help)")
                 
             }
         } else {
-            return .Error("Syntax error")
+            outputErrorLine("Syntax error")
         }
+        delegate.didExecuteCommand()
     }
 
     var output = [String]()
     
-    func outputOK() -> MonitorReturnValue {
-        return .Output("\n".join(output))
-    }
-    
-    func outputError() -> MonitorReturnValue {
-        return .Error("\n".join(output))
-    }
-    
-    func badArgs() -> MonitorReturnValue {
-        return .Error("Bad args (? for help)")
+    func badArgs() {
+        outputErrorLine("Bad args (? for help)")
     }
     
     let flag_c = 0x01
@@ -167,20 +169,19 @@ class Monitor: NSObject {
     let flag_n = 0x80
     
     
-    func cmdEnterMonitor(args: [String]?) -> MonitorReturnValue {
-        output.append(NSString(format: "***BREAK at frame %d line %d cycle %d",
+    func cmdEnterMonitor(args: [String]?) {
+        outputLine(NSString(format: "***BREAK at frame %d line %d cycle %d",
             emulator.state.display.frame,
             emulator.state.display.line,
             emulator.state.display.cycle))
-        return outputOK()
     }
     
-    func cmdShowRegs(args: [String]?) -> MonitorReturnValue {
+    func cmdShowRegs(args: [String]?) {
         if args != nil {
             return badArgs()
         }
         
-        output.append("PC   A  X  Y  S  nv1bdizc  IR  State")
+        outputLine("PC   A  X  Y  S  nv1bdizc  IR  State")
         let state = emulator.state
         let status = NSString(format: "%d%d1%d%d%d%d%d",
             (Int(state.cpu.status) & flag_n) >> 7,
@@ -190,7 +191,7 @@ class Monitor: NSObject {
             (Int(state.cpu.status) & flag_i) >> 2,
             (Int(state.cpu.status) & flag_z) >> 1,
             (Int(state.cpu.status) & flag_c))
-        output.append(NSString(format: "%04x %02x %02x %02x %02x %@  %02x  %@",
+        outputLine(NSString(format: "%04x %02x %02x %02x %02x %@  %02x  %@",
             state.cpu.pc,
             state.cpu.a,
             state.cpu.x,
@@ -199,40 +200,38 @@ class Monitor: NSObject {
             status,
             state.cpu.ir,
             state.cpu.state.description))
-        
-        return outputOK()
     }
     
-//    func cmdStepCycle(args: [String]?) -> MonitorReturnValue {
-//        return outputOK()
-//    }
-    
-    func cmdStepCycle(args: [String]?) -> MonitorReturnValue {
+    func cmdStepCycle(args: [String]?) {
         emulator.step()
-        return cmdShowRegs(nil)
+        cmdShowRegs(nil)
     }
     
-    func cmdStepInstruction(args: [String]?) -> MonitorReturnValue {
+    func cmdStepInstruction(args: [String]?) {
         emulator.step()
         for ;; {
             switch emulator.state.cpu.state {
-            case .Done, .Stopped, .Waiting:
+            case .Done:
                 cmdShowRegs(nil)
-                output.append(disassembler.disassemble(emulator.state.cpu.pc, to: emulator.state.cpu.pc + 1))
-                return outputOK()
+                outputLine(disassembler.disassemble(emulator.state.cpu.pc))
+                return
+            case .Stopped, .Waiting:
+                cmdShowRegs(nil)
+                return
             default:
                 emulator.step()
             }
         }
     }
     
-    func cmdDisassemble(args: [String]?) -> MonitorReturnValue {
+    func cmdDisassemble(args: [String]?) {
         var from: UInt16 = emulator.state.cpu.pc
         var to: UInt16 = emulator.state.cpu.pc &+ 32
         
         if let args = args {
             if args.count > 2 {
-                return .Error("Usage: d [start] [end]")
+                outputErrorLine("Usage: d [start] [end]")
+                return
             }
             if args.count >= 1 {
                 if let addr = argAsUInt16(args[0]) {
@@ -241,16 +240,22 @@ class Monitor: NSObject {
                         if let addr = argAsUInt16(args[1]) {
                             to = addr
                         } else {
-                            return .Error("Expected address argument")
+                            outputErrorLine("Expected address argument")
+                            return
                         }
                     }
                 } else {
-                    return .Error("Expected address argument")
+                    outputErrorLine("Expected address argument")
+                    return
                 }
             }
         }
-        output.append(disassembler.disassemble(from, to: to))
-        return outputOK()
+        
+        let bytes = to &- from
+        outputLine(disassembler.disassemble(from))
+        while disassembler.pc &- from < bytes {
+            outputLine(disassembler.disassemble())
+        }
     }
     
     func argAsUInt16(arg: String) -> UInt16? {

@@ -131,6 +131,9 @@ class Monitor: NSObject {
             case "d":
                 cmdDisassemble(args)
             
+            case "m":
+                cmdShowMemory(args)
+                
             case "r":
                 cmdShowRegs(args)
                 
@@ -174,6 +177,55 @@ class Monitor: NSObject {
             emulator.state.display.frame,
             emulator.state.display.line,
             emulator.state.display.cycle))
+    }
+    
+    
+    func cmdShowMemory(args: [String]?) {
+        var from: UInt16 = emulator.state.cpu.pc
+        var to: UInt16 = emulator.state.cpu.pc &+ 255
+        
+        if let args = args {
+            if args.count > 2 {
+                outputErrorLine("Usage: m [start] [end]")
+                return
+            }
+            if args.count >= 1 {
+                if let addr = argAsUInt16(args[0]) {
+                    from = addr
+                    if args.count >= 2 {
+                        if let addr = argAsUInt16(args[1]) {
+                            to = addr
+                        } else {
+                            outputErrorLine("Expected address argument")
+                            return
+                        }
+                    } else {
+                        to = from &+ 255
+                    }
+                } else {
+                    outputErrorLine("Expected address argument")
+                    return
+                }
+            }
+        }
+        
+        let bytes = to &- from
+        var addr = from
+        while addr &- from <= bytes {
+            var output: String = NSString(format: "%04x  ", addr)
+            var ascii = ""
+            for i in 0..<16 {
+                let byte = emulator.readMemory(addr)
+                output += NSString(format: " %02x", byte)
+                if byte >= 0x20 && byte < 0x7f {
+                    ascii += String(UnicodeScalar(Int(byte)))
+                } else {
+                    ascii += "."
+                }
+                addr = addr &+ 1
+            }
+            outputLine(output + "   " + ascii)
+        }
     }
     
     func cmdShowRegs(args: [String]?) {
@@ -243,6 +295,8 @@ class Monitor: NSObject {
                             outputErrorLine("Expected address argument")
                             return
                         }
+                    } else {
+                        to = from &+ 255
                     }
                 } else {
                     outputErrorLine("Expected address argument")

@@ -26,9 +26,9 @@ class c02emuTests: XCTestCase {
         //   RES vector set to $0400.
         rom = NSMutableData()
         rom.appendData(NSMutableData(length: 0x1000 - 6)!)
-        rom.appendBytes([0x03, 0x04] as [Byte], length: 2)
-        rom.appendBytes([0x00, 0x04] as [Byte], length: 2)
-        rom.appendBytes([0x06, 0x04] as [Byte], length: 2)
+        rom.appendBytes([0x03, 0x04] as [UInt8], length: 2)
+        rom.appendBytes([0x00, 0x04] as [UInt8], length: 2)
+        rom.appendBytes([0x06, 0x04] as [UInt8], length: 2)
         c02emuLoadROM(emuState, rom.bytes, UInt(rom.length))
         // Set program load PC to $0400.
         prgPtr = 0x0400
@@ -41,7 +41,7 @@ class c02emuTests: XCTestCase {
         super.tearDown()
     }
     
-    func setProgramBytes(bytes: Array<Byte>) {
+    func setProgramBytes(bytes: Array<UInt8>) {
         for byte in bytes {
             c02emuCPUWrite(emuState, prgPtr++, byte)
         }
@@ -49,7 +49,7 @@ class c02emuTests: XCTestCase {
     
     func loadBin(addr: Int, data: UnsafePointer<Void>, length: Int) {
         NSLog("Loading \(length) bytes at \(addr)")
-        let bytes = UnsafePointer<Byte>(data)
+        let bytes = UnsafePointer<UInt8>(data)
         for i in 0..<length {
             c02emuCPUWrite(emuState, UInt16(addr + i), bytes[i])
         }
@@ -154,8 +154,8 @@ class c02emuTests: XCTestCase {
         c02emuReset(emuState)
         c02emuRun(emuState)
         let regs = c02emuCPURegs(emuState)
-        XCTAssertEqual(regs.memory.a, UInt8(0), "A")
-        XCTAssertEqual(regs.memory.status & 0xdf, UInt8(0x02), "S")
+        XCTAssertEqual(regs.a, UInt8(0), "A")
+        XCTAssertEqual(regs.status & 0xdf, UInt8(0x02), "S")
     }
     
     func testDecimalADC() {
@@ -168,8 +168,8 @@ class c02emuTests: XCTestCase {
         c02emuReset(emuState)
         c02emuRun(emuState)
         let regs = c02emuCPURegs(emuState)
-        XCTAssertEqual(regs.memory.a, UInt8(0x99), "A")
-        XCTAssertEqual(regs.memory.status | 0x20, UInt8(0x6d), "S")
+        XCTAssertEqual(regs.a, UInt8(0x99), "A")
+        XCTAssertEqual(regs.status | 0x20, UInt8(0x6d), "S")
     }
 
     func testDecimalSBC() {
@@ -182,8 +182,8 @@ class c02emuTests: XCTestCase {
         c02emuReset(emuState)
         c02emuRun(emuState)
         let regs = c02emuCPURegs(emuState)
-        XCTAssertEqual(regs.memory.a, UInt8(0x98), "A")
-        XCTAssertEqual(regs.memory.status | 0x20, UInt8(0xad), "S")
+        XCTAssertEqual(regs.a, UInt8(0x98), "A")
+        XCTAssertEqual(regs.status | 0x20, UInt8(0xad), "S")
     }
 
     func testDEX() {
@@ -197,8 +197,8 @@ class c02emuTests: XCTestCase {
         c02emuReset(emuState)
         c02emuRun(emuState)
         let regs = c02emuCPURegs(emuState)
-        XCTAssertEqual(regs.memory.x, UInt8(0xff), "X")
-        XCTAssertEqual(regs.memory.status | 0x20, UInt8(0xa4), "S")
+        XCTAssertEqual(regs.x, UInt8(0xff), "X")
+        XCTAssertEqual(regs.status | 0x20, UInt8(0xa4), "S")
     }
     
     func testBRAForward() {
@@ -209,7 +209,7 @@ class c02emuTests: XCTestCase {
         c02emuReset(emuState)
         c02emuRun(emuState)
         let regs = c02emuCPURegs(emuState)
-        XCTAssertEqual(regs.memory.pc, UInt16(0x482), "PC")
+        XCTAssertEqual(regs.pc, UInt16(0x482), "PC")
     }
     
     func testBRABackward() {
@@ -221,7 +221,7 @@ class c02emuTests: XCTestCase {
         c02emuReset(emuState)
         c02emuRun(emuState)
         let regs = c02emuCPURegs(emuState)
-        XCTAssertEqual(regs.memory.pc, UInt16(0x483), "PC")
+        XCTAssertEqual(regs.pc, UInt16(0x483), "PC")
     }
     
     func testzpx() {
@@ -236,8 +236,8 @@ class c02emuTests: XCTestCase {
         c02emuReset(emuState)
         c02emuRun(emuState)
         let regs = c02emuCPURegs(emuState)
-        XCTAssertEqual(regs.memory.a, UInt8(0xff), "A")
-        XCTAssertEqual(regs.memory.status | 0x20, UInt8(0xa4), "S")
+        XCTAssertEqual(regs.a, UInt8(0xff), "A")
+        XCTAssertEqual(regs.status | 0x20, UInt8(0xa4), "S")
     }
     
     func test6502FuncTest() {

@@ -10,8 +10,102 @@
 #define __c02emu__c02emu_private_c__
 
 
-#include "c02emu_private.h"
 #include <stdio.h>
+#include "c02emu_private.h"
+#include "c02emu_optable.h"
+
+
+// Running and stepping.
+
+
+static C02EmuReturnReason cpu_step_cycle(C02EmuState *state) {
+    Byte op;
+    
+    if (state->cpu.op.cycle == C02EMU_OP_DONE) {
+        
+        if (state->monitor.trace_cpu) {
+            fputs("  PC   A  X  Y  S  nv1bdizc\n", stderr);
+            fprintf(stderr, ".;%04x %02x %02x %02x %02x %d%d1%d%d%d%d%d\n",
+                    state->cpu.pc,
+                    state->cpu.a,
+                    state->cpu.x,
+                    state->cpu.y,
+                    state->cpu.stack,
+                    (state->cpu.status & flag_n) >> 7,
+                    (state->cpu.status & flag_v) >> 6,
+                    (state->cpu.status & flag_b) >> 4,
+                    (state->cpu.status & flag_d) >> 3,
+                    (state->cpu.status & flag_i) >> 2,
+                    (state->cpu.status & flag_z) >> 1,
+                    (state->cpu.status & flag_c));
+        }
+        
+        if (state->cpu.op.irq_active) {
+            op = 0;
+            if (state->monitor.trace_cpu) {
+                fprintf(stderr, "PC = %04x IRQ\n", state->cpu.pc);
+            }
+            state->cpu.op.uop_list = irq_op_table[OP_IRQ];
+        } else {
+            op = raw_mem_read(state, (state->cpu.pc)++);
+            if (state->monitor.trace_cpu) {
+                fprintf(stderr, "PC = %04x OP = %02x\n", (state->cpu.pc - 1) & 0xffff, op);
+            }
+            state->cpu.op.uop_list = op_table[op];
+        }
+        state->cpu.op.cycle = C02EMU_OP_CYCLE_1;
+        state->cpu.op.address_fixup = false;
+        state->cpu.op.decimal_fixup = false;
+        state->cpu.op.opcode = op;
+        
+    } else if(state->cpu.op.cycle == C02EMU_OP_STOPPED) {
+        
+        if (!state->cpu.op.stop_notified) {
+            state->cpu.op.stop_notified = true;
+            return C02EMU_CPU_STOPPED;
+        }
+        
+    } else if(state->cpu.op.cycle == C02EMU_OP_WAITING) {
+        
+        if (!(state->cpu.status & flag_i)) {
+            // Evaluate IRQs.
+        } else {
+            // Evaluate IRQs, but continue at PC instead of jumping to vector.
+        }
+        // Evaluate NMIs.
+        
+    } else {
+        
+        state->cpu.op.irq_active = false;
+        if (!(state->cpu.status & flag_i)) {
+            if (state->line_ctr == 0 /* && state->cycle_ctr == 0*/ ) {
+                state->cpu.op.irq_active = true;
+            }
+        }
+        // Evaluate NMIs here.
+        
+        state->cpu.op.uop_list[state->cpu.op.cycle](state);
+        if (state->cpu.op.cycle < C02EMU_OP_DONE) {
+            state->cpu.op.cycle += 1;
+        }
+    }
+    
+    return C02EMU_CYCLE_STEPPED;
+}
+
+
+static C02EmuReturnReason io_step_cycle(C02EmuState *state) {
+    if (++state->cycle_ctr > C02EMU_CYCLES_PER_LINE) {
+        state->cycle_ctr = 0;
+        if (++state->line_ctr > C02EMU_LINES_PER_FRAME) {
+            state->line_ctr = 0;
+            state->frame_ctr += 1;
+            return C02EMU_FRAME_READY;
+        }
+    }
+
+    return C02EMU_CYCLE_STEPPED;
+}
 
 
 // Memory access and address decoding.

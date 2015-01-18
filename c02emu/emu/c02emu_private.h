@@ -32,18 +32,9 @@ typedef uint32_t LongAddr;
 #define cycles_per_frame(FRAME_CTR) ((FRAME_CTR % 3) == 0 ? 133334 : 133333)
 
 typedef enum {
-    C02EMU_OP_CYCLE_1=0,    // Cycle 1 value is 0, and so on, to correctly index op table.
-    C02EMU_OP_CYCLE_2,
-    C02EMU_OP_CYCLE_3,
-    C02EMU_OP_CYCLE_4,
-    C02EMU_OP_CYCLE_5,
-    C02EMU_OP_CYCLE_6,
-    C02EMU_OP_CYCLE_7,
-    C02EMU_OP_DONE,
-    C02EMU_OP_STOPPED,
-    C02EMU_OP_WAITING,
-} C02EmuOpCycle;
-
+    C02EMU_PHASE_CPU,
+    C02EMU_PHASE_IO,
+} C02EmuPhase;
 
 #ifdef __LITTLE_ENDIAN__
 #define BYTE_LH Byte l, h
@@ -96,6 +87,8 @@ struct _c02EmuState {
         } display;
     } io;
     
+    C02EmuPhase phase;
+    
     unsigned int cycle_ctr;
     unsigned int line_ctr;
     unsigned int frame_ctr;
@@ -106,6 +99,9 @@ struct _c02EmuState {
     } monitor;
 };
 
+
+static C02EmuReturnReason cpu_step_cycle(C02EmuState *state);
+static C02EmuReturnReason io_step_cycle(C02EmuState *state);
 
 static LongAddr mmu_addr(C02EmuState *state, Addr addr);
 static Byte raw_mem_read(C02EmuState *state, Addr addr);

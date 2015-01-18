@@ -32,33 +32,33 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     
     @IBOutlet weak var window: NSWindow!
     @IBOutlet weak var skView: SKView!
-    var emuState: COpaquePointer = nil
+    @IBOutlet weak var emulator: EmulatorController!
     
     func applicationDidFinishLaunching(aNotification: NSNotification) {
-        emuState = c02emuCreate()
-        let romData = NSData(contentsOfURL: NSBundle.mainBundle().URLForResource("rom", withExtension: "bin")!)!
-        c02emuLoadROM(emuState, romData.bytes, UInt(romData.length))
-        c02emuReset(emuState)
+        
+        emulator.configure()
         
         /* Pick a size for the scene */
         if let scene = GameScene.unarchiveFromFile("GameScene") as? GameScene {
             /* Set the scale mode to scale to fit the window */
             scene.scaleMode = .AspectFit
-            scene.emuState = emuState
+            scene.emulator = emulator
             
             self.skView!.presentScene(scene)
             
             /* Sprite Kit applies additional optimizations to improve rendering performance */
             self.skView!.ignoresSiblingOrder = true
-            
+            self.skView!.shouldCullNonVisibleNodes = false
+            self.skView!.allowsTransparency = false
             self.skView!.showsFPS = true
-            self.skView!.showsNodeCount = true
+            //self.skView!.showsNodeCount = true
         }
+        
+        emulator.start()
     }
     
     func applicationShouldTerminateAfterLastWindowClosed(sender: NSApplication) -> Bool {
-        c02emuDestroy(emuState)
-        emuState = nil
+        emulator.stop()
         return true
     }
 }

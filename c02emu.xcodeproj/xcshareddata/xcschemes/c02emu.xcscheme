@@ -34,6 +34,20 @@
                ReferencedContainer = "container:c02emu.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "NO"
+            buildForArchiving = "NO"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "669FCCCA1A6AD58800E6299F"
+               BuildableName = "Emulator Tests.xctest"
+               BlueprintName = "Emulator Tests"
+               ReferencedContainer = "container:c02emu.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
    <TestAction
@@ -49,6 +63,16 @@
                BlueprintIdentifier = "6673C4201A5C709700D17696"
                BuildableName = "c02emuTests.xctest"
                BlueprintName = "c02emuTests"
+               ReferencedContainer = "container:c02emu.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "669FCCCA1A6AD58800E6299F"
+               BuildableName = "Emulator Tests.xctest"
+               BlueprintName = "Emulator Tests"
                ReferencedContainer = "container:c02emu.xcodeproj">
             </BuildableReference>
          </TestableReference>

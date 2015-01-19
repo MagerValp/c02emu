@@ -104,8 +104,8 @@ static C02EmuReturnReason cpu_step_cycle(C02EmuState *state);
 static C02EmuReturnReason io_step_cycle(C02EmuState *state);
 
 static LongAddr mmu_addr(C02EmuState *state, Addr addr);
-static Byte raw_mem_read(C02EmuState *state, Addr addr);
-static void raw_mem_write(C02EmuState *state, Addr addr, Byte byte);
+static Byte cpu_read(C02EmuState *state, Addr addr);
+static void cpu_write(C02EmuState *state, Addr addr, Byte byte);
 static Byte io_read(C02EmuState *state, Addr addr);
 static void io_write(C02EmuState *state, Addr addr, Byte byte);
 

@@ -47,7 +47,7 @@ static C02EmuReturnReason cpu_step_cycle(C02EmuState *state) {
             }
             state->cpu.op.uop_list = irq_op_table[OP_IRQ];
         } else {
-            op = raw_mem_read(state, (state->cpu.pc)++);
+            op = cpu_read(state, (state->cpu.pc)++);
             if (state->monitor.trace_cpu) {
                 fprintf(stderr, "PC = %04x OP = %02x\n", (state->cpu.pc - 1) & 0xffff, op);
             }
@@ -118,7 +118,7 @@ static LongAddr mmu_addr(C02EmuState *state, Addr addr) {
 }
 
 
-static Byte raw_mem_read(C02EmuState *state, Addr addr) {
+static Byte cpu_read(C02EmuState *state, Addr addr) {
     Byte byte;
     LongAddr la;
     
@@ -153,7 +153,7 @@ static Byte raw_mem_read(C02EmuState *state, Addr addr) {
 }
 
 
-static void raw_mem_write(C02EmuState *state, Addr addr, Byte byte) {
+static void cpu_write(C02EmuState *state, Addr addr, Byte byte) {
     LongAddr la;
     
     if (addr <= 0x000f) {
@@ -318,19 +318,19 @@ static void io_debug_write(C02EmuState *state, Addr addr, Byte byte) {
             fputs("Stack:\n", stderr);
             fprintf(stderr, "01%02x", state->cpu.stack);
             for (Addr a = (0x0100 | state->cpu.stack) + 1; a < 0x200; a++) {
-                fprintf(stderr, " %02x", raw_mem_read(state, a));
+                fprintf(stderr, " %02x", cpu_read(state, a));
             }
             fputs("\n", stderr);
             fputs("ZP:\n", stderr);
             fputs("000c", stderr);
             for (Addr a = 0; a < 7; a++) {
-                fprintf(stderr, " %02x", raw_mem_read(state, 0x000c + a));
+                fprintf(stderr, " %02x", cpu_read(state, 0x000c + a));
             }
             fputs("\n", stderr);
             fputs("ABS:\n", stderr);
             fputs("0200", stderr);
             for (Addr a = 0; a < 8; a++) {
-                fprintf(stderr, " %02x", raw_mem_read(state, 0x0200 + a));
+                fprintf(stderr, " %02x", cpu_read(state, 0x0200 + a));
             }
             fputs("\n", stderr);
             break;

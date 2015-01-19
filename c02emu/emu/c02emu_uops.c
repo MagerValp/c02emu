@@ -72,59 +72,59 @@ static bool flag_clear(C02EmuState *state, Byte flag) {
 
 
 static void u_zp_ad(C02EmuState *state) {
-    AD = raw_mem_read(state, PC++);
+    AD = cpu_read(state, PC++);
 }
 
 static void u_abs_adl(C02EmuState *state) {
-    ADL = raw_mem_read(state, PC++);
+    ADL = cpu_read(state, PC++);
 }
 
 static void u_abs_adh(C02EmuState *state) {
-    ADH = raw_mem_read(state, PC++);
+    ADH = cpu_read(state, PC++);
 }
 
 static void u_izp(C02EmuState *state) {
-    BA = raw_mem_read(state, PC++);
+    BA = cpu_read(state, PC++);
 }
 
 static void u_izp_adl(C02EmuState *state) {
-    ADL = raw_mem_read(state, BA);
+    ADL = cpu_read(state, BA);
 }
 
 static void u_izp_adh(C02EmuState *state) {
-    ADH = raw_mem_read(state, (BA + 1) & 0xff);
+    ADH = cpu_read(state, (BA + 1) & 0xff);
 }
 
 static void u_izx_adl(C02EmuState *state) {
-    ADL = raw_mem_read(state, (BA + X) & 0xff);
+    ADL = cpu_read(state, (BA + X) & 0xff);
 }
 
 static void u_izx_adh(C02EmuState *state) {
-    ADH = raw_mem_read(state, (BA + X + 1) & 0xff);
+    ADH = cpu_read(state, (BA + X + 1) & 0xff);
 }
 
 static void u_rel_bra(C02EmuState *state) {
     if (state->cpu.op.address_fixup == false &&
         (PC + (int8_t)BAL) >> 8 != PC >> 8) {
-        raw_mem_read(state, (PC & 0xff00) | ((PC + (int8_t)BAL) & 0xff));
+        cpu_read(state, (PC & 0xff00) | ((PC + (int8_t)BAL) & 0xff));
         state->cpu.op.address_fixup = true;
     } else {
         PC += (int8_t)BAL;
-        raw_mem_read(state, PC);
+        cpu_read(state, PC);
         OP_DONE();
     }
 }
 
 static void u_rmw_ad(C02EmuState *state) {
-    ALU = raw_mem_read(state, AD);
+    ALU = cpu_read(state, AD);
 }
 
 static void u_rmw_adx(C02EmuState *state) {
-    ALU = raw_mem_read(state, AD + X);
+    ALU = cpu_read(state, AD + X);
 }
 
 static void u_rmw_adlx(C02EmuState *state) {
-    ALU = raw_mem_read(state, (ADL + X) & 0xff);
+    ALU = cpu_read(state, (ADL + X) & 0xff);
 }
 
 
@@ -133,11 +133,11 @@ static void u_rmw_adlx(C02EmuState *state) {
 
 
 static Byte u_pull(C02EmuState *state) {
-    return raw_mem_read(state, 0x0100 | ++S);
+    return cpu_read(state, 0x0100 | ++S);
 }
 
 static void u_push(C02EmuState *state, Byte byte) {
-    raw_mem_write(state, 0x0100 | S--, byte);
+    cpu_write(state, 0x0100 | S--, byte);
 }
 
 
@@ -146,43 +146,43 @@ static void u_push(C02EmuState *state, Byte byte) {
 
 
 static void u_dum_sdec(C02EmuState *state) {
-    raw_mem_read(state, 0x0100 | S--);
+    cpu_read(state, 0x0100 | S--);
 }
 
 static void u_dum_ad(C02EmuState *state) {
-    raw_mem_read(state, AD);
+    cpu_read(state, AD);
 }
 
 static void u_dum_adl(C02EmuState *state) {
-    raw_mem_read(state, ADL);
+    cpu_read(state, ADL);
 }
 
 static void u_dum_adx(C02EmuState *state) {
-    raw_mem_read(state, (ADH << 8) | ((ADL + X) & 0xff));
+    cpu_read(state, (ADH << 8) | ((ADL + X) & 0xff));
 }
 
 static void u_dum_adxreal(C02EmuState *state) {
-    raw_mem_read(state, AD + X);
+    cpu_read(state, AD + X);
 }
 
 static void u_dum_adlx(C02EmuState *state) {
-    raw_mem_read(state, (ADL + X) & 0xff);
+    cpu_read(state, (ADL + X) & 0xff);
 }
 
 static void u_dum_ady(C02EmuState *state) {
-    raw_mem_read(state, (ADH << 8) | ((ADL + Y) & 0xff));
+    cpu_read(state, (ADH << 8) | ((ADL + Y) & 0xff));
 }
 
 static void u_dum_bal(C02EmuState *state) {
-    raw_mem_read(state, BAL);
+    cpu_read(state, BAL);
 }
 
 static void u_dum_s(C02EmuState *state) {
-    raw_mem_read(state, 0x0100 | S);
+    cpu_read(state, 0x0100 | S);
 }
 
 static void u_dum_pc(C02EmuState *state) {
-    raw_mem_read(state, PC);
+    cpu_read(state, PC);
 }
 
 
@@ -192,18 +192,18 @@ static void u_dum_pc(C02EmuState *state) {
 
 #define SYNTHESIZE_imp(OP) \
 static void u_##OP##_imp(C02EmuState *state) { \
-    raw_mem_read(state, PC); \
+    cpu_read(state, PC); \
     op_##OP(state); \
 }
 
 #define SYNTHESIZE_imm(OP) \
 static void u_##OP##_imm(C02EmuState *state) { \
-    op_##OP(state, raw_mem_read(state, PC++)); \
+    op_##OP(state, cpu_read(state, PC++)); \
 }
 
 #define SYNTHESIZE_ad(OP) \
 static void u_##OP##_ad(C02EmuState *state) { \
-    op_##OP(state, raw_mem_read(state, AD)); \
+    op_##OP(state, cpu_read(state, AD)); \
 }
 
 #define SYNTHESIZE_w_ad(OP) \
@@ -219,10 +219,10 @@ static void u_##OP##_ad(C02EmuState *state) { \
 #define SYNTHESIZE_r_adx(OP) \
 static void u_##OP##_adx(C02EmuState *state) { \
     if (!state->cpu.op.address_fixup && X + ADL >= 256) { \
-        raw_mem_read(state, AD + X - 256); \
+        cpu_read(state, AD + X - 256); \
         state->cpu.op.address_fixup = true; \
     } else { \
-        op_##OP(state, raw_mem_read(state, AD + X)); \
+        op_##OP(state, cpu_read(state, AD + X)); \
     } \
 }
 
@@ -239,10 +239,10 @@ static void u_##OP##_adlx(C02EmuState *state) { \
 #define SYNTHESIZE_r_ady(OP) \
 static void u_##OP##_ady(C02EmuState *state) { \
     if (!state->cpu.op.address_fixup && Y + ADL >= 256) { \
-        raw_mem_read(state, AD + Y - 256); \
+        cpu_read(state, AD + Y - 256); \
         state->cpu.op.address_fixup = true; \
     } else { \
-        op_##OP(state, raw_mem_read(state, AD + Y)); \
+        op_##OP(state, cpu_read(state, AD + Y)); \
     } \
 }
 
@@ -258,7 +258,7 @@ static void u_##OP##_ady(C02EmuState *state) { \
 
 #define SYNTHESIZE_alx(OP) \
 static void u_##OP##_alx(C02EmuState *state) { \
-    op_##OP(state, raw_mem_read(state, (ADL + X) & 0xff)); \
+    op_##OP(state, cpu_read(state, (ADL + X) & 0xff)); \
 }
 
 #define SYNTHESIZE_w_alx(OP) \
@@ -268,7 +268,7 @@ static void u_##OP##_alx(C02EmuState *state) { \
 
 #define SYNTHESIZE_aly(OP) \
 static void u_##OP##_aly(C02EmuState *state) { \
-    op_##OP(state, raw_mem_read(state, (ADL + Y) & 0xff)); \
+    op_##OP(state, cpu_read(state, (ADL + Y) & 0xff)); \
 }
 
 #define SYNTHESIZE_w_aly(OP) \
@@ -282,7 +282,7 @@ static void u_##OP##_aly(C02EmuState *state) { \
 
 
 static void u_IRQ_incpc(C02EmuState *state) {
-    raw_mem_read(state, PC++);
+    cpu_read(state, PC++);
 }
 
 static void u_IRQ_pch(C02EmuState *state) {
@@ -299,20 +299,20 @@ static void u_IRQ_p(C02EmuState *state) {
 }
 
 static void u_IRQ_adl(C02EmuState *state) {
-    PC = (PC & 0xff00) | raw_mem_read(state, 0xfffe);
+    PC = (PC & 0xff00) | cpu_read(state, 0xfffe);
 }
 
 static void u_IRQ_adh(C02EmuState *state) {
-    PC = (PC & 0x00ff) | (raw_mem_read(state, 0xffff) << 8);
+    PC = (PC & 0x00ff) | (cpu_read(state, 0xffff) << 8);
     OP_DONE();
 }
 
 static void u_NMI_adl(C02EmuState *state) {
-    PC = (PC & 0xff00) | raw_mem_read(state, 0xfffa);
+    PC = (PC & 0xff00) | cpu_read(state, 0xfffa);
 }
 
 static void u_NMI_adh(C02EmuState *state) {
-    PC = (PC & 0x00ff) | (raw_mem_read(state, 0xfffb) << 8);
+    PC = (PC & 0x00ff) | (cpu_read(state, 0xfffb) << 8);
     OP_DONE();
 }
 
@@ -322,11 +322,11 @@ static void u_RESET_p(C02EmuState *state) {
 }
 
 static void u_RESET_adl(C02EmuState *state) {
-    PC = (PC & 0xff00) | raw_mem_read(state, 0xfffc);
+    PC = (PC & 0xff00) | cpu_read(state, 0xfffc);
 }
 
 static void u_RESET_adh(C02EmuState *state) {
-    PC = (PC & 0x00ff) | (raw_mem_read(state, 0xfffd) << 8);
+    PC = (PC & 0x00ff) | (cpu_read(state, 0xfffd) << 8);
     OP_DONE();
 }
 
@@ -419,7 +419,7 @@ SYNTHESIZE_alx(AND)
 
 
 static void u_ASL_imp(C02EmuState *state) {
-    raw_mem_read(state, PC);
+    cpu_read(state, PC);
     if (A & 0x80) {
         SEC();
     } else {
@@ -437,7 +437,7 @@ static void op_ASL(C02EmuState *state, Addr addr) {
     }
     ALU <<= 1;
     SETNZ(ALU);
-    raw_mem_write(state, addr, ALU);
+    cpu_write(state, addr, ALU);
     OP_DONE();
 }
 SYNTHESIZE_rmw_ad(ASL)
@@ -447,7 +447,7 @@ SYNTHESIZE_rmw_adlx(ASL)
 
 #define SYNTHESIZE_bbr(BIT) \
 static void u_BBR##BIT##_rel(C02EmuState *state) { \
-    BA = raw_mem_read(state, PC++); \
+    BA = cpu_read(state, PC++); \
     if ((A & 1<<BIT) != 0) { \
         OP_DONE(); \
     } \
@@ -464,7 +464,7 @@ SYNTHESIZE_bbr(7)
 
 #define SYNTHESIZE_bbs(BIT) \
 static void u_BBS##BIT##_rel(C02EmuState *state) { \
-    BA = raw_mem_read(state, PC++); \
+    BA = cpu_read(state, PC++); \
     if ((A & 1<<BIT) == 0) { \
         OP_DONE(); \
     } \
@@ -480,7 +480,7 @@ SYNTHESIZE_bbs(7)
 
 
 static void u_BCC_rel(C02EmuState *state) {
-    BA = raw_mem_read(state, PC++);
+    BA = cpu_read(state, PC++);
     if (!flag_clear(state, flag_c)) {
         OP_DONE();
     }
@@ -488,7 +488,7 @@ static void u_BCC_rel(C02EmuState *state) {
 
 
 static void u_BCS_rel(C02EmuState *state) {
-    BA = raw_mem_read(state, PC++);
+    BA = cpu_read(state, PC++);
     if (!flag_set(state, flag_c)) {
         OP_DONE();
     }
@@ -496,7 +496,7 @@ static void u_BCS_rel(C02EmuState *state) {
 
 
 static void u_BEQ_rel(C02EmuState *state) {
-    BA = raw_mem_read(state, PC++);
+    BA = cpu_read(state, PC++);
     if (!flag_set(state, flag_z)) {
         OP_DONE();
     }
@@ -519,7 +519,7 @@ SYNTHESIZE_alx(BIT)
 
 
 static void u_BMI_rel(C02EmuState *state) {
-    BA = raw_mem_read(state, PC++);
+    BA = cpu_read(state, PC++);
     if (!flag_set(state, flag_n)) {
         OP_DONE();
     }
@@ -527,7 +527,7 @@ static void u_BMI_rel(C02EmuState *state) {
 
 
 static void u_BNE_rel(C02EmuState *state) {
-    BA = raw_mem_read(state, PC++);
+    BA = cpu_read(state, PC++);
     if (!flag_clear(state, flag_z)) {
         OP_DONE();
     }
@@ -535,7 +535,7 @@ static void u_BNE_rel(C02EmuState *state) {
 
 
 static void u_BPL_rel(C02EmuState *state) {
-    BA = raw_mem_read(state, PC++);
+    BA = cpu_read(state, PC++);
     if (!flag_clear(state, flag_n)) {
         OP_DONE();
     }
@@ -543,7 +543,7 @@ static void u_BPL_rel(C02EmuState *state) {
 
 
 static void u_BRA_rel(C02EmuState *state) {
-    BA = raw_mem_read(state, PC++);
+    BA = cpu_read(state, PC++);
 }
 
 
@@ -554,7 +554,7 @@ static void u_BRK_p(C02EmuState *state) {
 
 
 static void u_BVC_rel(C02EmuState *state) {
-    BA = raw_mem_read(state, PC++);
+    BA = cpu_read(state, PC++);
     if (!flag_clear(state, flag_v)) {
         OP_DONE();
     }
@@ -562,7 +562,7 @@ static void u_BVC_rel(C02EmuState *state) {
 
 
 static void u_BVS_rel(C02EmuState *state) {
-    BA = raw_mem_read(state, PC++);
+    BA = cpu_read(state, PC++);
     if (!flag_set(state, flag_v)) {
         OP_DONE();
     }
@@ -641,7 +641,7 @@ SYNTHESIZE_ad(CPY)
 
 
 static void u_DEC_imp(C02EmuState *state) {
-    raw_mem_read(state, PC);
+    cpu_read(state, PC);
     A -= 1;
     SETNZ(A);
     OP_DONE();
@@ -649,7 +649,7 @@ static void u_DEC_imp(C02EmuState *state) {
 static void op_DEC(C02EmuState *state, Addr addr) {
     ALU -= 1;
     SETNZ(ALU);
-    raw_mem_write(state, addr, ALU);
+    cpu_write(state, addr, ALU);
     OP_DONE();
 }
 SYNTHESIZE_rmw_ad(DEC)
@@ -684,7 +684,7 @@ SYNTHESIZE_alx(EOR)
 
 
 static void u_INC_imp(C02EmuState *state) {
-    raw_mem_read(state, PC);
+    cpu_read(state, PC);
     A += 1;
     SETNZ(A);
     OP_DONE();
@@ -692,7 +692,7 @@ static void u_INC_imp(C02EmuState *state) {
 static void op_INC(C02EmuState *state, Addr addr) {
     ALU += 1;
     SETNZ(ALU);
-    raw_mem_write(state, addr, ALU);
+    cpu_write(state, addr, ALU);
     OP_DONE();
 }
 SYNTHESIZE_rmw_ad(INC)
@@ -715,29 +715,29 @@ SYNTHESIZE_imp(INY)
 
 
 static void u_JMP_adh(C02EmuState *state) {
-    ADH = raw_mem_read(state, PC++);
+    ADH = cpu_read(state, PC++);
     PC = AD;
     OP_DONE();
 }
 static void u_JMP_bal(C02EmuState *state) {
-    BAL = raw_mem_read(state, AD);
+    BAL = cpu_read(state, AD);
 }
 static void u_JMP_bah(C02EmuState *state) {
-    BAH = raw_mem_read(state, (AD & 0xff00) | ((ADL + 1) & 0xff));
+    BAH = cpu_read(state, (AD & 0xff00) | ((ADL + 1) & 0xff));
 }
 static void u_JMP_ba(C02EmuState *state) {
-    BAH = raw_mem_read(state, AD + 1);
+    BAH = cpu_read(state, AD + 1);
     PC = BA;
     OP_DONE();
 }
 static void u_JMP_balx(C02EmuState *state) {
-    BAL = raw_mem_read(state, AD);
+    BAL = cpu_read(state, AD);
 }
 static void u_JMP_bahx(C02EmuState *state) {
-    BAL = raw_mem_read(state, AD + X);
+    BAL = cpu_read(state, AD + X);
 }
 static void u_JMP_bax(C02EmuState *state) {
-    BAH = raw_mem_read(state, AD + X + 1);
+    BAH = cpu_read(state, AD + X + 1);
     PC = BA;
     OP_DONE();
 }
@@ -786,7 +786,7 @@ SYNTHESIZE_alx(LDY)
 
 
 static void u_LSR_imp(C02EmuState *state) {
-    raw_mem_read(state, PC);
+    cpu_read(state, PC);
     if (A & 0x01) {
         SEC();
     } else {
@@ -804,7 +804,7 @@ static void op_LSR(C02EmuState *state, Addr addr) {
     }
     ALU >>= 1;
     SETNZ(ALU);
-    raw_mem_write(state, addr, ALU);
+    cpu_write(state, addr, ALU);
     OP_DONE();
 }
 SYNTHESIZE_rmw_ad(LSR)
@@ -816,7 +816,7 @@ static void op_NOP(C02EmuState *state, Byte byte) {
     OP_DONE();
 }
 static void u_NOP_imp(C02EmuState *state) {
-    raw_mem_read(state, PC);
+    cpu_read(state, PC);
     OP_DONE();
 }
 SYNTHESIZE_imm(NOP)
@@ -890,7 +890,7 @@ static void u_PLP_imp(C02EmuState *state) {
 #define SYNTHESIZE_rmb(BIT) \
 static void u_RMB##BIT##_ad(C02EmuState *state) { \
     ALU &= ~(1 << (BIT)); \
-    raw_mem_write(state, AD, ALU); \
+    cpu_write(state, AD, ALU); \
     OP_DONE(); \
 }
 SYNTHESIZE_rmb(0)
@@ -906,7 +906,7 @@ SYNTHESIZE_rmb(7)
 static void u_ROL_imp(C02EmuState *state) {
     Byte carry = P & flag_c;
     
-    raw_mem_read(state, PC);
+    cpu_read(state, PC);
     if (A & 0x80) {
         SEC();
     } else {
@@ -926,7 +926,7 @@ static void op_ROL(C02EmuState *state, Addr addr) {
     }
     ALU = (ALU << 1) | carry;
     SETNZ(ALU);
-    raw_mem_write(state, addr, ALU);
+    cpu_write(state, addr, ALU);
     OP_DONE();
 }
 SYNTHESIZE_rmw_ad(ROL)
@@ -937,7 +937,7 @@ SYNTHESIZE_rmw_adlx(ROL)
 static void u_ROR_imp(C02EmuState *state) {
     Byte carry = P & flag_c;
     
-    raw_mem_read(state, PC);
+    cpu_read(state, PC);
     if (A & 0x01) {
         SEC();
     } else {
@@ -963,7 +963,7 @@ static void op_ROR(C02EmuState *state, Addr addr) {
         ALU |= 0x80;
     }
     SETNZ(ALU);
-    raw_mem_write(state, addr, ALU);
+    cpu_write(state, addr, ALU);
     OP_DONE();
 }
 SYNTHESIZE_rmw_ad(ROR)
@@ -990,7 +990,7 @@ static void u_RTS_pch(C02EmuState *state) {
     PC = (PC & 0x00ff) | (u_pull(state) << 8);
 }
 static void u_RTS_incpc(C02EmuState *state) {
-    raw_mem_read(state, PC++);
+    cpu_read(state, PC++);
     OP_DONE();
 }
 
@@ -1089,7 +1089,7 @@ SYNTHESIZE_imp(SEI)
 #define SYNTHESIZE_smb(BIT) \
 static void u_SMB##BIT##_ad(C02EmuState *state) { \
     ALU |= 1 << (BIT); \
-    raw_mem_write(state, AD, ALU); \
+    cpu_write(state, AD, ALU); \
     OP_DONE(); \
 }
 SYNTHESIZE_smb(0)
@@ -1103,7 +1103,7 @@ SYNTHESIZE_smb(7)
 
 
 static void op_STA(C02EmuState *state, Addr addr) {
-    raw_mem_write(state, addr, A);
+    cpu_write(state, addr, A);
     OP_DONE();
 }
 SYNTHESIZE_w_ad(STA)
@@ -1113,14 +1113,14 @@ SYNTHESIZE_w_alx(STA)
 
 
 static void u_STP_imp(C02EmuState *state) {
-    raw_mem_read(state, PC);
+    cpu_read(state, PC);
     state->cpu.op.stop_notified = false;
     state->cpu.op.cycle = C02EMU_OP_STOPPED;
 }
 
 
 static void op_STX(C02EmuState *state, Addr addr) {
-    raw_mem_write(state, addr, X);
+    cpu_write(state, addr, X);
     OP_DONE();
 }
 SYNTHESIZE_w_ad(STX)
@@ -1128,7 +1128,7 @@ SYNTHESIZE_w_aly(STX)
 
 
 static void op_STY(C02EmuState *state, Addr addr) {
-    raw_mem_write(state, addr, Y);
+    cpu_write(state, addr, Y);
     OP_DONE();
 }
 SYNTHESIZE_w_ad(STY)
@@ -1136,7 +1136,7 @@ SYNTHESIZE_w_alx(STY)
 
 
 static void op_STZ(C02EmuState *state, Addr addr) {
-    raw_mem_write(state, addr, 0);
+    cpu_write(state, addr, 0);
     OP_DONE();
 }
 SYNTHESIZE_w_ad(STZ)
@@ -1167,7 +1167,7 @@ static void u_TRB_ad(C02EmuState *state) {
         CLZ();
     }
     ALU &= ~A;
-    raw_mem_write(state, AD, ALU);
+    cpu_write(state, AD, ALU);
     OP_DONE();
 }
 
@@ -1179,7 +1179,7 @@ static void u_TSB_ad(C02EmuState *state) {
         CLZ();
     }
     ALU |= A;
-    raw_mem_write(state, AD, ALU);
+    cpu_write(state, AD, ALU);
     OP_DONE();
 }
 
@@ -1216,7 +1216,7 @@ SYNTHESIZE_imp(TYA)
 
 
 static void u_WAI_imp(C02EmuState *state) {
-    raw_mem_read(state, PC);
+    cpu_read(state, PC);
     state->cpu.op.cycle = C02EMU_OP_WAITING;
 }
 

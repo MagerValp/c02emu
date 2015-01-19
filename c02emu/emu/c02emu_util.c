@@ -51,12 +51,12 @@ C02EmuDisplayState c02emuDisplayState(C02EmuState *state) {
 
 
 Byte c02emuCPURead(C02EmuState *state, Addr addr) {
-    return raw_mem_read(state, addr);
+    return cpu_read(state, addr);
 }
 
 
 void c02emuCPUWrite(C02EmuState *state, Addr addr, Byte byte) {
-    raw_mem_write(state, addr, byte);
+    cpu_write(state, addr, byte);
 }
 
 

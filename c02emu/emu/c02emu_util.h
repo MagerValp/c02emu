@@ -19,9 +19,14 @@ typedef struct {
 } C02EmuCPURegs;
 
 typedef struct {
-    uint8_t ir;
+    Byte ir;
     C02EmuOpCycle op_state;
 } C02EmuCPUState;
+
+typedef struct {
+    Byte _dummy;    // WTH is up with Swift here?
+    Byte page[16];
+} C02EmuMMUState;
 
 typedef struct {
     unsigned int cycle_ctr;
@@ -31,6 +36,7 @@ typedef struct {
 
 C02EmuCPURegs c02emuCPURegs(C02EmuState *state);
 C02EmuCPUState c02emuCPUState(C02EmuState *state);
+C02EmuMMUState c02emuMMUState(C02EmuState *state);
 C02EmuDisplayState c02emuDisplayState(C02EmuState *state);
 
 Byte c02emuCPURead(C02EmuState *state, Addr addr);

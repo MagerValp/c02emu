@@ -209,6 +209,10 @@ class EmulatorController: NSObject, DisassemblerDelegate {
         let state: CPUOPState
     }
     
+    struct MMUState {
+        let page: [UInt8]
+    }
+    
     struct DisplayState {
         let cycle: UInt
         let line: UInt
@@ -217,6 +221,7 @@ class EmulatorController: NSObject, DisassemblerDelegate {
     
     struct EmulatorState {
         let cpu: CPUState
+        let mmu: MMUState
         let display: DisplayState
     }
     
@@ -224,8 +229,6 @@ class EmulatorController: NSObject, DisassemblerDelegate {
         get {
             let c02cpuRegs = c02emuCPURegs(emuState)
             let c02cpuState = c02emuCPUState(emuState)
-            let c02displayState = c02emuDisplayState(emuState)
-            
             let cpuState = CPUState(a: c02cpuRegs.a,
                 x: c02cpuRegs.x,
                 y: c02cpuRegs.y,
@@ -235,9 +238,32 @@ class EmulatorController: NSObject, DisassemblerDelegate {
                 ir: c02cpuState.ir,
                 state: CPUOPState(rawValue: Int(c02cpuState.op_state.value))!)
             
+            let c02mmuState = c02emuMMUState(emuState)
+            // I really wish Swift didn't interpret C arrays as tuples.
+            let page = [
+                c02mmuState.page.0,
+                c02mmuState.page.1,
+                c02mmuState.page.2,
+                c02mmuState.page.3,
+                c02mmuState.page.4,
+                c02mmuState.page.5,
+                c02mmuState.page.6,
+                c02mmuState.page.7,
+                c02mmuState.page.8,
+                c02mmuState.page.9,
+                c02mmuState.page.10,
+                c02mmuState.page.11,
+                c02mmuState.page.12,
+                c02mmuState.page.13,
+                c02mmuState.page.14,
+                c02mmuState.page.15,
+            ]
+            let mmuState = MMUState(page: page)
+            
+            let c02displayState = c02emuDisplayState(emuState)
             let displayState = DisplayState(cycle: UInt(c02displayState.cycle_ctr), line: UInt(c02displayState.line_ctr), frame: UInt(c02displayState.frame_ctr))
             
-            return EmulatorState(cpu: cpuState, display: displayState)
+            return EmulatorState(cpu: cpuState, mmu: mmuState, display: displayState)
         }
     }
     

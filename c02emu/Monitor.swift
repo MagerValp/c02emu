@@ -134,6 +134,9 @@ class Monitor: NSObject {
             case "m":
                 cmdShowMemory(args)
                 
+            case "mmu":
+                cmdMMU(args)
+                
             case "r":
                 cmdShowRegs(args)
                 
@@ -321,6 +324,19 @@ class Monitor: NSObject {
             return UInt16(value & 0xffff)
         } else {
             return nil
+        }
+    }
+    
+    func cmdMMU(args: [String]?) {
+        let c02mmuState = c02emuMMUState(emulator.emuState)
+        for (reg, bank) in enumerate(emulator.state.mmu.page) {
+            if bank < 0x80 {
+                outputLine(NSString(format: "%04x RAM %05x", reg << 12, Int(bank) << 12))
+            } else if bank < 0xc0 {
+                outputLine(NSString(format: "%04x I/O %05x", reg << 12, Int(bank) << 12))
+            } else {
+                outputLine(NSString(format: "%04x ROM %05x", reg << 12, Int(bank) << 12))
+            }
         }
     }
 }

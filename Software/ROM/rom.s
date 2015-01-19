@@ -21,19 +21,19 @@ reset:
 	ldx #$0d
 @reset_mmu:
 	txa
-	sta $f000,x
+	sta $00,x		; Map RAM bank x at $x000.
 	dex
 	bpl @reset_mmu
-	lda #$fe
-	sta $f00e
-	lda #$ff
-	sta $f00f
+	lda #$a0		; Map I/O at $e000.
+	sta $0e
+	lda #$ff		; Map ROM at $f000.
+	sta $0f
 	
 	ldx #0
 	txa
 @clear_ram:
-	sta $00,x
-	sta $0100,x
+	stz a:$0010,x
+	pha
 	inx
 	bne @clear_ram
 	
@@ -45,11 +45,10 @@ reset:
 	jsr display_init
 	
 	ldx #0
-	stx $e300
 @printmsg:
 	lda msg_startup,x
 	beq :+
-	sta $e200,x
+	sta $1000,x
 	inx
 	bne @printmsg
 :	
@@ -61,12 +60,12 @@ reset:
 j_nmih:
 	jmp (vec_nmih)
 rom_nmih:
-	inc $e24e
+	inc $104e
 	rti
 j_irqh:
 	jmp (vec_irqh)
 rom_irqh:
-	inc $e24f
+	inc $104f
 	rti
 
 

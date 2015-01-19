@@ -120,26 +120,32 @@ static LongAddr mmu_addr(C02EmuState *state, Addr addr) {
 
 static Byte raw_mem_read(C02EmuState *state, Addr addr) {
     Byte byte;
-    unsigned int region = addr & 0xf000;
+    LongAddr la;
     
-    if (region == 0xe000 && state->io.mmu.page[0x0e] == 0xfe) {
-        // Reads from $exxx access I/O if MMU page is $fe.
-        byte = raw_read_io(state, addr);
+    if (addr <= 0x000f) {
+        // 00-0f are hardwired to the MMU registers.
+        byte = io_mmu_read(state, addr);
         if (state->monitor.trace_ram) {
-            fprintf(stderr, "I/O %04x R %02x\n", addr, byte);
+            fprintf(stderr, "MMU %04x R %02x\n", addr, byte);
         }
-        
-    } else if (region == 0xf000 && state->io.mmu.page[0x0f] == 0xff) {
-        // Reads from $fxxx access ROM if MMU page is $ff.
-        byte = state->mem.rom[addr & 0x0fff];
-        if (state->monitor.trace_ram) {
-            fprintf(stderr, "ROM %04x R %02x\n", addr, byte);
-        }
-        
     } else {
-        byte = state->mem.ram[mmu_addr(state, addr)];
-        if (state->monitor.trace_ram) {
-            fprintf(stderr, "RAM %04x R %02x\n", addr, byte);
+        // Others are translated by the MMU.
+        la = mmu_addr(state, addr);
+        if (la < 0x080000) {
+            byte = state->mem.ram[la & (sizeof(state->mem.ram) - 1)];
+            if (state->monitor.trace_ram) {
+                fprintf(stderr, "RAM %04x R %02x\n", addr, byte);
+            }
+        } else if (la < 0x0c0000) {
+            byte = io_read(state, addr);
+            if (state->monitor.trace_ram) {
+                fprintf(stderr, "I/O %04x R %02x\n", addr, byte);
+            }
+        } else {
+            byte = state->mem.rom[la & (sizeof(state->mem.rom) - 1)];
+            if (state->monitor.trace_ram) {
+                fprintf(stderr, "ROM %04x R %02x\n", addr, byte);
+            }
         }
     }
     
@@ -148,23 +154,33 @@ static Byte raw_mem_read(C02EmuState *state, Addr addr) {
 
 
 static void raw_mem_write(C02EmuState *state, Addr addr, Byte byte) {
-    unsigned int region = addr & 0xf000;
+    LongAddr la;
     
-    if (region == 0xf000 || (region == 0xe000 && state->io.mmu.page[0x0e] == 0xfe)) {
+    if (addr <= 0x000f) {
+        // 00-0f are hardwired to the MMU registers.
+        io_mmu_write(state, addr, byte);
         if (state->monitor.trace_ram) {
-            fprintf(stderr, "I/O %04x W %02x\n", addr, byte);
+            fprintf(stderr, "MMU %04x W %02x\n", addr, byte);
         }
-        // Writes to $fxxx always go to I/O.
-        // Writes to $exxx go to I/O if MMU page is $fe.
-        raw_write_io(state, addr, byte);
-        return;
-        
     } else {
-        if (state->monitor.trace_ram) {
-            fprintf(stderr, "RAM %04x W %02x\n", addr, byte);
+        // Others are translated by the MMU.
+        la = mmu_addr(state, addr);
+        if (la < 0x080000) {
+            if (state->monitor.trace_ram) {
+                fprintf(stderr, "RAM %04x W %02x\n", addr, byte);
+            }
+            state->mem.ram[la & (sizeof(state->mem.ram) - 1)] = byte;
+        } else if (la < 0x0c0000) {
+            if (state->monitor.trace_ram) {
+                fprintf(stderr, "I/O %04x W %02x\n", addr, byte);
+            }
+            io_write(state, addr, byte);
+        } else {
+            if (state->monitor.trace_ram) {
+                fprintf(stderr, "ROM %04x R %02x\n", addr, byte);
+            }
+            state->mem.rom[la & (sizeof(state->mem.rom) - 1)] = byte;
         }
-        state->mem.ram[mmu_addr(state, addr)] = byte;
-        return;
     }
 }
 
@@ -172,17 +188,13 @@ static void raw_mem_write(C02EmuState *state, Addr addr, Byte byte) {
 // I/O access.
 
 
-static Byte raw_read_io(C02EmuState *state, Addr addr) {
+static Byte io_read(C02EmuState *state, Addr addr) {
     switch (addr & 0x0f00) {
         case 0x0000:
-            return raw_io_mmu_read(state, addr);
-            
-        case 0x0200:
-        case 0x0300:
-            return raw_io_display_read(state, addr);
+            return io_display_read(state, addr);
             
         case 0x0f00:
-            return raw_io_debug_read(state, addr);
+            return io_debug_read(state, addr);
             
         default:
             return 0xff;
@@ -190,19 +202,14 @@ static Byte raw_read_io(C02EmuState *state, Addr addr) {
 }
 
 
-static void raw_write_io(C02EmuState *state, Addr addr, Byte byte) {
+static void io_write(C02EmuState *state, Addr addr, Byte byte) {
     switch (addr & 0x0f00) {
         case 0x0000:
-            raw_io_mmu_write(state, addr, byte);
-            return;
-            
-        case 0x0200:
-        case 0x0300:
-            raw_io_display_write(state, addr, byte);
+            io_display_write(state, addr, byte);
             return;
             
         case 0x0f00:
-            raw_io_debug_write(state, addr, byte);
+            io_debug_write(state, addr, byte);
             return;
         
         default:
@@ -214,12 +221,12 @@ static void raw_write_io(C02EmuState *state, Addr addr, Byte byte) {
 // MMU.
 
 
-static Byte raw_io_mmu_read(C02EmuState *state, Addr addr) {
+static Byte io_mmu_read(C02EmuState *state, Addr addr) {
     return state->io.mmu.page[addr & 0x000f];
 }
 
 
-static void raw_io_mmu_write(C02EmuState *state, Addr addr, Byte byte) {
+static void io_mmu_write(C02EmuState *state, Addr addr, Byte byte) {
     state->io.mmu.page[addr & 0x000f] = byte;
 }
 
@@ -227,28 +234,51 @@ static void raw_io_mmu_write(C02EmuState *state, Addr addr, Byte byte) {
 // Display.
 
 
-static Addr display_addr(C02EmuState *state, Addr addr) {
-    addr &= 0x00ff;
-    addr |= state->io.display.page << 8;
-    addr &= sizeof(state->io.display.ram) - 1;
-    return addr;
-}
-
-
-static Byte raw_io_display_read(C02EmuState *state, Addr addr) {
-    if (addr & 0x0100) {
-        return state->io.display.page;
-    } else {
-        return state->io.display.ram[display_addr(state, addr)];
+static Byte io_display_read(C02EmuState *state, Addr addr) {
+    switch (addr & 0x0f) {
+        case 0x00:
+            return state->io.display.base & 0xff;
+            break;
+            
+        case 0x01:
+            return (state->io.display.base >> 8) & 0xff;
+            break;
+            
+        case 0x02:
+            return (state->io.display.base >> 16) & 0x07;
+            break;
+        
+        case 0x03:
+            return (Byte)state->io.display.mode;
+            break;
+            
+        default:
+            return 0xff;
+            break;
     }
 }
 
 
-static void raw_io_display_write(C02EmuState *state, Addr addr, Byte byte) {
-    if (addr & 0x0100) {
-        state->io.display.page = byte;
-    } else {
-        state->io.display.ram[display_addr(state, addr)] = byte;
+static void io_display_write(C02EmuState *state, Addr addr, Byte byte) {
+    switch (addr & 0x0f) {
+        case 0x00:
+            state->io.display.base = (state->io.display.base & 0x07ff00) | byte;
+            break;
+            
+        case 0x01:
+            state->io.display.base = (state->io.display.base & 0x0700ff) | (byte << 8);
+            break;
+            
+        case 0x02:
+            state->io.display.base = (state->io.display.base & 0x00ffff) | ((byte & 0x07) << 16);
+            break;
+            
+        case 0x03:
+            state->io.display.mode = byte & 0x03;
+            break;
+            
+        default:
+            break;
     }
 }
 
@@ -258,12 +288,12 @@ static void raw_io_display_write(C02EmuState *state, Addr addr, Byte byte) {
 
 #include <stdio.h>
 
-static Byte raw_io_debug_read(C02EmuState *state, Addr addr) {
+static Byte io_debug_read(C02EmuState *state, Addr addr) {
     return 0;
 }
 
 
-static void raw_io_debug_write(C02EmuState *state, Addr addr, Byte byte) {
+static void io_debug_write(C02EmuState *state, Addr addr, Byte byte) {
     switch (addr & 0xff) {
         case 0x00:
             fputc(byte, stderr);

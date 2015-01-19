@@ -74,16 +74,16 @@ struct _c02EmuState {
         } op;
     } cpu;
     struct {
-        Byte ram[256 * 4096];
-        Byte rom[4096];
+        Byte ram[128 * 4096];   // 512 kB RAM at $00000-$7ffff
+        Byte rom[4096];         // 256 kB ROM at $c0000-$fffff
     } mem;
     struct {
         struct {
             Byte page[16];
         } mmu;
         struct {
-            Byte page;
-            Byte ram[256 * 256];
+            C02EmuDisplayMode mode;
+            unsigned int base;
         } display;
     } io;
     
@@ -106,18 +106,17 @@ static C02EmuReturnReason io_step_cycle(C02EmuState *state);
 static LongAddr mmu_addr(C02EmuState *state, Addr addr);
 static Byte raw_mem_read(C02EmuState *state, Addr addr);
 static void raw_mem_write(C02EmuState *state, Addr addr, Byte byte);
-static Byte raw_read_io(C02EmuState *state, Addr addr);
-static void raw_write_io(C02EmuState *state, Addr addr, Byte byte);
+static Byte io_read(C02EmuState *state, Addr addr);
+static void io_write(C02EmuState *state, Addr addr, Byte byte);
 
-static Byte raw_io_mmu_read(C02EmuState *state, Addr addr);
-static void raw_io_mmu_write(C02EmuState *state, Addr addr, Byte byte);
+static Byte io_mmu_read(C02EmuState *state, Addr addr);
+static void io_mmu_write(C02EmuState *state, Addr addr, Byte byte);
 
-static Addr display_addr(C02EmuState *state, Addr addr);
-static Byte raw_io_display_read(C02EmuState *state, Addr addr);
-static void raw_io_display_write(C02EmuState *state, Addr addr, Byte byte);
+static Byte io_display_read(C02EmuState *state, Addr addr);
+static void io_display_write(C02EmuState *state, Addr addr, Byte byte);
 
-static Byte raw_io_debug_read(C02EmuState *state, Addr addr);
-static void raw_io_debug_write(C02EmuState *state, Addr addr, Byte byte);
+static Byte io_debug_read(C02EmuState *state, Addr addr);
+static void io_debug_write(C02EmuState *state, Addr addr, Byte byte);
 
 
 #endif /* defined(__c02emu__c02emu_private__) */

@@ -7,6 +7,12 @@
 	.code
 
 display_init:
+	lda #$00
+	sta $e000
+	lda #$10
+	sta $e001
+	lda #$00
+	sta $e002
 	lda #0
-	sta $e300
+	sta $e003
 	rts

@@ -44,8 +44,8 @@ C02EmuState *c02emuCreate(void) {
     memset(state->mem.ram, 0x00, sizeof(state->mem.ram));
     memset(state->mem.rom, 0xdb, sizeof(state->mem.rom));
     
-    memset(state->io.display.ram, 0xff, sizeof(state->io.display.ram));
-    state->io.display.page = 0x00;
+    state->io.display.mode = C02EMU_DISPLAY_MODE_TEXT_80X50;
+    state->io.display.base = 0x000000;
     
     c02emuReset(state);
     
@@ -140,8 +140,8 @@ C02EmuReturnReason c02emuRun(C02EmuState *state) {
 
 const C02EmuOutput c02emuGetOutput(C02EmuState *state) {
     C02EmuOutput output;
-    output.display.mode = C02EMU_DISPLAY_MODE_TEXT_80X50;
-    output.display.data = state->io.display.ram;
+    output.display.mode = state->io.display.mode;
+    output.display.data = &state->mem.ram[state->io.display.base];
     return output;
 }
 

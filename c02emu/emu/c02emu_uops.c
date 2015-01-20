@@ -54,7 +54,7 @@
 
 
 #define OP_DONE() do { \
-    state->cpu.op.cycle = C02EMU_OP_DONE; \
+    state->cpu.op.cycle = C02EMU_OP_FETCH; \
 } while (0)
 
 
@@ -299,11 +299,22 @@ static void u_IRQ_p(C02EmuState *state) {
 }
 
 static void u_IRQ_adl(C02EmuState *state) {
-    PC = (PC & 0xff00) | cpu_read(state, 0xfffe);
+    Addr vector = 0xfffe;
+    
+    if (state->cpu.op.nmi_active) {
+        vector = 0xfffa;
+    }
+    PC = (PC & 0xff00) | cpu_read(state, vector);
 }
 
 static void u_IRQ_adh(C02EmuState *state) {
-    PC = (PC & 0x00ff) | (cpu_read(state, 0xffff) << 8);
+    Addr vector = 0xfffe;
+    
+    if (state->cpu.op.nmi_active) {
+        vector = 0xfffa;
+        state->cpu.op.nmi_active = false;
+    }
+    PC = (PC & 0x00ff) | (cpu_read(state, vector + 1) << 8);
     OP_DONE();
 }
 
@@ -312,6 +323,7 @@ static void u_NMI_adl(C02EmuState *state) {
 }
 
 static void u_NMI_adh(C02EmuState *state) {
+    state->cpu.op.nmi_active = false;
     PC = (PC & 0x00ff) | (cpu_read(state, 0xfffb) << 8);
     OP_DONE();
 }

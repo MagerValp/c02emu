@@ -236,7 +236,7 @@ class Monitor: NSObject {
             return badArgs()
         }
         
-        outputLine("PC   A  X  Y  S  nv1bdizc  IR  State")
+        outputLine("PC   A  X  Y  S  nv1bdizc  IR  CPU State    Line Cycle")
         let state = emulator.state
         let status = NSString(format: "%d%d1%d%d%d%d%d",
             (Int(state.cpu.status) & flag_n) >> 7,
@@ -246,15 +246,20 @@ class Monitor: NSObject {
             (Int(state.cpu.status) & flag_i) >> 2,
             (Int(state.cpu.status) & flag_z) >> 1,
             (Int(state.cpu.status) & flag_c))
-        outputLine(NSString(format: "%04x %02x %02x %02x %02x %@  %02x  %@",
-            state.cpu.pc,
-            state.cpu.a,
-            state.cpu.x,
-            state.cpu.y,
-            state.cpu.stack,
-            status,
-            state.cpu.ir,
-            state.cpu.state.description))
+        state.cpu.state.description.withCString {
+            cpuState in
+            self.outputLine(NSString(format: "%04x %02x %02x %02x %02x %@  %02x  %-11s  %03d  %03d",
+                state.cpu.pc,
+                state.cpu.a,
+                state.cpu.x,
+                state.cpu.y,
+                state.cpu.stack,
+                status,
+                state.cpu.ir,
+                COpaquePointer(cpuState),
+                state.display.line,
+                state.display.cycle))
+        }
     }
     
     func cmdStepCycle(args: [String]?) {
@@ -266,11 +271,11 @@ class Monitor: NSObject {
         emulator.step()
         for ;; {
             switch emulator.state.cpu.state {
-            case .Done:
+            case .FetchingOp:
                 cmdShowRegs(nil)
                 outputLine(disassembler.disassemble(emulator.state.cpu.pc))
                 return
-            case .Stopped, .Waiting:
+            case .Stopped:
                 cmdShowRegs(nil)
                 return
             default:

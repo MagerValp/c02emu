@@ -18,10 +18,26 @@
 // Running and stepping.
 
 
+static void evaluate_irqs(C02EmuState *state) {
+    bool nmi;
+    
+    // IRQ is masked by the I flag.
+    state->cpu.op.irq_active = (state->cpu.status & flag_i) == 0 && (
+        (state->io.display.irq_status & C02EMU_DISPLAY_IRQ_ACTIVE)
+    );
+    // NMI is edge triggered, so only active if it changed from the previous cycle.
+    nmi = false;
+    if (nmi && nmi != state->cpu.op.nmi_previous) {
+        state->cpu.op.nmi_active = true;
+    }
+    state->cpu.op.nmi_previous = nmi;
+}
+
+
 static C02EmuReturnReason cpu_step_cycle(C02EmuState *state) {
     Byte op;
     
-    if (state->cpu.op.cycle == C02EMU_OP_DONE) {
+    if (state->cpu.op.cycle == C02EMU_OP_FETCH) {
         
         if (state->monitor.trace_cpu) {
             fputs("  PC   A  X  Y  S  nv1bdizc\n", stderr);
@@ -40,7 +56,13 @@ static C02EmuReturnReason cpu_step_cycle(C02EmuState *state) {
                     (state->cpu.status & flag_c));
         }
         
-        if (state->cpu.op.irq_active) {
+        if (state->cpu.op.nmi_active) {
+            op = 0;
+            if (state->monitor.trace_cpu) {
+                fprintf(stderr, "PC = %04x NMI\n", state->cpu.pc);
+            }
+            state->cpu.op.uop_list = irq_op_table[OP_NMI];
+        } else if (state->cpu.op.irq_active) {
             op = 0;
             if (state->monitor.trace_cpu) {
                 fprintf(stderr, "PC = %04x IRQ\n", state->cpu.pc);
@@ -67,23 +89,31 @@ static C02EmuReturnReason cpu_step_cycle(C02EmuState *state) {
         
     } else if(state->cpu.op.cycle == C02EMU_OP_WAITING) {
         
-        if (!(state->cpu.status & flag_i)) {
-            // Evaluate IRQs.
-        } else {
-            // Evaluate IRQs, but continue at PC instead of jumping to vector.
+        cpu_read(state, state->cpu.pc);
+        evaluate_irqs(state);
+        if (state->cpu.op.irq_active || state->cpu.op.nmi_active) {
+            if ((state->cpu.status & flag_i)) {
+                // Continue at PC if I is set.
+                state->cpu.op.cycle = C02EMU_OP_FETCH;
+            } else {
+                // Jump to vector.
+                op = 0;
+                if (state->monitor.trace_cpu) {
+                    fprintf(stderr, "PC = %04x %s\n", state->cpu.pc, state->cpu.op.nmi_active ? "NMI" : "IRQ");
+                }
+                state->cpu.op.uop_list = irq_op_table[OP_IRQ];
+                state->cpu.op.cycle = C02EMU_OP_CYCLE_1;
+                state->cpu.op.address_fixup = false;
+                state->cpu.op.decimal_fixup = false;
+                state->cpu.op.opcode = op;
+            }
         }
-        // Evaluate NMIs.
         
     } else {
         
-        state->cpu.op.irq_active = false;
-        if (!(state->cpu.status & flag_i)) {
-            state->cpu.op.irq_active = (state->io.display.irq_status & C02EMU_DISPLAY_IRQ_ACTIVE) /* || next || next... */;
-        }
-        // Evaluate NMIs here.
-        
+        evaluate_irqs(state);
         state->cpu.op.uop_list[state->cpu.op.cycle](state);
-        if (state->cpu.op.cycle < C02EMU_OP_DONE) {
+        if (state->cpu.op.cycle < C02EMU_OP_FETCH) {
             state->cpu.op.cycle += 1;
         }
     }

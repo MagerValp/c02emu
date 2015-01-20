@@ -90,6 +90,8 @@ void c02emuReset(C02EmuState *state) {
     state->cpu.op.cycle = C02EMU_OP_CYCLE_1;
     state->cpu.op.address_fixup = false;
     state->cpu.op.decimal_fixup = false;
+    state->cpu.op.irq_active = false;
+    state->cpu.op.nmi_active = false;
 }
 
 

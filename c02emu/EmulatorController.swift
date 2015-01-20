@@ -164,7 +164,7 @@ class EmulatorController: NSObject, DisassemblerDelegate {
         case Cycle5
         case Cycle6
         case Cycle7
-        case Done
+        case FetchingOp
         case Stopped
         case Waiting
         
@@ -185,7 +185,7 @@ class EmulatorController: NSObject, DisassemblerDelegate {
                     return "Cycle 6"
                 case Cycle7:
                     return "Cycle 7"
-                case Done:
+                case FetchingOp:
                     return "Fetching op"
                 case Stopped:
                     return "Stopped"

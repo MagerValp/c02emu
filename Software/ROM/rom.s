@@ -53,7 +53,9 @@ reset:
 	bne @printmsg
 :	
 	cli
-	jmp *
+	
+:	wai
+	jmp :-
 	
 	
 

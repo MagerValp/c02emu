@@ -46,6 +46,8 @@ C02EmuState *c02emuCreate(void) {
     
     state->io.display.mode = C02EMU_DISPLAY_MODE_TEXT_80X50;
     state->io.display.base = 0x000000;
+    state->io.display.irq_mask = 0;
+    state->io.display.irq_status = 0;
     
     c02emuReset(state);
     

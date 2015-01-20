@@ -65,7 +65,11 @@ rom_nmih:
 j_irqh:
 	jmp (vec_irqh)
 rom_irqh:
+	pha
 	inc $104f
+	lda $e005
+	sta $e005
+	pla
 	rti
 
 

@@ -78,9 +78,7 @@ static C02EmuReturnReason cpu_step_cycle(C02EmuState *state) {
         
         state->cpu.op.irq_active = false;
         if (!(state->cpu.status & flag_i)) {
-            if (state->line_ctr == 0 /* && state->cycle_ctr == 0*/ ) {
-                state->cpu.op.irq_active = true;
-            }
+            state->cpu.op.irq_active = (state->io.display.irq_status & C02EMU_DISPLAY_IRQ_ACTIVE) /* || next || next... */;
         }
         // Evaluate NMIs here.
         
@@ -95,16 +93,21 @@ static C02EmuReturnReason cpu_step_cycle(C02EmuState *state) {
 
 
 static C02EmuReturnReason io_step_cycle(C02EmuState *state) {
+    C02EmuReturnReason reason = C02EMU_CYCLE_STEPPED;
+    
     if (++state->cycle_ctr > C02EMU_CYCLES_PER_LINE) {
         state->cycle_ctr = 0;
         if (++state->line_ctr > C02EMU_LINES_PER_FRAME) {
             state->line_ctr = 0;
             state->frame_ctr += 1;
-            return C02EMU_FRAME_READY;
+            if (state->io.display.irq_mask & C02EMU_DISPLAY_IRQ_VBL) {
+                state->io.display.irq_status |= C02EMU_DISPLAY_IRQ_ACTIVE | C02EMU_DISPLAY_IRQ_VBL;
+            }
+            reason = C02EMU_FRAME_READY;
         }
     }
 
-    return C02EMU_CYCLE_STEPPED;
+    return reason;
 }
 
 
@@ -252,6 +255,14 @@ static Byte io_display_read(C02EmuState *state, Addr addr) {
             return (Byte)state->io.display.mode;
             break;
             
+        case 0x04:
+            return (Byte)state->io.display.irq_mask;
+            break;
+            
+        case 0x05:
+            return (Byte)state->io.display.irq_status;
+            break;
+            
         default:
             return 0xff;
             break;
@@ -275,6 +286,17 @@ static void io_display_write(C02EmuState *state, Addr addr, Byte byte) {
             
         case 0x03:
             state->io.display.mode = byte & 0x03;
+            break;
+            
+        case 0x04:
+            state->io.display.irq_mask = byte & 0x81;
+            break;
+            
+        case 0x05:
+            state->io.display.irq_status &= ~(byte & C02EMU_DISPLAY_IRQ_VBL);
+            if ((state->io.display.irq_status & C02EMU_DISPLAY_IRQ_VBL) == 0) {
+                state->io.display.irq_status = 0;
+            }
             break;
             
         default:

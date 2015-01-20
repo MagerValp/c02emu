@@ -15,4 +15,6 @@ display_init:
 	sta $e002
 	lda #0
 	sta $e003
+	lda #1
+	sta $e004
 	rts

@@ -32,6 +32,11 @@ typedef uint32_t LongAddr;
 #define cycles_per_frame(FRAME_CTR) ((FRAME_CTR % 3) == 0 ? 133334 : 133333)
 
 typedef enum {
+    C02EMU_DISPLAY_IRQ_VBL = 1<<0,
+    C02EMU_DISPLAY_IRQ_ACTIVE = 1<<7,
+} C02EmuDisplayIRQMask;
+
+typedef enum {
     C02EMU_PHASE_CPU,
     C02EMU_PHASE_IO,
 } C02EmuPhase;
@@ -84,6 +89,8 @@ struct _c02EmuState {
         struct {
             C02EmuDisplayMode mode;
             unsigned int base;
+            Byte irq_mask;
+            Byte irq_status;
         } display;
     } io;
     

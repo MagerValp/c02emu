@@ -10,8 +10,8 @@
 #define c02emu_c02emu_Bridging_Header_h
 
 
-#import "c02emu.h"
-#import "c02emu_util.h"
+#import "emu/c02emu.h"
+#import "emu/c02emu_util.h"
 
 
 #endif

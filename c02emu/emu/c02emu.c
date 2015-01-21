@@ -79,7 +79,7 @@ void c02emuReset(C02EmuState *state) {
     for (int i = 0; i < 0x0e; i++) {
         state->io.mmu.page[i] = i;
     }
-    state->io.mmu.page[0x0e] = 0xfe;
+    state->io.mmu.page[0x0e] = 0xa0;
     state->io.mmu.page[0x0f] = 0xff;
     
     state->cpu.op.opcode = 0;
@@ -122,21 +122,9 @@ C02EmuReturnReason c02emuRun(C02EmuState *state) {
     C02EmuReturnReason reason;
     
     for (;;) {
-        
-        if (state->phase == C02EMU_PHASE_CPU) {
-            state->phase = C02EMU_PHASE_IO;
-            reason = cpu_step_cycle(state);
-            if (reason != C02EMU_CYCLE_STEPPED) {
-                return reason;
-            }
-        }
-        
-        if (state->phase == C02EMU_PHASE_IO) {
-            state->phase = C02EMU_PHASE_CPU;
-            reason = io_step_cycle(state);
-            if (reason != C02EMU_CYCLE_STEPPED) {
-                return reason;
-            }
+        reason = c02emuStepCycle(state);
+        if (reason != C02EMU_CYCLE_STEPPED) {
+            return reason;
         }
     }
 }

@@ -48,7 +48,7 @@ class Disassembler: NSObject {
         .IMP, .IZX, .IMM, .IMP, .ZP,  .ZP,  .ZP,  .ZP,
         .IMP, .IMM, .IMP, .IMP, .ABS, .ABS, .ABS, .ZPR,
         .REL, .IZY, .IZP, .IMP, .ZPX, .ZPX, .ZPX, .ZP,
-        .IMP, .ABY, .IMP, .IMP, .IMP, .ABX, .ABX, .ZPR,
+        .IMP, .ABY, .IMP, .IMP, .ABS, .ABX, .ABX, .ZPR,
         .IMP, .IZX, .IMM, .IMP, .ZP,  .ZP,  .ZP,  .ZP,
         .IMP, .IMM, .IMP, .IMP, .IND, .ABS, .ABS, .ZPR,
         .REL, .IZY, .IZP, .IMP, .ZPX, .ZPX, .ZPX, .ZP,
@@ -64,11 +64,11 @@ class Disassembler: NSObject {
         .IMM, .IZX, .IMM, .IMP, .ZP,  .ZP,  .ZP,  .ZP,
         .IMP, .IMM, .IMP, .IMP, .ABS, .ABS, .ABS, .ZPR,
         .REL, .IZY, .IZP, .IMP, .ZPX, .ZPX, .ZPX, .ZP,
-        .IMP, .ABY, .IMP, .IMP, .IMP, .ABX, .ABX, .ZPR,
+        .IMP, .ABY, .IMP, .IMP, .ABS, .ABX, .ABX, .ZPR,
         .IMM, .IZX, .IMM, .IMP, .ZP,  .ZP,  .ZP,  .ZP,
         .IMP, .IMM, .IMP, .IMP, .ABS, .ABS, .ABS, .ZPR,
         .REL, .IZY, .IZP, .IMP, .ZPX, .ZPX, .ZPX, .ZP,
-        .IMP, .ABY, .IMP, .IMP, .IMP, .ABX, .ABX, .ZPR,
+        .IMP, .ABY, .IMP, .IMP, .ABS, .ABX, .ABX, .ZPR,
     ]
     
     let opCodes = [

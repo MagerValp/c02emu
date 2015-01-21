@@ -219,7 +219,7 @@ static C02EmuUop op_table[256][6] = {
     R_ABY(EOR),     // EOR aby 4*
     PUSH_IMP(PHY),  // PHY 3
     R_IMP(NOP),     // NOP
-    R_IMP(NOP),     // NOP
+    R_ABS(NOP),     // NOP abs 3
     R_ABX(EOR),     // EOR abx 4*
     RMW_ABX(LSR),   // LSR abx 6*
     B_ZPR(BBR5),    // BBR5 zpr 5
@@ -355,7 +355,7 @@ static C02EmuUop op_table[256][6] = {
     R_ABY(CMP),     // CMP aby 4*
     PUSH_IMP(PHX),  // PHX 3
     STOP_IMP(STP),  // STP 3
-    R_IMP(NOP),     // NOP
+    R_ABS(NOP),     // NOP abs 3
     R_ABX(CMP),     // CMP abx 4*
     RMW_ABX(DEC),   // DEC abx 6*
     B_ZPR(BBS5),    // BBS5 zpr 5
@@ -389,7 +389,7 @@ static C02EmuUop op_table[256][6] = {
     RD_ABY(SBC),    // SBC aby 4*
     PULL_IMP(PLX),  // PLX 4
     R_IMP(NOP),     // NOP
-    R_IMP(NOP),     // NOP
+    R_ABS(NOP),     // NOP abs 3
     RD_ABX(SBC),    // SBC abx 4*
     RMW_ABX(INC),   // INC abx 6*
     B_ZPR(BBS7),    // BBS7 zpr 5

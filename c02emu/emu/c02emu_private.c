@@ -355,7 +355,7 @@ static void io_debug_write(C02EmuState *state, Addr addr, Byte byte) {
             fputs("\nDebug trap registers:\n", stderr);
             fputs("  PC   A  X  Y  S  nv1bdizc\n", stderr);
             fprintf(stderr, ".;%04x %02x %02x %02x %02x %d%d1%d%d%d%d%d\n",
-                    state->cpu.pc,
+                    (state->cpu.pc - 3) & 0xffff,
                     state->cpu.a,
                     state->cpu.x,
                     state->cpu.y,

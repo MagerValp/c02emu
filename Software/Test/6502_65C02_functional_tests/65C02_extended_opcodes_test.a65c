@@ -97,7 +97,7 @@ data_segment = $200
 code_segment = $1000  
 
 ;added WDC only opcodes WAI & STP (0=test as NOPs, >0=no test)
-wdc_op = 0
+wdc_op = 1
 
 ;added Rockwell & WDC opcodes BBR, BBS, RMB & SMB
 ;(0=test as NOPs, 1=full test, >1=no test) 

@@ -532,7 +532,14 @@ static void op_BIT(C02EmuState *state, Byte byte) {
     }
     OP_DONE();
 }
-SYNTHESIZE_imm(BIT)
+static void u_BIT_imm(C02EmuState *state) {
+    if ((A & cpu_read(state, PC++)) == 0) {
+        SEZ();
+    } else {
+        CLZ();
+    }
+    OP_DONE();
+}
 SYNTHESIZE_ad(BIT)
 SYNTHESIZE_r_adx(BIT)
 SYNTHESIZE_alx(BIT)

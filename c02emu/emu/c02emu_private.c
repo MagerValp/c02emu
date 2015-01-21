@@ -374,9 +374,9 @@ static void io_debug_write(C02EmuState *state, Addr addr, Byte byte) {
             }
             fputs("\n", stderr);
             fputs("ZP:\n", stderr);
-            fputs("000c", stderr);
+            fputs("0010", stderr);
             for (Addr a = 0; a < 7; a++) {
-                fprintf(stderr, " %02x", cpu_read(state, 0x000c + a));
+                fprintf(stderr, " %02x", cpu_read(state, 0x0010 + a));
             }
             fputs("\n", stderr);
             fputs("ABS:\n", stderr);
@@ -385,6 +385,10 @@ static void io_debug_write(C02EmuState *state, Addr addr, Byte byte) {
                 fprintf(stderr, " %02x", cpu_read(state, 0x0200 + a));
             }
             fputs("\n", stderr);
+            break;
+            
+        case 0x03:
+            fprintf(stderr, "Running test %d\n", state->cpu.a);
             break;
             
         default:

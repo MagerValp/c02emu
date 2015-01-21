@@ -26,12 +26,12 @@ class c02emuTests: XCTestCase {
         //   RES vector set to $0400.
         rom = NSMutableData()
         rom.appendData(NSMutableData(length: 0x1000 - 6)!)
-        rom.appendBytes([0x03, 0x04] as [UInt8], length: 2)
-        rom.appendBytes([0x00, 0x04] as [UInt8], length: 2)
-        rom.appendBytes([0x06, 0x04] as [UInt8], length: 2)
+        rom.appendBytes([0x03, 0x10] as [UInt8], length: 2)
+        rom.appendBytes([0x00, 0x10] as [UInt8], length: 2)
+        rom.appendBytes([0x06, 0x10] as [UInt8], length: 2)
         c02emuLoadROM(emuState, rom.bytes, UInt(rom.length))
-        // Set program load PC to $0400.
-        prgPtr = 0x0400
+        // Set program load PC to $1000.
+        prgPtr = 0x1000
         //bundle = NSBundle(forClass: self.dynamicType)
     }
     
@@ -118,17 +118,21 @@ class c02emuTests: XCTestCase {
     
     func testDisplayOutput() {
         setProgramBytes([0xa9, 0x00])       // lda #0
-        setProgramBytes([0x8d, 0x00, 0xe3]) // sta $e300
-        setProgramBytes([0xa9, chr("H")])       // lda #'H'
-        setProgramBytes([0x8d, 0x00, 0xe2]) // sta $e200
-        setProgramBytes([0xa9, chr("e")])       // lda #'e'
-        setProgramBytes([0x8d, 0x01, 0xe2]) // sta $e201
-        setProgramBytes([0xa9, chr("l")])       // lda #'l'
-        setProgramBytes([0x8d, 0x02, 0xe2]) // sta $e202
-        setProgramBytes([0xa9, chr("l")])       // lda #'l'
-        setProgramBytes([0x8d, 0x03, 0xe2]) // sta $e203
-        setProgramBytes([0xa9, chr("o")])       // lda #'o'
-        setProgramBytes([0x8d, 0x04, 0xe2]) // sta $e204
+        setProgramBytes([0x8d, 0x00, 0xe0]) // sta $e300
+        setProgramBytes([0x8d, 0x02, 0xe0]) // sta $e302
+        setProgramBytes([0x8d, 0x03, 0xe0]) // sta $e303
+        setProgramBytes([0xa9, 0x10])       // lda #$10
+        setProgramBytes([0x8d, 0x01, 0xe0]) // sta $e301
+        setProgramBytes([0xa9, chr("H")])   // lda #'H'
+        setProgramBytes([0x8d, 0x00, 0x10]) // sta $1000
+        setProgramBytes([0xa9, chr("e")])   // lda #'e'
+        setProgramBytes([0x8d, 0x01, 0x10]) // sta $1001
+        setProgramBytes([0xa9, chr("l")])   // lda #'l'
+        setProgramBytes([0x8d, 0x02, 0x10]) // sta $1002
+        setProgramBytes([0xa9, chr("l")])   // lda #'l'
+        setProgramBytes([0x8d, 0x03, 0x10]) // sta $1003
+        setProgramBytes([0xa9, chr("o")])   // lda #'o'
+        setProgramBytes([0x8d, 0x04, 0x10]) // sta $1004
         setProgramBytes([0xdb])             // stp
         c02emuReset(emuState)
         
@@ -209,11 +213,11 @@ class c02emuTests: XCTestCase {
         c02emuReset(emuState)
         c02emuRun(emuState)
         let regs = c02emuCPURegs(emuState)
-        XCTAssertEqual(regs.pc, UInt16(0x482), "PC")
+        XCTAssertEqual(regs.pc, UInt16(0x1082), "PC")
     }
     
     func testBRABackward() {
-        setProgramBytes([0x4c, 0x00, 0x05]) // jmp $0500
+        setProgramBytes([0x4c, 0x00, 0x11]) // jmp $0500
         for i in 0..<253 {
             setProgramBytes([0xdb])             // stp
         }
@@ -221,7 +225,7 @@ class c02emuTests: XCTestCase {
         c02emuReset(emuState)
         c02emuRun(emuState)
         let regs = c02emuCPURegs(emuState)
-        XCTAssertEqual(regs.pc, UInt16(0x483), "PC")
+        XCTAssertEqual(regs.pc, UInt16(0x1083), "PC")
     }
     
     func testzpx() {
@@ -267,9 +271,24 @@ class c02emuTests: XCTestCase {
         
         let bundle = NSBundle(forClass: self.dynamicType)
         if let romData = NSData(contentsOfURL: bundle.URLForResource("6502_functional_test", withExtension: "bin")!) {
-            loadBin(0x0400, data: romData.bytes, length: romData.length)
+            loadBin(0x1000, data: romData.bytes, length: romData.length)
         } else {
             XCTAssertTrue(false, "Couldn't load 6502_functional_test.bin")
+        }
+        c02emuReset(emuState)
+        while c02emuRun(emuState).value == C02EMU_FRAME_READY.value {
+            //NSLog("Frame: \(frame++)")
+        }
+    }
+    
+    func test65C02ExtendedOpcodes() {
+        var frame = 0
+        
+        let bundle = NSBundle(forClass: self.dynamicType)
+        if let romData = NSData(contentsOfURL: bundle.URLForResource("65C02_extended_opcodes_test", withExtension: "bin")!) {
+            loadBin(0x1000, data: romData.bytes, length: romData.length)
+        } else {
+            XCTAssertTrue(false, "Couldn't load 65C02_extended_opcodes_test.bin")
         }
         c02emuReset(emuState)
         while c02emuRun(emuState).value == C02EMU_FRAME_READY.value {
@@ -280,7 +299,7 @@ class c02emuTests: XCTestCase {
     func testCPUEmulationPerformance() {
         let bundle = NSBundle(forClass: self.dynamicType)
         if let romData = NSData(contentsOfURL: bundle.URLForResource("6502_functional_test", withExtension: "bin")!) {
-            loadBin(0x0400, data: romData.bytes, length: romData.length)
+            loadBin(0x1000, data: romData.bytes, length: romData.length)
         } else {
             XCTAssertTrue(false, "Couldn't load 6502_functional_test.bin")
         }

@@ -128,7 +128,17 @@ static void u_rmw_ad(C02EmuState *state) {
 }
 
 static void u_rmw_adx(C02EmuState *state) {
-    ALU = cpu_read(state, AD + X);
+    if (state->cpu.op.address_fixup == true) {
+        ALU = cpu_read(state, AD + X);
+    } else {
+        if (((AD + X) & 0xff00) == (AD & 0xff00)) {
+            ALU = cpu_read(state, AD + X);
+            state->cpu.op.cycle += 1;
+        } else {
+            cpu_read(state, (AD & 0xff00) | ((AD + X) & 0xff));
+            state->cpu.op.address_fixup = true;
+        }
+    }
 }
 
 static void u_rmw_adlx(C02EmuState *state) {

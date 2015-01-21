@@ -95,7 +95,8 @@ static void u_error(C02EmuState *state) {
 // ALU RMW ops.
 #define RMW_IMP(OP)   I_IMP(OP)
 #define RMW_ABS(OP)   { u_abs_adl,    u_abs_adh,    u_rmw_ad,     u_dum_ad,     u_##OP##_ad,   CMAX6 }
-#define RMW_ABX(OP)   { u_abs_adl,    u_abs_adh,    u_dum_adx,    u_rmw_adx,    u_dum_adxreal, u_##OP##_adx, CMAX7 }
+#define RMW_ABX6(OP)  { u_abs_adl,    u_abs_adh,    u_rmw_adx,    u_rmw_adx,    u_dum_adxreal, u_##OP##_adx, CMAX7 }
+#define RMW_ABX7(OP)  { u_abs_adl,    u_abs_adh,    u_dum_adx,    u_rmw_adx,    u_dum_adxreal, u_##OP##_adx, CMAX7 }
 #define RMW_ZP(OP)    { u_zp_ad,      u_rmw_ad,     u_dum_ad,     u_##OP##_ad,  CMAX5 }
 #define RMW_ZPX(OP)   { u_zp_ad,      u_dum_adlx,   u_rmw_adlx,   u_dum_adlx,   u_##OP##_adlx, CMAX6 }
 
@@ -153,7 +154,7 @@ static C02EmuUop op_table[256][6] = {
     R_IMP(NOP),     // NOP
     RMW_ABS(TRB),   // TRB abs 6
     R_ABX(ORA),     // ORA abx 4*
-    RMW_ABX(ASL),   // ASL abx 7
+    RMW_ABX6(ASL),  // ASL abx 6*
     B_ZPR(BBR1),    // BBR1 zpr 5
     // 20 - 2f
     JSR_ABS(JSR),   // JSR abs 6
@@ -187,7 +188,7 @@ static C02EmuUop op_table[256][6] = {
     R_IMP(NOP),     // NOP
     R_ABX(BIT),     // BIT abx 4*
     R_ABX(AND),     // AND abx 4*
-    RMW_ABX(ROL),   // ROL abx 7
+    RMW_ABX6(ROL),  // ROL abx 6*
     B_ZPR(BBR3),    // BBR3 zpr 5
     // 40 - 4f
     RTI_IMP(RTI),   // RTI 6
@@ -221,7 +222,7 @@ static C02EmuUop op_table[256][6] = {
     R_IMP(NOP),     // NOP
     R_ABS(NOP),     // NOP abs 3
     R_ABX(EOR),     // EOR abx 4*
-    RMW_ABX(LSR),   // LSR abx 7
+    RMW_ABX6(LSR),  // LSR abx 6*
     B_ZPR(BBR5),    // BBR5 zpr 5
     // 60 - 6f
     RTS_IMP(RTS),   // RTS 6
@@ -255,7 +256,7 @@ static C02EmuUop op_table[256][6] = {
     R_IMP(NOP),     // NOP
     JMP_IAX(JMP),   // JMP iax 6
     RD_ABX(ADC),    // ADC abx 4*
-    RMW_ABX(ROR),   // ROR abx 7
+    RMW_ABX6(ROR),  // ROR abx 6*
     B_ZPR(BBR7),    // BBR7 zpr 5
     // 80 - 8f
     B_REL(BRA),     // BRA rel 3*
@@ -357,7 +358,7 @@ static C02EmuUop op_table[256][6] = {
     STOP_IMP(STP),  // STP 3
     R_ABS(NOP),     // NOP abs 3
     R_ABX(CMP),     // CMP abx 4*
-    RMW_ABX(DEC),   // DEC abx 7
+    RMW_ABX7(DEC),  // DEC abx 7
     B_ZPR(BBS5),    // BBS5 zpr 5
     // e0 - ef
     R_IMM(CPX),     // CPX imm 2
@@ -391,7 +392,7 @@ static C02EmuUop op_table[256][6] = {
     R_IMP(NOP),     // NOP
     R_ABS(NOP),     // NOP abs 3
     RD_ABX(SBC),    // SBC abx 4*
-    RMW_ABX(INC),   // INC abx 7
+    RMW_ABX7(INC),  // INC abx 7
     B_ZPR(BBS7),    // BBS7 zpr 5
 };
 

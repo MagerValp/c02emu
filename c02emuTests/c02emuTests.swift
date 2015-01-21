@@ -240,6 +240,28 @@ class c02emuTests: XCTestCase {
         XCTAssertEqual(regs.status | 0x20, UInt8(0xa4), "S")
     }
     
+    func testHCMTest() {
+        for test in 0...14 {
+            NSLog("Running HCM test \(test)")
+            let name = String(format: "hcm-test%02d", test)
+            let bundle = NSBundle(forClass: self.dynamicType)
+            if let romData = NSData(contentsOfURL: bundle.URLForResource(name, withExtension: "bin")!) {
+                c02emuLoadROM(emuState, romData.bytes, UInt(romData.length))
+            } else {
+                XCTAssertTrue(false, "Couldn't load \(name).bin")
+            }
+            c02emuReset(emuState)
+            if test == 15 {
+                c02emuSetCPUTrace(emuState, true)
+                c02emuSetRAMTrace(emuState, true)
+            }
+            while c02emuRun(emuState).value == C02EMU_FRAME_READY.value {
+            }
+            let regs = c02emuCPURegs(emuState)
+            XCTAssertEqual(regs.a, UInt8(0x00), "HCM test \(test) failed")
+        }
+    }
+    
     func test6502FuncTest() {
         var frame = 0
         

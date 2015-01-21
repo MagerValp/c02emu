@@ -10,6 +10,21 @@
 		6609A11D1A605D1D00CA5B87 /* c02emu.c in Sources */ = {isa = PBXBuildFile; fileRef = 668D3C431A5DBF0F00D9C4B9 /* c02emu.c */; settings = {COMPILER_FLAGS = "-ferror-limit=100"; }; };
 		6609A11E1A61424800CA5B87 /* c02emu.c in Sources */ = {isa = PBXBuildFile; fileRef = 668D3C431A5DBF0F00D9C4B9 /* c02emu.c */; };
 		663A67F81A65B9DF0000F38E /* MonitorWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 663A67F71A65B9DF0000F38E /* MonitorWindowController.swift */; };
+		666057161A6ECCF400B35343 /* hcm-test00.bin in Resources */ = {isa = PBXBuildFile; fileRef = 666057071A6ECCF400B35343 /* hcm-test00.bin */; };
+		666057171A6ECCF400B35343 /* hcm-test01.bin in Resources */ = {isa = PBXBuildFile; fileRef = 666057081A6ECCF400B35343 /* hcm-test01.bin */; };
+		666057181A6ECCF400B35343 /* hcm-test02.bin in Resources */ = {isa = PBXBuildFile; fileRef = 666057091A6ECCF400B35343 /* hcm-test02.bin */; };
+		666057191A6ECCF400B35343 /* hcm-test03.bin in Resources */ = {isa = PBXBuildFile; fileRef = 6660570A1A6ECCF400B35343 /* hcm-test03.bin */; };
+		6660571A1A6ECCF400B35343 /* hcm-test04.bin in Resources */ = {isa = PBXBuildFile; fileRef = 6660570B1A6ECCF400B35343 /* hcm-test04.bin */; };
+		6660571B1A6ECCF400B35343 /* hcm-test05.bin in Resources */ = {isa = PBXBuildFile; fileRef = 6660570C1A6ECCF400B35343 /* hcm-test05.bin */; };
+		6660571C1A6ECCF400B35343 /* hcm-test06.bin in Resources */ = {isa = PBXBuildFile; fileRef = 6660570D1A6ECCF400B35343 /* hcm-test06.bin */; };
+		6660571D1A6ECCF400B35343 /* hcm-test07.bin in Resources */ = {isa = PBXBuildFile; fileRef = 6660570E1A6ECCF400B35343 /* hcm-test07.bin */; };
+		6660571E1A6ECCF400B35343 /* hcm-test08.bin in Resources */ = {isa = PBXBuildFile; fileRef = 6660570F1A6ECCF400B35343 /* hcm-test08.bin */; };
+		6660571F1A6ECCF400B35343 /* hcm-test09.bin in Resources */ = {isa = PBXBuildFile; fileRef = 666057101A6ECCF400B35343 /* hcm-test09.bin */; };
+		666057201A6ECCF400B35343 /* hcm-test10.bin in Resources */ = {isa = PBXBuildFile; fileRef = 666057111A6ECCF400B35343 /* hcm-test10.bin */; };
+		666057211A6ECCF400B35343 /* hcm-test11.bin in Resources */ = {isa = PBXBuildFile; fileRef = 666057121A6ECCF400B35343 /* hcm-test11.bin */; };
+		666057221A6ECCF400B35343 /* hcm-test12.bin in Resources */ = {isa = PBXBuildFile; fileRef = 666057131A6ECCF400B35343 /* hcm-test12.bin */; };
+		666057231A6ECCF400B35343 /* hcm-test13.bin in Resources */ = {isa = PBXBuildFile; fileRef = 666057141A6ECCF400B35343 /* hcm-test13.bin */; };
+		666057241A6ECCF400B35343 /* hcm-test14.bin in Resources */ = {isa = PBXBuildFile; fileRef = 666057151A6ECCF400B35343 /* hcm-test14.bin */; };
 		666551ED1A684812007CE683 /* Monitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 666551EC1A684812007CE683 /* Monitor.swift */; };
 		6673C4131A5C709700D17696 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6673C4121A5C709700D17696 /* AppDelegate.swift */; };
 		6673C4151A5C709700D17696 /* GameScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6673C4141A5C709700D17696 /* GameScene.swift */; };
@@ -72,6 +87,21 @@
 		661BAC751A5FB6C200202909 /* c02emu_optable.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = c02emu_optable.c; path = emu/c02emu_optable.c; sourceTree = "<group>"; };
 		661BAC761A5FB6C200202909 /* c02emu_optable.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = c02emu_optable.h; path = emu/c02emu_optable.h; sourceTree = "<group>"; };
 		663A67F71A65B9DF0000F38E /* MonitorWindowController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MonitorWindowController.swift; sourceTree = "<group>"; };
+		666057071A6ECCF400B35343 /* hcm-test00.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; name = "hcm-test00.bin"; path = "../Software/Test/hcm-6502/hcm-test00.bin"; sourceTree = "<group>"; };
+		666057081A6ECCF400B35343 /* hcm-test01.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; name = "hcm-test01.bin"; path = "../Software/Test/hcm-6502/hcm-test01.bin"; sourceTree = "<group>"; };
+		666057091A6ECCF400B35343 /* hcm-test02.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; name = "hcm-test02.bin"; path = "../Software/Test/hcm-6502/hcm-test02.bin"; sourceTree = "<group>"; };
+		6660570A1A6ECCF400B35343 /* hcm-test03.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; name = "hcm-test03.bin"; path = "../Software/Test/hcm-6502/hcm-test03.bin"; sourceTree = "<group>"; };
+		6660570B1A6ECCF400B35343 /* hcm-test04.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; name = "hcm-test04.bin"; path = "../Software/Test/hcm-6502/hcm-test04.bin"; sourceTree = "<group>"; };
+		6660570C1A6ECCF400B35343 /* hcm-test05.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; name = "hcm-test05.bin"; path = "../Software/Test/hcm-6502/hcm-test05.bin"; sourceTree = "<group>"; };
+		6660570D1A6ECCF400B35343 /* hcm-test06.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; name = "hcm-test06.bin"; path = "../Software/Test/hcm-6502/hcm-test06.bin"; sourceTree = "<group>"; };
+		6660570E1A6ECCF400B35343 /* hcm-test07.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; name = "hcm-test07.bin"; path = "../Software/Test/hcm-6502/hcm-test07.bin"; sourceTree = "<group>"; };
+		6660570F1A6ECCF400B35343 /* hcm-test08.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; name = "hcm-test08.bin"; path = "../Software/Test/hcm-6502/hcm-test08.bin"; sourceTree = "<group>"; };
+		666057101A6ECCF400B35343 /* hcm-test09.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; name = "hcm-test09.bin"; path = "../Software/Test/hcm-6502/hcm-test09.bin"; sourceTree = "<group>"; };
+		666057111A6ECCF400B35343 /* hcm-test10.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; name = "hcm-test10.bin"; path = "../Software/Test/hcm-6502/hcm-test10.bin"; sourceTree = "<group>"; };
+		666057121A6ECCF400B35343 /* hcm-test11.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; name = "hcm-test11.bin"; path = "../Software/Test/hcm-6502/hcm-test11.bin"; sourceTree = "<group>"; };
+		666057131A6ECCF400B35343 /* hcm-test12.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; name = "hcm-test12.bin"; path = "../Software/Test/hcm-6502/hcm-test12.bin"; sourceTree = "<group>"; };
+		666057141A6ECCF400B35343 /* hcm-test13.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; name = "hcm-test13.bin"; path = "../Software/Test/hcm-6502/hcm-test13.bin"; sourceTree = "<group>"; };
+		666057151A6ECCF400B35343 /* hcm-test14.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; name = "hcm-test14.bin"; path = "../Software/Test/hcm-6502/hcm-test14.bin"; sourceTree = "<group>"; };
 		666551EC1A684812007CE683 /* Monitor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Monitor.swift; sourceTree = "<group>"; };
 		6673C40D1A5C709700D17696 /* c02emu.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = c02emu.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6673C4111A5C709700D17696 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -180,6 +210,21 @@
 		6673C4251A5C709700D17696 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				666057071A6ECCF400B35343 /* hcm-test00.bin */,
+				666057081A6ECCF400B35343 /* hcm-test01.bin */,
+				666057091A6ECCF400B35343 /* hcm-test02.bin */,
+				6660570A1A6ECCF400B35343 /* hcm-test03.bin */,
+				6660570B1A6ECCF400B35343 /* hcm-test04.bin */,
+				6660570C1A6ECCF400B35343 /* hcm-test05.bin */,
+				6660570D1A6ECCF400B35343 /* hcm-test06.bin */,
+				6660570E1A6ECCF400B35343 /* hcm-test07.bin */,
+				6660570F1A6ECCF400B35343 /* hcm-test08.bin */,
+				666057101A6ECCF400B35343 /* hcm-test09.bin */,
+				666057111A6ECCF400B35343 /* hcm-test10.bin */,
+				666057121A6ECCF400B35343 /* hcm-test11.bin */,
+				666057131A6ECCF400B35343 /* hcm-test12.bin */,
+				666057141A6ECCF400B35343 /* hcm-test13.bin */,
+				666057151A6ECCF400B35343 /* hcm-test14.bin */,
 				66DE98E81A6324BF00AD860C /* 6502_functional_test.bin */,
 				6673C4261A5C709700D17696 /* Info.plist */,
 			);
@@ -356,6 +401,21 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				666057161A6ECCF400B35343 /* hcm-test00.bin in Resources */,
+				666057171A6ECCF400B35343 /* hcm-test01.bin in Resources */,
+				666057181A6ECCF400B35343 /* hcm-test02.bin in Resources */,
+				666057191A6ECCF400B35343 /* hcm-test03.bin in Resources */,
+				6660571A1A6ECCF400B35343 /* hcm-test04.bin in Resources */,
+				6660571B1A6ECCF400B35343 /* hcm-test05.bin in Resources */,
+				6660571C1A6ECCF400B35343 /* hcm-test06.bin in Resources */,
+				6660571D1A6ECCF400B35343 /* hcm-test07.bin in Resources */,
+				6660571E1A6ECCF400B35343 /* hcm-test08.bin in Resources */,
+				6660571F1A6ECCF400B35343 /* hcm-test09.bin in Resources */,
+				666057201A6ECCF400B35343 /* hcm-test10.bin in Resources */,
+				666057211A6ECCF400B35343 /* hcm-test11.bin in Resources */,
+				666057221A6ECCF400B35343 /* hcm-test12.bin in Resources */,
+				666057231A6ECCF400B35343 /* hcm-test13.bin in Resources */,
+				666057241A6ECCF400B35343 /* hcm-test14.bin in Resources */,
 				66DE98E91A6324BF00AD860C /* 6502_functional_test.bin in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -674,6 +734,7 @@
 				669FCCD41A6AD58800E6299F /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		66DE98E01A61B49A00AD860C /* Build configuration list for PBXLegacyTarget "c02emuROM" */ = {
 			isa = XCConfigurationList;

@@ -22,7 +22,7 @@ ADDRMODE = {
     u"abs 6":   u"ABS",
     u"abx 4*":  u"ABX",
     u"abx 5":   u"ABX",
-    u"abx 6*":  u"ABX",
+    u"abx 7":   u"ABX",
     u"aby 4*":  u"ABY",
     u"aby 5":   u"ABY",
     u"iax 6":   u"IAX",

@@ -115,6 +115,14 @@ static void u_rel_bra(C02EmuState *state) {
     }
 }
 
+static void u_rel_bbra(C02EmuState *state) {
+    cpu_read(state, (PC & 0xff00) | ((PC + (int8_t)BAL) & 0xff));
+}
+
+static void u_zpr_ba(C02EmuState *state) {
+    BA = cpu_read(state, PC++);
+}
+
 static void u_rmw_ad(C02EmuState *state) {
     ALU = cpu_read(state, AD);
 }
@@ -458,11 +466,11 @@ SYNTHESIZE_rmw_adlx(ASL)
 
 
 #define SYNTHESIZE_bbr(BIT) \
-static void u_BBR##BIT##_rel(C02EmuState *state) { \
-    BA = cpu_read(state, PC++); \
-    if ((A & 1<<BIT) != 0) { \
-        OP_DONE(); \
+static void u_BBR##BIT##_zpr(C02EmuState *state) { \
+    if ((cpu_read(state, ADL) & 1<<BIT) == 0) { \
+        PC += (int8_t)BAL; \
     } \
+    OP_DONE(); \
 }
 SYNTHESIZE_bbr(0)
 SYNTHESIZE_bbr(1)
@@ -475,11 +483,11 @@ SYNTHESIZE_bbr(7)
 
 
 #define SYNTHESIZE_bbs(BIT) \
-static void u_BBS##BIT##_rel(C02EmuState *state) { \
-    BA = cpu_read(state, PC++); \
-    if ((A & 1<<BIT) == 0) { \
-        OP_DONE(); \
+static void u_BBS##BIT##_zpr(C02EmuState *state) { \
+    if ((cpu_read(state, ADL) & 1<<BIT) != 0) { \
+        PC += (int8_t)BAL; \
     } \
+    OP_DONE(); \
 }
 SYNTHESIZE_bbs(0)
 SYNTHESIZE_bbs(1)

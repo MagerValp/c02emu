@@ -86,6 +86,7 @@ static void u_error(C02EmuState *state) {
 
 // Relative branches.
 #define B_REL(OP)     { u_##OP##_rel, u_rel_bra,    u_rel_bra,    CMAX4 }
+#define B_ZPR(OP)     { u_zp_ad,      u_zpr_ba,     u_rel_bbra,   u_##OP##_zpr, CMAX5 }
 
 // Stack ops.
 #define PULL_IMP(OP)  { u_dum_pc,     u_dum_s,      u_##OP##_imp, CMAX4 }
@@ -136,7 +137,7 @@ static C02EmuUop op_table[256][6] = {
     RMW_ABS(TSB),   // TSB abs 6
     R_ABS(ORA),     // ORA abs 4
     RMW_ABS(ASL),   // ASL abs 6
-    B_REL(BBR0),    // BBR0 rel 2*
+    B_ZPR(BBR0),    // BBR0 zpr 5
     // 10 - 1f
     B_REL(BPL),     // BPL rel 2*
     R_IZY(ORA),     // ORA izy 5*
@@ -153,7 +154,7 @@ static C02EmuUop op_table[256][6] = {
     RMW_ABS(TRB),   // TRB abs 6
     R_ABX(ORA),     // ORA abx 4*
     RMW_ABX(ASL),   // ASL abx 6*
-    B_REL(BBR1),    // BBR1 rel 2*
+    B_ZPR(BBR1),    // BBR1 zpr 5
     // 20 - 2f
     JSR_ABS(JSR),   // JSR abs 6
     R_IZX(AND),     // AND izx 6
@@ -170,7 +171,7 @@ static C02EmuUop op_table[256][6] = {
     R_ABS(BIT),     // BIT abs 4
     R_ABS(AND),     // AND abs 4
     RMW_ABS(ROL),   // ROL abs 6
-    B_REL(BBR2),    // BBR2 rel 2*
+    B_ZPR(BBR2),    // BBR2 zpr 5
     // 30 - 3f
     B_REL(BMI),     // BMI rel 2*
     R_IZY(AND),     // AND izy 5*
@@ -187,7 +188,7 @@ static C02EmuUop op_table[256][6] = {
     R_ABX(BIT),     // BIT abx 4*
     R_ABX(AND),     // AND abx 4*
     RMW_ABX(ROL),   // ROL abx 6*
-    B_REL(BBR3),    // BBR3 rel 2*
+    B_ZPR(BBR3),    // BBR3 zpr 5
     // 40 - 4f
     RTI_IMP(RTI),   // RTI 6
     R_IZX(EOR),     // EOR izx 6
@@ -204,7 +205,7 @@ static C02EmuUop op_table[256][6] = {
     JMP_ABS(JMP),   // JMP abs 3
     R_ABS(EOR),     // EOR abs 4
     RMW_ABS(LSR),   // LSR abs 6
-    B_REL(BBR4),    // BBR4 rel 2*
+    B_ZPR(BBR4),    // BBR4 zpr 5
     // 50 - 5f
     B_REL(BVC),     // BVC rel 2*
     R_IZY(EOR),     // EOR izy 5*
@@ -221,7 +222,7 @@ static C02EmuUop op_table[256][6] = {
     R_IMP(NOP),     // NOP
     R_ABX(EOR),     // EOR abx 4*
     RMW_ABX(LSR),   // LSR abx 6*
-    B_REL(BBR5),    // BBR5 rel 2*
+    B_ZPR(BBR5),    // BBR5 zpr 5
     // 60 - 6f
     RTS_IMP(RTS),   // RTS 6
     RD_IZX(ADC),    // ADC izx 6
@@ -238,7 +239,7 @@ static C02EmuUop op_table[256][6] = {
     JMP_IND(JMP),   // JMP ind 6
     RD_ABS(ADC),    // ADC abs 4
     RMW_ABS(ROR),   // ROR abs 6
-    B_REL(BBR6),    // BBR6 rel 2*
+    B_ZPR(BBR6),    // BBR6 zpr 5
     // 70 - 7f
     B_REL(BVS),     // BVS rel 2*
     RD_IZY(ADC),    // ADC izy 5*
@@ -255,7 +256,7 @@ static C02EmuUop op_table[256][6] = {
     JMP_IAX(JMP),   // JMP iax 6
     RD_ABX(ADC),    // ADC abx 4*
     RMW_ABX(ROR),   // ROR abx 6*
-    B_REL(BBR7),    // BBR7 rel 2*
+    B_ZPR(BBR7),    // BBR7 zpr 5
     // 80 - 8f
     B_REL(BRA),     // BRA rel 3*
     W_IZX(STA),     // STA izx 6
@@ -272,7 +273,7 @@ static C02EmuUop op_table[256][6] = {
     W_ABS(STY),     // STY abs 4
     W_ABS(STA),     // STA abs 4
     W_ABS(STX),     // STX abs 4
-    B_REL(BBS0),    // BBS0 rel 2*
+    B_ZPR(BBS0),    // BBS0 zpr 5
     // 90 - 9f
     B_REL(BCC),     // BCC rel 2*
     W_IZY(STA),     // STA izy 6
@@ -289,7 +290,7 @@ static C02EmuUop op_table[256][6] = {
     W_ABS(STZ),     // STZ abs 4
     W_ABX(STA),     // STA abx 5
     W_ABX(STZ),     // STZ abx 5
-    B_REL(BBS1),    // BBS1 rel 2*
+    B_ZPR(BBS1),    // BBS1 zpr 5
     // a0 - af
     R_IMM(LDY),     // LDY imm 2
     R_IZX(LDA),     // LDA izx 6
@@ -306,7 +307,7 @@ static C02EmuUop op_table[256][6] = {
     R_ABS(LDY),     // LDY abs 4
     R_ABS(LDA),     // LDA abs 4
     R_ABS(LDX),     // LDX abs 4
-    B_REL(BBS2),    // BBS2 rel 2*
+    B_ZPR(BBS2),    // BBS2 zpr 5
     // b0 - bf
     B_REL(BCS),     // BCS rel 2*
     R_IZY(LDA),     // LDA izy 5*
@@ -323,7 +324,7 @@ static C02EmuUop op_table[256][6] = {
     R_ABX(LDY),     // LDY abx 4*
     R_ABX(LDA),     // LDA abx 4*
     R_ABY(LDX),     // LDX aby 4*
-    B_REL(BBS3),    // BBS3 rel 2*
+    B_ZPR(BBS3),    // BBS3 zpr 5
     // c0 - cf
     R_IMM(CPY),     // CPY imm 2
     R_IZX(CMP),     // CMP izx 6
@@ -340,7 +341,7 @@ static C02EmuUop op_table[256][6] = {
     R_ABS(CPY),     // CPY abs 4
     R_ABS(CMP),     // CMP abs 4
     RMW_ABS(DEC),   // DEC abs 6
-    B_REL(BBS4),    // BBS4 rel 2*
+    B_ZPR(BBS4),    // BBS4 zpr 5
     // d0 - df
     B_REL(BNE),     // BNE rel 2*
     R_IZY(CMP),     // CMP izy 5*
@@ -357,7 +358,7 @@ static C02EmuUop op_table[256][6] = {
     R_IMP(NOP),     // NOP
     R_ABX(CMP),     // CMP abx 4*
     RMW_ABX(DEC),   // DEC abx 6*
-    B_REL(BBS5),    // BBS5 rel 2*
+    B_ZPR(BBS5),    // BBS5 zpr 5
     // e0 - ef
     R_IMM(CPX),     // CPX imm 2
     RD_IZX(SBC),    // SBC izx 6
@@ -374,7 +375,7 @@ static C02EmuUop op_table[256][6] = {
     R_ABS(CPX),     // CPX abs 4
     RD_ABS(SBC),    // SBC abs 4
     RMW_ABS(INC),   // INC abs 6
-    B_REL(BBS6),    // BBS6 rel 2*
+    B_ZPR(BBS6),    // BBS6 zpr 5
     // f0 - ff
     B_REL(BEQ),     // BEQ rel 2*
     RD_IZY(SBC),    // SBC izy 5*
@@ -391,7 +392,7 @@ static C02EmuUop op_table[256][6] = {
     R_IMP(NOP),     // NOP
     RD_ABX(SBC),    // SBC abx 4*
     RMW_ABX(INC),   // INC abx 6*
-    B_REL(BBS7),    // BBS7 rel 2*
+    B_ZPR(BBS7),    // BBS7 zpr 5
 };
 
 

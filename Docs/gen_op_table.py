@@ -36,6 +36,7 @@ ADDRMODE = {
     u"rel 3*":  u"REL",
     u"zp 3":    u"ZP",
     u"zp 5":    u"ZP",
+    u"zpr 5":   u"ZPR",
     u"zpx 4":   u"ZPX",
     u"zpx 6":   u"ZPX",
     u"zpy 4":   u"ZPY",

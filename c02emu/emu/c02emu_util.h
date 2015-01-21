@@ -42,5 +42,7 @@ C02EmuDisplayState c02emuDisplayState(C02EmuState *state);
 Byte c02emuCPURead(C02EmuState *state, Addr addr);
 void c02emuCPUWrite(C02EmuState *state, Addr addr, Byte byte);
 
+bool c02emuSetCPUTrace(C02EmuState *state, bool enable);
+bool c02emuSetRAMTrace(C02EmuState *state, bool enable);
 
 #endif /* defined(__c02emu__c02emu_util__) */

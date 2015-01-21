@@ -163,6 +163,9 @@ class c02emuTests: XCTestCase {
     }
     
     func testDecimalADC() {
+        setProgramBytes([0xa9, 0x00])       // lda #0
+        setProgramBytes([0x48])             // pha
+        setProgramBytes([0x28])             // plp
         setProgramBytes([0xf8])             // sed
         setProgramBytes([0x38])             // sec
         setProgramBytes([0xa9, 0x99])       // lda #$99
@@ -173,7 +176,9 @@ class c02emuTests: XCTestCase {
         c02emuRun(emuState)
         let regs = c02emuCPURegs(emuState)
         XCTAssertEqual(regs.a, UInt8(0x99), "A")
-        XCTAssertEqual(regs.status | 0x20, UInt8(0x6d), "S")
+        XCTAssertEqual(regs.status & 0x01, UInt8(0x01), "C")
+        XCTAssertEqual(regs.status & 0x02, UInt8(0x00), "Z")
+        XCTAssertEqual(regs.status & 0x80, UInt8(0x80), "N")
     }
 
     func testDecimalSBC() {

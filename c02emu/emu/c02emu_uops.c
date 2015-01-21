@@ -369,33 +369,23 @@ static void op_ADC(C02EmuState *state, Byte byte) {
         if (lo > 9) {
             lo += 6;
         }
-        result = (lo & 0x0f) + (A & 0xf0) + (byte & 0xf0);
-        if (lo >= 0x10) {
-            result += 0x10;
-        }
-        /* N and V are set using standard logic but between nybbles. */
-        if (result & 0x80) {
-            SEN();
-        } else {
-            CLN();
-        }
-        if (~(A ^ byte) & (A ^ result) & 0x80) {
+        
+        if (~(A ^ byte) & (A ^ lo) & 0x80) {
             SEV();
         } else {
             CLV();
         }
         
+        result = (lo & 0x0f) + (A & 0xf0) + (byte & 0xf0);
+        if (lo >= 0x10) {
+            result += 0x10;
+        }
+        
         if (result >= 0xa0) {
             result += 0x60;
         }
-        A = result;
         
-        /* Z is set according to binary logic. */
-        if ((A + byte + carry) & 0xff) {
-            CLZ();
-        } else {
-            SEZ();
-        }
+        A = result;
         
     } else {
         result = A + byte + carry;
@@ -405,8 +395,8 @@ static void op_ADC(C02EmuState *state, Byte byte) {
             CLV();
         }
         A = result;
-        SETNZ(A);
     }
+    SETNZ(A);
     if (result >= 0x100) {
         SEC();
     } else {

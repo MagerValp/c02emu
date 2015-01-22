@@ -159,6 +159,8 @@ trap_vc macro
 ; please observe that during the test the stack gets invalidated
 ; therefore a RTS inside the success macro is not possible
 success macro
+ sta $ef04
+ db "success", 10, 0
         jmp *           ;test passed, no errors
         endm
     endif
@@ -210,6 +212,8 @@ skip\?
 ; please observe that during the test the stack gets invalidated
 ; therefore a RTS inside the success macro is not possible
 success macro
+ sta $ef04
+ db "success", 10, 0
         db $db
         ;jsr report_success
         endm
@@ -544,7 +548,7 @@ next_test   macro           ;make sure, tests don't jump the fence
 test_num = test_num + 1
             lda #test_num   ;*** next tests' number
             sta test_case
-            sta $ef03
+            ;sta $ef03
             ;check_ram       ;uncomment to find altered RAM after each test
             endm
 
@@ -740,7 +744,8 @@ gcs4    iny
     endif
         next_test            
 
-;testing stack operations PHX PHY PLX PLY
+ sta $ef04
+ db "testing stack operations PHX PHY PLX PLY\n", 0
         lda #$99        ;protect a
         ldx #$ff        ;initialize stack
         txs
@@ -789,7 +794,8 @@ gcs4    iny
         trap_ne
         next_test            
         
-; test PHX does not alter flags or X but PLX does
+ sta $ef04
+ db "test PHX does not alter flags or X but PLX does", 10, 0
         ldy #$aa        ;protect y
         set_x 1,$ff     ;push
         phx
@@ -831,7 +837,8 @@ gcs4    iny
         trap_ne
         next_test            
  
-; test PHY does not alter flags or Y but PLY does
+ sta $ef04
+ db "test PHY does not alter flags or Y but PLY does", 10, 0
         ldx #$55        ;x & a protected
         set_y 1,$ff     ;push
         phy
@@ -873,8 +880,10 @@ gcs4    iny
         trap_ne
         next_test            
  
-; PC modifying instructions (BRA, BBR, BBS, 1, 2, 3 byte NOPs, JMP(abs,x))
-; testing unconditional branch BRA
+ sta $ef04
+ db "PC modifying instructions (BRA, BBR, BBS, 1, 2, 3 byte NOPs, JMP(abs,x))", 10, 0
+ sta $ef04
+ db "testing unconditional branch BRA", 10, 0
 
         ldx #$81        ;protect unused registers
         ldy #$7e
@@ -988,7 +997,8 @@ bra6
         next_test
         
     if rkwl_wdc_op = 1
-; testing BBR & BBS
+ sta $ef04
+ db "testing BBR & BBS", 10, 0
 
 bbt     macro           ;\1 = bitnum
         lda #(1<<\1)    ;testing 1 bit on
@@ -1091,7 +1101,8 @@ bbcl    lda #0
         next_test            
     endif
     
-; testing NOP
+ sta $ef04
+ db "testing NOP", 10, 0
 
 nop_test    macro       ;\1 = opcode, \2 = # of bytes
             ldy #$42
@@ -1211,7 +1222,8 @@ nop_test    macro       ;\1 = opcode, \2 = # of bytes
     endif
         next_test
             
-; jump indirect (test page cross bug is fixed)
+ sta $ef04
+ db "jump indirect (test page cross bug is fixed)", 10, 0
         ldx #3          ;prepare table
 ji1     lda ji_adr,x
         sta ji_tab,x
@@ -1249,7 +1261,8 @@ ji_ret  php             ;either SP or Y count will fail, if we do not hit
         trap_ne
         next_test
 
-; jump indexed indirect
+ sta $ef04
+ db "jump indexed indirect", 10, 0
         ldx #11         ;prepare table
 jxi1    lda jxi_adr,x
         sta jxi_tab,x
@@ -1304,7 +1317,8 @@ jxp_ok
         next_test
 
     if ROM_vectors = 1
-; test BRK clears decimal mode
+ sta $ef04
+ db "test BRK clears decimal mode", 10, 0
         sed
         brk
         nop
@@ -1312,7 +1326,8 @@ brk_ret
         next_test
     endif
  
-; testing accumulator increment/decrement INC A & DEC A
+ sta $ef04
+ db "testing accumulator increment/decrement INC A & DEC A", 10, 0
         ldx #$ac    ;protect x & y
         ldy #$dc
         set_a $fe,$ff
@@ -1347,7 +1362,8 @@ brk_ret
         trap_ne     ;sp push/pop mismatch
         next_test
 
-; testing load / store accumulator LDA / STA (zp)
+ sta $ef04
+ db "testing load / store accumulator LDA / STA (zp)", 10, 0
         ldx #$99    ;protect x & y
         ldy #$66
         set_stat 0  
@@ -1500,7 +1516,8 @@ tstai2  lda abst,y
         trap_ne     ;sp push/pop mismatch
         next_test
 
-; testing STZ - zp / abs / zp,x / abs,x
+ sta $ef04
+ db "testing STZ - zp / abs / zp,x / abs,x", 10, 0
         ldy #123    ;protect y
         ldx #4      ;precharge test area
         lda #7
@@ -1657,7 +1674,8 @@ tstz24  lda abst,x   ;verify zeros stored
         trap_ne     ;sp push/pop mismatch
         next_test
 
-; testing BIT - zp,x / abs,x / #
+ sta $ef04
+ db "testing BIT - zp,x / abs,x / #", 10, 0
         ldy #$42
         ldx #3
         set_a $ff,0
@@ -1769,7 +1787,8 @@ tstz24  lda abst,x   ;verify zeros stored
         trap_ne     ;sp push/pop mismatch
         next_test
 
-; testing TRB, TSB - zp / abs
+ sta $ef04
+ db "testing TRB, TSB - zp / abs", 10, 0
 
 trbt    macro       ;\1 = memory, \2 = flags   
         sty \1
@@ -1865,7 +1884,8 @@ tbt2
         next_test    
 
     if rkwl_wdc_op
-; testing RMB, SMB - zp
+ sta $ef04
+ db "testing RMB, SMB - zp", 10, 0
 rmbt    macro       ;\1 = bitnum
         lda #$ff
         sta zpt
@@ -1930,7 +1950,8 @@ smbt    macro       ;\1 = bitnum
         next_test
     endif        
          
-; testing CMP - (zp)         
+ sta $ef04
+ db "testing CMP - (zp)         ", 10, 0
         ldx #$de    ;protect x & y
         ldy #$ad
         set_a $80,0
@@ -1960,7 +1981,8 @@ smbt    macro       ;\1 = bitnum
         trap_ne     ;sp push/pop mismatch
         next_test
 
-; testing logical instructions - AND EOR ORA (zp)
+ sta $ef04
+ db "testing logical instructions - AND EOR ORA (zp)", 10, 0
         ldx #$42    ;protect x & y
 
         ldy #0      ;AND
@@ -2043,7 +2065,8 @@ tora2
         cli
     endif                
 
-; full binary add/subtract test - (zp) only
+ sta $ef04
+ db "full binary add/subtract test - (zp) only", 10, 0
 ; iterates through all combinations of operands and carry input
 ; uses increments/decrements to predict result & result flags
         cld
@@ -2102,7 +2125,8 @@ tadd1   ora adrh        ;merge C to expected flags
         trap_ne         ;sp push/pop mismatch
         next_test
 
-; decimal add/subtract test
+ sta $ef04
+ db "decimal add/subtract test", 10, 0
 ; *** WARNING - tests documented behavior only! ***
 ;   only valid BCD operands are tested, the V flag is ignored
 ;   although V is declared as beeing valid on the 65C02 it has absolutely

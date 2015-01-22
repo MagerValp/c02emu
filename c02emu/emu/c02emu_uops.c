@@ -848,6 +848,10 @@ static void u_NOP_imp(C02EmuState *state) {
     cpu_read(state, PC);
     OP_DONE();
 }
+static void u_NOP_abs8(C02EmuState *state) {
+    cpu_read(state, PC - 1);
+    OP_DONE();
+}
 SYNTHESIZE_imm(NOP)
 SYNTHESIZE_ad(NOP)
 SYNTHESIZE_alx(NOP)

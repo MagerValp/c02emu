@@ -75,10 +75,14 @@ static C02EmuReturnReason cpu_step_cycle(C02EmuState *state) {
             }
             state->cpu.op.uop_list = op_table[op];
         }
-        state->cpu.op.cycle = C02EMU_OP_CYCLE_1;
+        state->cpu.op.opcode = op;
         state->cpu.op.address_fixup = false;
         state->cpu.op.decimal_fixup = false;
-        state->cpu.op.opcode = op;
+        if (state->cpu.op.uop_list[0] == NULL) {
+            state->cpu.op.cycle = C02EMU_OP_FETCH;
+        } else {
+            state->cpu.op.cycle = C02EMU_OP_CYCLE_1;
+        }
         
     } else if(state->cpu.op.cycle == C02EMU_OP_STOPPED) {
         

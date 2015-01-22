@@ -11,7 +11,7 @@ def print8(*args):
 
 
 ADDRMODE = {
-    u"":        u"IMP",
+    u"1":       u"NULL",
     u"2":       u"IMP",
     u"3":       u"IMP",
     u"4":       u"IMP",
@@ -20,6 +20,7 @@ ADDRMODE = {
     u"abs 3":   u"ABS",
     u"abs 4":   u"ABS",
     u"abs 6":   u"ABS",
+    u"abs 8":   u"ABS8",
     u"abx 4*":  u"ABX",
     u"abx 5":   u"ABX",
     u"abx 6*":  u"ABX6",

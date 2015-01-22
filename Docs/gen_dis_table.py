@@ -23,6 +23,7 @@ ADDRMODE = {
     u"abx 4*":  u"ABX",
     u"abx 5":   u"ABX",
     u"abx 6*":  u"ABX",
+    u"abx 7":   u"ABX",
     u"aby 4*":  u"ABY",
     u"aby 5":   u"ABY",
     u"iax 6":   u"IAX",
@@ -36,6 +37,7 @@ ADDRMODE = {
     u"rel 3*":  u"REL",
     u"zp 3":    u"ZP",
     u"zp 5":    u"ZP",
+    u"zpr 5":   u"ZPR",
     u"zpx 4":   u"ZPX",
     u"zpx 6":   u"ZPX",
     u"zpy 4":   u"ZPY",
@@ -59,7 +61,7 @@ def main(argv):
     print8("    enum AddrMode {")
     for addrmode in sorted(set(ADDRMODE[x] for x in addrmodes)):
         print8("        case %s" % addrmode)
-    print8("    }")
+    print8("    }\n")
     
     def adjustedcomma(s):
         if len(s) < 3:
@@ -70,7 +72,7 @@ def main(argv):
     print8("    let addrModes: [AddrMode] = [")
     for offset in xrange(0, 255, 8):
         print8('        .%s' % ' .'.join(adjustedcomma(ADDRMODE[x]) for x in addrmodes[offset:offset + 8]))
-    print8("    ]")
+    print8("    ]\n")
     
     print8("    let opCodes = [")
     for offset in xrange(0, 255, 8):

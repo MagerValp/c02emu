@@ -39,6 +39,16 @@ C02EmuCPUState c02emuCPUState(C02EmuState *state) {
 }
 
 
+C02EmuMMUState c02emuMMUState(C02EmuState *state) {
+    C02EmuMMUState mmu_state;
+    
+    for (int i; i < 16; i++) {
+        mmu_state.page[i] = state->io.mmu.page[i];
+    }
+    
+    return mmu_state;
+}
+
 C02EmuDisplayState c02emuDisplayState(C02EmuState *state) {
     C02EmuDisplayState display_state;
     
@@ -51,12 +61,26 @@ C02EmuDisplayState c02emuDisplayState(C02EmuState *state) {
 
 
 Byte c02emuCPURead(C02EmuState *state, Addr addr) {
-    return raw_mem_read(state, addr);
+    return cpu_read(state, addr);
 }
 
 
 void c02emuCPUWrite(C02EmuState *state, Addr addr, Byte byte) {
-    raw_mem_write(state, addr, byte);
+    cpu_write(state, addr, byte);
+}
+
+
+bool c02emuSetCPUTrace(C02EmuState *state, bool enable) {
+    bool old = state->monitor.trace_cpu;
+    state->monitor.trace_cpu = enable;
+    return old;
+}
+
+
+bool c02emuSetRAMTrace(C02EmuState *state, bool enable) {
+    bool old = state->monitor.trace_ram;
+    state->monitor.trace_ram = enable;
+    return old;
 }
 
 

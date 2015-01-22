@@ -44,8 +44,10 @@ C02EmuState *c02emuCreate(void) {
     memset(state->mem.ram, 0x00, sizeof(state->mem.ram));
     memset(state->mem.rom, 0xdb, sizeof(state->mem.rom));
     
-    memset(state->io.display.ram, 0xff, sizeof(state->io.display.ram));
-    state->io.display.page = 0x00;
+    state->io.display.mode = C02EMU_DISPLAY_MODE_TEXT_80X50;
+    state->io.display.base = 0x000000;
+    state->io.display.irq_mask = 0;
+    state->io.display.irq_status = 0;
     
     c02emuReset(state);
     
@@ -77,7 +79,7 @@ void c02emuReset(C02EmuState *state) {
     for (int i = 0; i < 0x0e; i++) {
         state->io.mmu.page[i] = i;
     }
-    state->io.mmu.page[0x0e] = 0xfe;
+    state->io.mmu.page[0x0e] = 0xa0;
     state->io.mmu.page[0x0f] = 0xff;
     
     state->cpu.op.opcode = 0;
@@ -88,6 +90,8 @@ void c02emuReset(C02EmuState *state) {
     state->cpu.op.cycle = C02EMU_OP_CYCLE_1;
     state->cpu.op.address_fixup = false;
     state->cpu.op.decimal_fixup = false;
+    state->cpu.op.irq_active = false;
+    state->cpu.op.nmi_active = false;
 }
 
 
@@ -118,21 +122,9 @@ C02EmuReturnReason c02emuRun(C02EmuState *state) {
     C02EmuReturnReason reason;
     
     for (;;) {
-        
-        if (state->phase == C02EMU_PHASE_CPU) {
-            state->phase = C02EMU_PHASE_IO;
-            reason = cpu_step_cycle(state);
-            if (reason != C02EMU_CYCLE_STEPPED) {
-                return reason;
-            }
-        }
-        
-        if (state->phase == C02EMU_PHASE_IO) {
-            state->phase = C02EMU_PHASE_CPU;
-            reason = io_step_cycle(state);
-            if (reason != C02EMU_CYCLE_STEPPED) {
-                return reason;
-            }
+        reason = c02emuStepCycle(state);
+        if (reason != C02EMU_CYCLE_STEPPED) {
+            return reason;
         }
     }
 }
@@ -140,8 +132,8 @@ C02EmuReturnReason c02emuRun(C02EmuState *state) {
 
 const C02EmuOutput c02emuGetOutput(C02EmuState *state) {
     C02EmuOutput output;
-    output.display.mode = C02EMU_DISPLAY_MODE_TEXT_80X50;
-    output.display.data = state->io.display.ram;
+    output.display.mode = state->io.display.mode;
+    output.display.data = &state->mem.ram[state->io.display.base];
     return output;
 }
 

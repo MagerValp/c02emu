@@ -31,43 +31,44 @@ class Disassembler: NSObject {
         case IZY
         case REL
         case ZP
+        case ZPR
         case ZPX
         case ZPY
     }
     
     let addrModes: [AddrMode] = [
         .IMP, .IZX, .IMM, .IMP, .ZP,  .ZP,  .ZP,  .ZP,
-        .IMP, .IMM, .IMP, .IMP, .ABS, .ABS, .ABS, .REL,
+        .IMP, .IMM, .IMP, .IMP, .ABS, .ABS, .ABS, .ZPR,
         .REL, .IZY, .IZP, .IMP, .ZP,  .ZPX, .ZPX, .ZP,
-        .IMP, .ABY, .IMP, .IMP, .ABS, .ABX, .ABX, .REL,
+        .IMP, .ABY, .IMP, .IMP, .ABS, .ABX, .ABX, .ZPR,
         .ABS, .IZX, .IMM, .IMP, .ZP,  .ZP,  .ZP,  .ZP,
-        .IMP, .IMM, .IMP, .IMP, .ABS, .ABS, .ABS, .REL,
+        .IMP, .IMM, .IMP, .IMP, .ABS, .ABS, .ABS, .ZPR,
         .REL, .IZY, .IZP, .IMP, .ZPX, .ZPX, .ZPX, .ZP,
-        .IMP, .ABY, .IMP, .IMP, .ABX, .ABX, .ABX, .REL,
+        .IMP, .ABY, .IMP, .IMP, .ABX, .ABX, .ABX, .ZPR,
         .IMP, .IZX, .IMM, .IMP, .ZP,  .ZP,  .ZP,  .ZP,
-        .IMP, .IMM, .IMP, .IMP, .ABS, .ABS, .ABS, .REL,
+        .IMP, .IMM, .IMP, .IMP, .ABS, .ABS, .ABS, .ZPR,
         .REL, .IZY, .IZP, .IMP, .ZPX, .ZPX, .ZPX, .ZP,
-        .IMP, .ABY, .IMP, .IMP, .IMP, .ABX, .ABX, .REL,
+        .IMP, .ABY, .IMP, .IMP, .ABS, .ABX, .ABX, .ZPR,
         .IMP, .IZX, .IMM, .IMP, .ZP,  .ZP,  .ZP,  .ZP,
-        .IMP, .IMM, .IMP, .IMP, .IND, .ABS, .ABS, .REL,
+        .IMP, .IMM, .IMP, .IMP, .IND, .ABS, .ABS, .ZPR,
         .REL, .IZY, .IZP, .IMP, .ZPX, .ZPX, .ZPX, .ZP,
-        .IMP, .ABY, .IMP, .IMP, .IAX, .ABX, .ABX, .REL,
+        .IMP, .ABY, .IMP, .IMP, .IAX, .ABX, .ABX, .ZPR,
         .REL, .IZX, .IMM, .IMP, .ZP,  .ZP,  .ZP,  .ZP,
-        .IMP, .IMM, .IMP, .IMP, .ABS, .ABS, .ABS, .REL,
+        .IMP, .IMM, .IMP, .IMP, .ABS, .ABS, .ABS, .ZPR,
         .REL, .IZY, .IZP, .IMP, .ZPX, .ZPX, .ZPY, .ZP,
-        .IMP, .ABY, .IMP, .IMP, .ABS, .ABX, .ABX, .REL,
+        .IMP, .ABY, .IMP, .IMP, .ABS, .ABX, .ABX, .ZPR,
         .IMM, .IZX, .IMM, .IMP, .ZP,  .ZP,  .ZP,  .ZP,
-        .IMP, .IMM, .IMP, .IMP, .ABS, .ABS, .ABS, .REL,
+        .IMP, .IMM, .IMP, .IMP, .ABS, .ABS, .ABS, .ZPR,
         .REL, .IZY, .IZP, .IMP, .ZPX, .ZPX, .ZPY, .ZP,
-        .IMP, .ABY, .IMP, .IMP, .ABX, .ABX, .ABY, .REL,
+        .IMP, .ABY, .IMP, .IMP, .ABX, .ABX, .ABY, .ZPR,
         .IMM, .IZX, .IMM, .IMP, .ZP,  .ZP,  .ZP,  .ZP,
-        .IMP, .IMM, .IMP, .IMP, .ABS, .ABS, .ABS, .REL,
+        .IMP, .IMM, .IMP, .IMP, .ABS, .ABS, .ABS, .ZPR,
         .REL, .IZY, .IZP, .IMP, .ZPX, .ZPX, .ZPX, .ZP,
-        .IMP, .ABY, .IMP, .IMP, .IMP, .ABX, .ABX, .REL,
+        .IMP, .ABY, .IMP, .IMP, .ABS, .ABX, .ABX, .ZPR,
         .IMM, .IZX, .IMM, .IMP, .ZP,  .ZP,  .ZP,  .ZP,
-        .IMP, .IMM, .IMP, .IMP, .ABS, .ABS, .ABS, .REL,
+        .IMP, .IMM, .IMP, .IMP, .ABS, .ABS, .ABS, .ZPR,
         .REL, .IZY, .IZP, .IMP, .ZPX, .ZPX, .ZPX, .ZP,
-        .IMP, .ABY, .IMP, .IMP, .IMP, .ABX, .ABX, .REL,
+        .IMP, .ABY, .IMP, .IMP, .ABS, .ABX, .ABX, .ZPR,
     ]
     
     let opCodes = [
@@ -118,6 +119,7 @@ class Disassembler: NSObject {
         .IZY: "($",
         .REL: "$",
         .ZP: "$",
+        .ZPR: "$",
         .ZPX: "$",
         .ZPY: "$",
     ]
@@ -134,6 +136,7 @@ class Disassembler: NSObject {
         .IZY: "),y",
         .REL: "",
         .ZP: "",
+        .ZPR: "",
         .ZPX: ",X",
         .ZPY: ",Y",
     ]
@@ -142,6 +145,7 @@ class Disassembler: NSObject {
         case Word
         case Byte
         case Relative
+        case ZPRelative
         case None
     }
     
@@ -158,6 +162,7 @@ class Disassembler: NSObject {
         .IZY: .Byte,
         .REL: .Relative,
         .ZP: .Byte,
+        .ZPR: .ZPRelative,
         .ZPX: .Byte,
         .ZPY: .Byte,
     ]
@@ -216,6 +221,18 @@ class Disassembler: NSObject {
             output += NSString(format: "%02x    ", byte)
             word = UInt16((Int(pc) + Int(unsafeBitCast(byte, Int8.self))) & 0xffff)
             operand = NSString(format: "%04x", word)
+            
+        case .ZPRelative:
+            byte = readIncPC()
+            bytes.append(byte)
+            output += NSString(format: "%02x ", byte)
+            operand = NSString(format: "%02x", byte)
+            
+            byte = readIncPC()
+            bytes.append(byte)
+            output += NSString(format: "%02x ", byte)
+            word = UInt16((Int(pc) + Int(unsafeBitCast(byte, Int8.self))) & 0xffff)
+            operand = NSString(format: "%@,$%04x", operand, word)
 
         case .None:
             output += "      "

@@ -76,7 +76,7 @@
 ;ROM_vectors writable (0=no, 1=yes)
 ;if ROM vectors can not be used interrupts will not be trapped
 ;as a consequence BRK can not be tested but will be emulated to test RTI
-ROM_vectors = 0
+ROM_vectors = 1
 
 ;load_data_direct (0=move from code segment, 1=load directly)
 ;loading directly is preferred but may not be supported by your platform
@@ -91,7 +91,7 @@ I_flag = 3
 ;configure memory - try to stay away from memory used by the system
 ;zero_page memory start address, $50 (80) consecutive Bytes required
 ;                                add 2 if I_flag = 2
-zero_page = $a  
+zero_page = $10
 
 ;data_segment memory start address, $5B (91) consecutive Bytes required
 data_segment = $200  
@@ -102,7 +102,7 @@ data_segment = $200
 ;code_segment memory start address, 13kB of consecutive space required
 ;                                   add 2.5 kB if I_flag = 2
 ;parts of the code are self modifying and must reside in RAM
-code_segment = $400  
+code_segment = $1000  
 
 ;report errors through I/O channel (0=use standard self trap loops, 1=include
 ;report.i65 as I/O channel, add 3.5 kB)
@@ -111,7 +111,7 @@ report = 1
 ;RAM integrity test option. Checks for undesired RAM writes.
 ;set lowest non RAM or RAM mirror address page (-1=disable, 0=64k, $40=16k)
 ;leave disabled if a monitor, OS or background interrupt is allowed to alter RAM
-ram_top = -1
+ram_top = $e0
 
         noopt       ;do not take shortcuts
 
@@ -160,6 +160,8 @@ trap_vc macro
 ; please observe that during the test the stack gets invalidated
 ; therefore a RTS inside the success macro is not possible
 success macro
+ sta $ef04
+ db "success", 10, 0
         jmp *           ;test passed, no errors
         endm
     endif
@@ -211,6 +213,8 @@ skip\?
 ; please observe that during the test the stack gets invalidated
 ; therefore a RTS inside the success macro is not possible
 success macro
+ sta $ef04
+ db "success", 10, 0
         db $db
         ;jsr report_success
         endm
@@ -537,7 +541,8 @@ next_test   macro           ;make sure, tests don't jump the fence
 test_num = test_num + 1
             lda #test_num   ;*** next tests' number
             sta test_case
-            ;check_ram       ;uncomment to find altered RAM after each test
+            ;sta $ef03
+            check_ram       ;uncomment to find altered RAM after each test
             endm
 
     if load_data_direct = 1
@@ -646,6 +651,8 @@ data_bss_end
 
         code
         org code_segment
+ lda #$0f
+ sta $0f
 start   cld
         ldx #$ff
         txs
@@ -735,7 +742,8 @@ gcs4    iny
     endif
         next_test            
 
-;testing relative addressing with BEQ
+ sta $ef04
+ db "testing relative addressing with BEQ", 10, 0
         ldy #$fe        ;testing maximum range, not -1/-2 (invalid/self adr)
 range_loop
         dey             ;next relative address
@@ -1046,7 +1054,8 @@ range_ok
 range_end               ;range test successful
         next_test
 
-;partial test BNE & CMP, CPX, CPY immediate
+ sta $ef04
+ db "partial test BNE & CMP, CPX, CPY immediate", 10, 0
         cpy #1          ;testing BNE true
         bne test_bne
         trap 
@@ -1079,7 +1088,8 @@ test_bne
         trap_cs
         trap_pl
         next_test
-;testing stack operations PHA PHP PLA PLP
+ sta $ef04
+ db "testing stack operations PHA PHP PLA PLP", 10, 0
             
         ldx #$ff        ;initialize stack
         txs
@@ -1106,7 +1116,8 @@ test_bne
         trap_ne
         next_test
 
-;testing branch decisions BPL BMI BVC BVS BCC BCS BNE BEQ
+ sta $ef04
+ db "testing branch decisions BPL BMI BVC BVS BCC BCS BNE BEQ", 10, 0
         set_stat $ff    ;all on
         bpl nbr1        ;branches should not be taken
         bvc nbr2
@@ -1311,7 +1322,8 @@ brvc7
 brvc8
         next_test
 
-; test PHA does not alter flags or accumulator but PLA does
+ sta $ef04
+ db "test PHA does not alter flags or accumulator but PLA does", 10, 0
         ldx #$55        ;x & y protected
         ldy #$aa
         set_a 1,$ff     ;push
@@ -1356,7 +1368,8 @@ brvc8
         trap_ne
         next_test
  
-; partial pretest EOR #
+ sta $ef04
+ db "partial pretest EOR #", 10, 0
         set_a $3c,0
         eor #$c3
         tst_a $ff,fn
@@ -1365,8 +1378,10 @@ brvc8
         tst_a 0,fz
         next_test
 
-; PC modifying instructions except branches (NOP, JMP, JSR, RTS, BRK, RTI)
-; testing NOP
+ sta $ef04
+ db "PC modifying instructions except branches (NOP, JMP, JSR, RTS, BRK, RTI)", 10, 0
+ sta $ef04
+ db "testing NOP", 10, 0
         ldx #$24
         ldy #$42
         set_a $18,0
@@ -1387,7 +1402,8 @@ brvc8
         trap_ne
         next_test
         
-; jump absolute
+ sta $ef04
+ db "jump absolute", 10, 0
         set_stat $0
         lda #'F'
         ldx #'A'
@@ -1433,7 +1449,8 @@ test_near
         trap_ne
         next_test
         
-; jump indirect
+ sta $ef04
+ db "jump indirect", 10, 0
         set_stat 0
         lda #'I'
         ldx #'N'
@@ -1464,7 +1481,8 @@ ind_ret
         trap_ne
         next_test
 
-; jump subroutine & return from subroutine
+ sta $ef04
+ db "jump subroutine & return from subroutine", 10, 0
         set_stat 0
         lda #'J'
         ldx #'S'
@@ -1491,7 +1509,8 @@ jsr_ret = *-1           ;last address of jsr = return address
         trap_ne
         next_test
 
-; break & return from interrupt
+ sta $ef04
+ db "break & return from interrupt", 10, 0
     if ROM_vectors = 1
         set_stat 0
         lda #'B'
@@ -1531,7 +1550,8 @@ brk_ret                 ;address of break return
         trap_ne
         next_test
  
-; test set and clear flags CLC CLI CLD CLV SEC SEI SED
+ sta $ef04
+ db "test set and clear flags CLC CLI CLD CLV SEC SEI SED", 10, 0
         set_stat $ff
         clc
         tst_stat $ff-carry
@@ -1570,8 +1590,10 @@ brk_ret                 ;address of break return
         clv
         tst_stat 0
         next_test
-; testing index register increment/decrement and transfer
-; INX INY DEX DEY TAX TXA TAY TYA 
+ sta $ef04
+ db "testing index register increment/decrement and transfer", 10, 0
+ sta $ef04
+ db "INX INY DEX DEY TAX TXA TAY TYA ", 10, 0
         ldx #$fe
         set_stat $ff
         inx             ;ff
@@ -1758,7 +1780,8 @@ brk_ret                 ;address of break return
         tst_x $ff,minus
         next_test
      
-;TSX sets NZ - TXS does not
+ sta $ef04
+ db "TSX sets NZ - TXS does not", 10, 0
 ;  This section also tests for proper stack wrap around.
         ldx #1          ;01
         set_stat $ff
@@ -1855,8 +1878,10 @@ brk_ret                 ;address of break return
         pla             ;sp=ff
         next_test
         
-; testing index register load & store LDY LDX STY STX all addressing modes
-; LDX / STX - zp,y / abs,y
+ sta $ef04
+ db "testing index register load & store LDY LDX STY STX all addressing modes", 10, 0
+ sta $ef04
+ db "LDX / STX - zp,y / abs,y", 10, 0
         ldy #3
 tldx    
         set_stat 0
@@ -1956,7 +1981,8 @@ tstx    lda zpt,y
         bpl tstx
         next_test
         
-; indexed wraparound test (only zp should wrap)
+ sta $ef04
+ db "indexed wraparound test (only zp should wrap)", 10, 0
         ldy #3+$fa
 tldx4   ldx zp1-$fa&$ff,y   ;wrap on indexed zp
         txa
@@ -1985,7 +2011,8 @@ tstx1   lda zpt,y
         bpl tstx1
         next_test
         
-; LDY / STY - zp,x / abs,x
+ sta $ef04
+ db "LDY / STY - zp,x / abs,x", 10, 0
         ldx #3
 tldy    
         set_stat 0
@@ -2085,7 +2112,8 @@ tsty    lda zpt,x
         bpl tsty
         next_test
 
-; indexed wraparound test (only zp should wrap)
+ sta $ef04
+ db "indexed wraparound test (only zp should wrap)", 10, 0
         ldx #3+$fa
 tldy4   ldy zp1-$fa&$ff,x   ;wrap on indexed zp
         tya
@@ -2114,7 +2142,8 @@ tsty1   lda zpt,x
         bpl tsty1
         next_test
 
-; LDX / STX - zp / abs / #
+ sta $ef04
+ db "LDX / STX - zp / abs / #", 10, 0
         set_stat 0  
         ldx zp1
         php         ;test stores do not alter flags
@@ -2504,7 +2533,8 @@ tsty1   lda zpt,x
         stx abst+3  ;clear                
         next_test
 
-; LDY / STY - zp / abs / #
+ sta $ef04
+ db "LDY / STY - zp / abs / #", 10, 0
         set_stat 0
         ldy zp1  
         php         ;test stores do not alter flags
@@ -2899,8 +2929,10 @@ tsty1   lda zpt,x
         sty abst+3  ;clear                
         next_test
 
-; testing load / store accumulator LDA / STA all addressing modes
-; LDA / STA - zp,x / abs,x
+ sta $ef04
+ db "testing load / store accumulator LDA / STA all addressing modes", 10, 0
+ sta $ef04
+ db "LDA / STA - zp,x / abs,x", 10, 0
         ldx #3
 tldax    
         set_stat 0
@@ -2994,7 +3026,8 @@ tstax   lda zpt,x
         bpl tstax
         next_test
 
-; LDA / STA - (zp),y / abs,y / (zp,x)
+ sta $ef04
+ db "LDA / STA - (zp),y / abs,y / (zp,x)", 10, 0
         ldy #3
 tlday    
         set_stat 0
@@ -3149,7 +3182,8 @@ tstay2  lda abst,y
         bpl tstay2
         next_test
 
-; indexed wraparound test (only zp should wrap)
+ sta $ef04
+ db "indexed wraparound test (only zp should wrap)", 10, 0
         ldx #3+$fa
 tldax6  lda zp1-$fa&$ff,x   ;wrap on indexed zp
         sta abst-$fa,x      ;no STX abs,x!
@@ -3232,7 +3266,8 @@ tstay6  lda abst,y
         bpl tstay6
         next_test
 
-; LDA / STA - zp / abs / #
+ sta $ef04
+ db "LDA / STA - zp / abs / #", 10, 0
         set_stat 0  
         lda zp1
         php         ;test stores do not alter flags
@@ -3574,8 +3609,10 @@ tstay6  lda abst,y
         stx abst+3  ;clear                
         next_test
 
-; testing bit test & compares BIT CPX CPY CMP all addressing modes
-; BIT - zp / abs
+ sta $ef04
+ db "testing bit test & compares BIT CPX CPY CMP all addressing modes", 10, 0
+ sta $ef04
+ db "BIT - zp / abs", 10, 0
         set_a $ff,0
         bit zp1+3   ;00 - should set Z / clear  NV
         tst_a $ff,fz 
@@ -3629,7 +3666,8 @@ tstay6  lda abst,y
         tst_a 1,~fz
         next_test
         
-; CPX - zp / abs / #         
+ sta $ef04
+ db "CPX - zp / abs / #         ", 10, 0
         set_x $80,0
         cpx zp7f
         tst_stat fc
@@ -3688,7 +3726,8 @@ tstay6  lda abst,y
         tst_x $7e,~fzc
         next_test
 
-; CPY - zp / abs / #         
+ sta $ef04
+ db "CPY - zp / abs / #         ", 10, 0
         set_y $80,0
         cpy zp7f
         tst_stat fc
@@ -3747,7 +3786,8 @@ tstay6  lda abst,y
         tst_y $7e,~fzc
         next_test
 
-; CMP - zp / abs / #         
+ sta $ef04
+ db "CMP - zp / abs / #         ", 10, 0
         set_a $80,0
         cmp zp7f
         tst_a $80,fc
@@ -3904,8 +3944,10 @@ tstay6  lda abst,y
         tst_a $7e,~fzc
         next_test
 
-; testing shifts - ASL LSR ROL ROR all addressing modes
-; shifts - accumulator
+ sta $ef04
+ db "testing shifts - ASL LSR ROL ROR all addressing modes", 10, 0
+ sta $ef04
+ db "shifts - accumulator", 10, 0
         ldx #3
 tasl
         set_ax zp1,0
@@ -3997,7 +4039,8 @@ trorc1
         bpl trorc1
         next_test
 
-; shifts - zeropage
+ sta $ef04
+ db "shifts - zeropage", 10, 0
         ldx #3
 tasl2
         set_z zp1,0
@@ -4089,7 +4132,8 @@ trorc3
         bpl trorc3
         next_test
 
-; shifts - absolute
+ sta $ef04
+ db "shifts - absolute", 10, 0
         ldx #3
 tasl4
         set_abs zp1,0
@@ -4181,7 +4225,8 @@ trorc5
         bpl trorc5
         next_test
 
-; shifts - zp indexed
+ sta $ef04
+ db "shifts - zp indexed", 10, 0
         ldx #3
 tasl6
         set_zx zp1,0
@@ -4273,7 +4318,8 @@ trorc7
         bpl trorc7
         next_test
         
-; shifts - abs indexed
+ sta $ef04
+ db "shifts - abs indexed", 10, 0
         ldx #3
 tasl8
         set_absx zp1,0
@@ -4365,8 +4411,10 @@ trorc9
         bpl trorc9
         next_test
 
-; testing memory increment/decrement - INC DEC all addressing modes
-; zeropage
+ sta $ef04
+ db "testing memory increment/decrement - INC DEC all addressing modes", 10, 0
+ sta $ef04
+ db "zeropage", 10, 0
         ldx #0
         lda #$7e
         sta zpt
@@ -4425,7 +4473,8 @@ tdec10
 tdec11
         next_test
 
-; absolute memory
+ sta $ef04
+ db "absolute memory", 10, 0
         ldx #0
         lda #$7e
         sta abst
@@ -4484,7 +4533,8 @@ tdec12
 tdec13
         next_test
 
-; zeropage indexed
+ sta $ef04
+ db "zeropage indexed", 10, 0
         ldx #0
         lda #$7e
 tinc4   sta zpt,x
@@ -4541,7 +4591,8 @@ tdec14  sta zpt,x
 tdec15
         next_test
 
-; memory indexed
+ sta $ef04
+ db "memory indexed", 10, 0
         ldx #0
         lda #$7e
 tinc6   sta abst,x
@@ -4598,8 +4649,10 @@ tdec16  sta abst,x
 tdec17
         next_test
 
-; testing logical instructions - AND EOR ORA all addressing modes
-; AND
+ sta $ef04
+ db "testing logical instructions - AND EOR ORA all addressing modes", 10, 0
+ sta $ef04
+ db "AND", 10, 0
         ldx #3      ;immediate - self modifying code
 tand    lda zpAN,x
         sta tandi1
@@ -4735,7 +4788,8 @@ tand15
         bpl tand15
         next_test
 
-; EOR
+ sta $ef04
+ db "EOR", 10, 0
         ldx #3      ;immediate - self modifying code
 teor    lda zpEO,x
         sta teori1
@@ -4871,7 +4925,8 @@ teor15
         bpl teor15
         next_test
 
-; OR
+ sta $ef04
+ db "OR", 10, 0
         ldx #3      ;immediate - self modifying code
 tora    lda zpOR,x
         sta torai1
@@ -5010,7 +5065,8 @@ tora15
     endif                
         next_test
 
-; full binary add/subtract test
+ sta $ef04
+ db "full binary add/subtract test", 10, 0
 ; iterates through all combinations of operands and carry input
 ; uses increments/decrements to predict result & result flags
         cld
@@ -5061,7 +5117,8 @@ tadd1   ora adrh        ;merge C to expected flags
         bne tadd        ;iterate op2
         next_test
 
-; decimal add/subtract test
+ sta $ef04
+ db "decimal add/subtract test", 10, 0
 ; *** WARNING - tests documented behavior only! ***
 ;   only valid BCD operands are tested, N V Z flags are ignored
 ; iterates through all valid combinations of operands and carry input
@@ -5144,7 +5201,8 @@ tdad6   dec ad2         ;operand 2 -1
 tdad7
         next_test
 
-; decimal/binary switch test
+ sta $ef04
+ db "decimal/binary switch test", 10, 0
 ; tests CLD, SED, PLP, RTI to properly switch between decimal & binary opcode
 ;   tables
         clc
@@ -5204,7 +5262,8 @@ bin_rti_ret
         lda #$f0        ;mark opcode testing complete
         sta test_case
         
-; final RAM integrity test
+ sta $ef04
+ db "final RAM integrity test", 10, 0
 ;   verifies that none of the previous tests has altered RAM outside of the
 ;   designated write areas.
         check_ram

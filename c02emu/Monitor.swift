@@ -134,6 +134,9 @@ class Monitor: NSObject {
             case "m":
                 cmdShowMemory(args)
                 
+            case "mmu":
+                cmdMMU(args)
+                
             case "r":
                 cmdShowRegs(args)
                 
@@ -233,7 +236,7 @@ class Monitor: NSObject {
             return badArgs()
         }
         
-        outputLine("PC   A  X  Y  S  nv1bdizc  IR  State")
+        outputLine("PC   A  X  Y  S  nv1bdizc  IR  CPU State    Line Cycle")
         let state = emulator.state
         let status = NSString(format: "%d%d1%d%d%d%d%d",
             (Int(state.cpu.status) & flag_n) >> 7,
@@ -243,15 +246,20 @@ class Monitor: NSObject {
             (Int(state.cpu.status) & flag_i) >> 2,
             (Int(state.cpu.status) & flag_z) >> 1,
             (Int(state.cpu.status) & flag_c))
-        outputLine(NSString(format: "%04x %02x %02x %02x %02x %@  %02x  %@",
-            state.cpu.pc,
-            state.cpu.a,
-            state.cpu.x,
-            state.cpu.y,
-            state.cpu.stack,
-            status,
-            state.cpu.ir,
-            state.cpu.state.description))
+        state.cpu.state.description.withCString {
+            cpuState in
+            self.outputLine(NSString(format: "%04x %02x %02x %02x %02x %@  %02x  %-11s  %03d  %03d",
+                state.cpu.pc,
+                state.cpu.a,
+                state.cpu.x,
+                state.cpu.y,
+                state.cpu.stack,
+                status,
+                state.cpu.ir,
+                COpaquePointer(cpuState),
+                state.display.line,
+                state.display.cycle))
+        }
     }
     
     func cmdStepCycle(args: [String]?) {
@@ -263,11 +271,11 @@ class Monitor: NSObject {
         emulator.step()
         for ;; {
             switch emulator.state.cpu.state {
-            case .Done:
+            case .FetchingOp:
                 cmdShowRegs(nil)
                 outputLine(disassembler.disassemble(emulator.state.cpu.pc))
                 return
-            case .Stopped, .Waiting:
+            case .Stopped:
                 cmdShowRegs(nil)
                 return
             default:
@@ -321,6 +329,19 @@ class Monitor: NSObject {
             return UInt16(value & 0xffff)
         } else {
             return nil
+        }
+    }
+    
+    func cmdMMU(args: [String]?) {
+        let c02mmuState = c02emuMMUState(emulator.emuState)
+        for (reg, bank) in enumerate(emulator.state.mmu.page) {
+            if bank < 0x80 {
+                outputLine(NSString(format: "%04x RAM %05x", reg << 12, Int(bank) << 12))
+            } else if bank < 0xc0 {
+                outputLine(NSString(format: "%04x I/O %05x", reg << 12, Int(bank) << 12))
+            } else {
+                outputLine(NSString(format: "%04x ROM %05x", reg << 12, Int(bank) << 12))
+            }
         }
     }
 }

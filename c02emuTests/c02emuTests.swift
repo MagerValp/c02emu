@@ -21,9 +21,9 @@ class c02emuTests: XCTestCase {
         super.setUp()
         emuState = c02emuCreate()
         // Load a dummy ROM with:
-        //   IRQ vector set to $0406
-        //   NMI vector set to $0403
-        //   RES vector set to $0400.
+        //   IRQ vector set to $1006
+        //   NMI vector set to $1003
+        //   RES vector set to $1000.
         rom = NSMutableData()
         rom.appendData(NSMutableData(length: 0x1000 - 6)!)
         rom.appendBytes([0x03, 0x10] as [UInt8], length: 2)

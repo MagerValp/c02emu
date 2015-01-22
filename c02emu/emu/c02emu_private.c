@@ -56,32 +56,41 @@ static C02EmuReturnReason cpu_step_cycle(C02EmuState *state) {
                     (state->cpu.status & flag_c));
         }
         
-        if (state->cpu.op.nmi_active) {
+        state->cpu.op.address_fixup = false;
+        state->cpu.op.decimal_fixup = false;
+        
+        if (state->cpu.op.nmi_active || state->cpu.op.irq_active) {
             op = 0;
-            if (state->monitor.trace_cpu) {
-                fprintf(stderr, "PC = %04x NMI\n", state->cpu.pc);
+            state->cpu.op.opcode = op;
+            if (state->cpu.op.nmi_active) {
+                if (state->monitor.trace_cpu) {
+                    fprintf(stderr, "PC = %04x NMI\n", state->cpu.pc);
+                }
+                state->cpu.op.uop_list = irq_op_table[OP_NMI];
+            } else if (state->cpu.op.irq_active) {
+                if (state->monitor.trace_cpu) {
+                    fprintf(stderr, "PC = %04x IRQ\n", state->cpu.pc);
+                }
+                state->cpu.op.uop_list = irq_op_table[OP_IRQ];
             }
-            state->cpu.op.uop_list = irq_op_table[OP_NMI];
-        } else if (state->cpu.op.irq_active) {
-            op = 0;
-            if (state->monitor.trace_cpu) {
-                fprintf(stderr, "PC = %04x IRQ\n", state->cpu.pc);
+            state->cpu.op.cycle = C02EMU_OP_CYCLE_1;
+            state->cpu.op.uop_list[state->cpu.op.cycle](state);
+            if (state->cpu.op.cycle < C02EMU_OP_FETCH) {
+                state->cpu.op.cycle += 1;
             }
-            state->cpu.op.uop_list = irq_op_table[OP_IRQ];
         } else {
             op = cpu_read(state, (state->cpu.pc)++);
+            state->cpu.op.opcode = op;
             if (state->monitor.trace_cpu) {
                 fprintf(stderr, "PC = %04x OP = %02x\n", (state->cpu.pc - 1) & 0xffff, op);
             }
             state->cpu.op.uop_list = op_table[op];
-        }
-        state->cpu.op.opcode = op;
-        state->cpu.op.address_fixup = false;
-        state->cpu.op.decimal_fixup = false;
-        if (state->cpu.op.uop_list[0] == NULL) {
-            state->cpu.op.cycle = C02EMU_OP_FETCH;
-        } else {
-            state->cpu.op.cycle = C02EMU_OP_CYCLE_1;
+            
+            if (state->cpu.op.uop_list[0] == NULL) {
+                state->cpu.op.cycle = C02EMU_OP_FETCH;
+            } else {
+                state->cpu.op.cycle = C02EMU_OP_CYCLE_1;
+            }
         }
         
     } else if(state->cpu.op.cycle == C02EMU_OP_STOPPED) {

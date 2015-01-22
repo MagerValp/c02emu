@@ -68,7 +68,7 @@
 ;ROM_vectors writable (0=no, 1=yes)
 ;if ROM vectors can not be used interrupts will not be trapped
 ;as a consequence BRK can not be tested but will be emulated to test RTI
-ROM_vectors = 0
+ROM_vectors = 1
 
 ;load_data_direct (0=move from code segment, 1=load directly)
 ;loading directly is preferred but may not be supported by your platform
@@ -110,7 +110,7 @@ report = 1
 ;RAM integrity test option. Checks for undesired RAM writes.
 ;set lowest non RAM or RAM mirror address page (-1=disable, 0=64k, $40=16k)
 ;leave disabled if a monitor, OS or background interrupt is allowed to alter RAM
-ram_top = -1
+ram_top = $e0
 
         noopt       ;do not take shortcuts
         
@@ -549,7 +549,7 @@ test_num = test_num + 1
             lda #test_num   ;*** next tests' number
             sta test_case
             ;sta $ef03
-            ;check_ram       ;uncomment to find altered RAM after each test
+            check_ram       ;uncomment to find altered RAM after each test
             endm
 
     if load_data_direct = 1
@@ -660,6 +660,8 @@ jxp_tab equ data_segment + $100         ;JMP (jxp_tab-255) x=255
 
         code
         org code_segment
+ lda #$0f
+ sta $0f
 start   cld
         ldx #$ff
         txs
@@ -2236,7 +2238,8 @@ tdad7   cpx #ad2
         lda #$f0        ;mark opcode testing complete
         sta test_case
 
-; final RAM integrity test
+ sta $ef04
+ db "final RAM integrity test", 10, 0
 ;   verifies that none of the previous tests has altered RAM outside of the
 ;   designated write areas.
         check_ram

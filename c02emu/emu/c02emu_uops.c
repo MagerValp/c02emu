@@ -418,7 +418,14 @@ static void op_ADC(C02EmuState *state, Byte byte) {
         OP_DONE();
     }
 }
-SYNTHESIZE_imm(ADC)
+static void u_ADC_imm(C02EmuState *state) {
+    if (state->cpu.op.decimal_fixup == true) {
+        cpu_read(state, PC - 1);
+        OP_DONE();
+    } else {
+        op_ADC(state, cpu_read(state, PC++));
+    }
+}
 SYNTHESIZE_ad(ADC)
 SYNTHESIZE_r_adx(ADC)
 SYNTHESIZE_r_ady(ADC)
@@ -1088,7 +1095,14 @@ static void op_SBC(C02EmuState *state, Byte byte) {
         OP_DONE();
     }
 }
-SYNTHESIZE_imm(SBC)
+static void u_SBC_imm(C02EmuState *state) {
+    if (state->cpu.op.decimal_fixup == true) {
+        cpu_read(state, PC - 1);
+        OP_DONE();
+    } else {
+        op_SBC(state, cpu_read(state, PC++));
+    }
+}
 SYNTHESIZE_ad(SBC)
 SYNTHESIZE_r_adx(SBC)
 SYNTHESIZE_r_ady(SBC)

@@ -110,8 +110,8 @@ struct _c02EmuState {
 };
 
 
-static C02EmuReturnReason cpu_step_cycle(C02EmuState *state);
-static C02EmuReturnReason io_step_cycle(C02EmuState *state);
+static void cpu_step_cycle(C02EmuState *state);
+static void io_step_cycle(C02EmuState *state);
 
 static LongAddr mmu_addr(C02EmuState *state, Addr addr);
 static Byte cpu_read(C02EmuState *state, Addr addr);

@@ -34,7 +34,7 @@ static void evaluate_irqs(C02EmuState *state) {
 }
 
 
-static C02EmuReturnReason cpu_step_cycle(C02EmuState *state) {
+static void cpu_step_cycle(C02EmuState *state) {
     Byte op;
     
     if (state->cpu.op.cycle == C02EMU_OP_FETCH) {
@@ -94,14 +94,11 @@ static C02EmuReturnReason cpu_step_cycle(C02EmuState *state) {
             }
         }
         
-    } else if(state->cpu.op.cycle == C02EMU_OP_STOPPED) {
+    } else if (state->cpu.op.cycle == C02EMU_OP_STOPPED) {
         
-        if (!state->cpu.op.stop_notified) {
-            state->cpu.op.stop_notified = true;
-            return C02EMU_CPU_STOPPED;
-        }
+        //
         
-    } else if(state->cpu.op.cycle == C02EMU_OP_WAITING) {
+    } else if (state->cpu.op.cycle == C02EMU_OP_WAITING) {
         
         cpu_read(state, state->cpu.pc);
         evaluate_irqs(state);
@@ -131,14 +128,10 @@ static C02EmuReturnReason cpu_step_cycle(C02EmuState *state) {
             state->cpu.op.cycle += 1;
         }
     }
-    
-    return C02EMU_CYCLE_STEPPED;
 }
 
 
-static C02EmuReturnReason io_step_cycle(C02EmuState *state) {
-    C02EmuReturnReason reason = C02EMU_CYCLE_STEPPED;
-    
+static void io_step_cycle(C02EmuState *state) {
     if (++state->cycle_ctr > C02EMU_CYCLES_PER_LINE) {
         state->cycle_ctr = 0;
         if (++state->line_ctr > C02EMU_LINES_PER_FRAME) {
@@ -147,11 +140,8 @@ static C02EmuReturnReason io_step_cycle(C02EmuState *state) {
             if (state->io.display.irq_mask & C02EMU_DISPLAY_IRQ_VBL) {
                 state->io.display.irq_status |= C02EMU_DISPLAY_IRQ_ACTIVE | C02EMU_DISPLAY_IRQ_VBL;
             }
-            reason = C02EMU_FRAME_READY;
         }
     }
-
-    return reason;
 }
 
 

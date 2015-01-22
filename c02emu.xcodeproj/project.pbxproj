@@ -34,6 +34,7 @@
 		6673C4191A5C709700D17696 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6673C4181A5C709700D17696 /* Images.xcassets */; };
 		6673C41C1A5C709700D17696 /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6673C41A1A5C709700D17696 /* MainMenu.xib */; };
 		6673C4281A5C709700D17696 /* c02emuTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6673C4271A5C709700D17696 /* c02emuTests.swift */; };
+		6689C3BD1A71AC6B009A8229 /* ehbasic.bin in CopyFiles */ = {isa = PBXBuildFile; fileRef = 6689C3BC1A71AC6B009A8229 /* ehbasic.bin */; };
 		6691FD131A69938A00DFF540 /* Disassembler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6691FD121A69938A00DFF540 /* Disassembler.swift */; };
 		669FCCD01A6AD58800E6299F /* Emulator_Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 669FCCCF1A6AD58800E6299F /* Emulator_Tests.swift */; };
 		669FCCD71A6AD67000E6299F /* Disassembler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6691FD121A69938A00DFF540 /* Disassembler.swift */; };
@@ -73,6 +74,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 7;
 			files = (
+				6689C3BD1A71AC6B009A8229 /* ehbasic.bin in CopyFiles */,
 				66DE98E51A61B68400AD860C /* rom.bin in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -117,6 +119,7 @@
 		6673C4211A5C709700D17696 /* c02emuTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = c02emuTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		6673C4261A5C709700D17696 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		6673C4271A5C709700D17696 /* c02emuTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = c02emuTests.swift; sourceTree = "<group>"; };
+		6689C3BC1A71AC6B009A8229 /* ehbasic.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; name = ehbasic.bin; path = ../Software/EhBASIC/ehbasic.bin; sourceTree = "<group>"; };
 		668D3C431A5DBF0F00D9C4B9 /* c02emu.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = c02emu.c; path = emu/c02emu.c; sourceTree = "<group>"; };
 		668D3C441A5DBF0F00D9C4B9 /* c02emu.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = c02emu.h; path = emu/c02emu.h; sourceTree = "<group>"; };
 		668D3C461A5DF42C00D9C4B9 /* c02emu-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "c02emu-Bridging-Header.h"; sourceTree = "<group>"; };
@@ -196,6 +199,7 @@
 		6673C4101A5C709700D17696 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				6689C3BC1A71AC6B009A8229 /* ehbasic.bin */,
 				66DE98E41A61B68400AD860C /* rom.bin */,
 				6673C4111A5C709700D17696 /* Info.plist */,
 			);

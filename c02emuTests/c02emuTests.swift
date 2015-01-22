@@ -47,11 +47,71 @@ class c02emuTests: XCTestCase {
         }
     }
     
-    func loadBin(addr: Int, data: UnsafePointer<Void>, length: Int) {
-        NSLog("Loading \(length) bytes at \(addr)")
-        let bytes = UnsafePointer<UInt8>(data)
-        for i in 0..<length {
+    func writeBytes(addr: Int, bytes: UnsafePointer<Void>, count: Int) {
+        let bytes = UnsafePointer<UInt8>(bytes)
+        for i in 0..<count {
             c02emuCPUWrite(emuState, UInt16(addr + i), bytes[i])
+        }
+    }
+    
+    func splitExt(name: String) -> (String, String) {
+        let components = name.componentsSeparatedByString(".")
+        let name = ".".join(components[0..<components.count - 1])
+        let ext = components.last!
+        return (name, ext)
+    }
+    
+    func loadProgram(name: String) -> Bool {
+        let (name, ext) = splitExt(name)
+        return loadProgram(name, ext: ext)
+    }
+    
+    func loadProgram(name: String, ext: String) -> Bool {
+        let bundle = NSBundle(forClass: self.dynamicType)
+        
+        if let url = bundle.URLForResource(name, withExtension: ext) {
+            if let prgData = NSData(contentsOfURL: url) {
+                writeBytes(0x1000, bytes: prgData.bytes, count: prgData.length)
+            } else {
+                return false
+            }
+        } else {
+            return false
+        }
+        return true
+    }
+    
+    func loadROM(name: String) -> Bool {
+        let (name, ext) = splitExt(name)
+        return loadROM(name, ext: ext)
+    }
+    
+    func loadROM(name: String, ext: String) -> Bool {
+        let bundle = NSBundle(forClass: self.dynamicType)
+        
+        if let url = bundle.URLForResource(name, withExtension: ext) {
+            if let romData = NSData(contentsOfURL: url) {
+                c02emuLoadROM(emuState, romData.bytes, UInt(romData.length))
+            } else {
+                return false
+            }
+        } else {
+            return false
+        }
+        return true;
+    }
+    
+    func resetAndRunUntilSTP() -> Bool {
+        c02emuReset(emuState)
+        for ;; {
+            switch c02emuRun(emuState).value {
+            case C02EMU_FRAME_READY.value:
+                continue
+            case C02EMU_CPU_STOPPED.value:
+                return true
+            default:
+                return false
+            }
         }
     }
     
@@ -94,10 +154,10 @@ class c02emuTests: XCTestCase {
         setProgramBytes([0xa9, 0x0a])       // lda #$0a
         setProgramBytes([0x8d, 0x00, 0xef]) // sta $ef00
         setProgramBytes([0xdb])             // stp
-        c02emuReset(emuState)
-
-        let reason = c02emuRun(emuState)
-        XCTAssertEqual(reason.value, C02EMU_CPU_STOPPED.value, "reason")
+        if !resetAndRunUntilSTP() {
+            XCTFail("Unexpected return reason")
+            return
+        }
     }
     
     func testDebugTrap() {
@@ -110,34 +170,34 @@ class c02emuTests: XCTestCase {
         setProgramBytes([0x5a])             // phy
         setProgramBytes([0x8d, 0x02, 0xef]) // sta $ef02
         setProgramBytes([0xdb])             // stp
-        c02emuReset(emuState)
-        
-        let reason = c02emuRun(emuState)
-        XCTAssertEqual(reason.value, C02EMU_CPU_STOPPED.value, "reason")
+        if !resetAndRunUntilSTP() {
+            XCTFail("Unexpected return reason")
+            return
+        }
     }
     
     func testDisplayOutput() {
         setProgramBytes([0xa9, 0x00])       // lda #0
-        setProgramBytes([0x8d, 0x00, 0xe0]) // sta $e300
-        setProgramBytes([0x8d, 0x02, 0xe0]) // sta $e302
-        setProgramBytes([0x8d, 0x03, 0xe0]) // sta $e303
-        setProgramBytes([0xa9, 0x10])       // lda #$10
-        setProgramBytes([0x8d, 0x01, 0xe0]) // sta $e301
+        setProgramBytes([0x8d, 0x00, 0xe0]) // sta $e000
+        setProgramBytes([0x8d, 0x02, 0xe0]) // sta $e002
+        setProgramBytes([0x8d, 0x03, 0xe0]) // sta $e003
+        setProgramBytes([0xa9, 0x20])       // lda #$20
+        setProgramBytes([0x8d, 0x01, 0xe0]) // sta $e001
         setProgramBytes([0xa9, chr("H")])   // lda #'H'
-        setProgramBytes([0x8d, 0x00, 0x10]) // sta $1000
+        setProgramBytes([0x8d, 0x00, 0x20]) // sta $2000
         setProgramBytes([0xa9, chr("e")])   // lda #'e'
-        setProgramBytes([0x8d, 0x01, 0x10]) // sta $1001
+        setProgramBytes([0x8d, 0x01, 0x20]) // sta $2001
         setProgramBytes([0xa9, chr("l")])   // lda #'l'
-        setProgramBytes([0x8d, 0x02, 0x10]) // sta $1002
+        setProgramBytes([0x8d, 0x02, 0x20]) // sta $2002
         setProgramBytes([0xa9, chr("l")])   // lda #'l'
-        setProgramBytes([0x8d, 0x03, 0x10]) // sta $1003
+        setProgramBytes([0x8d, 0x03, 0x20]) // sta $2003
         setProgramBytes([0xa9, chr("o")])   // lda #'o'
-        setProgramBytes([0x8d, 0x04, 0x10]) // sta $1004
+        setProgramBytes([0x8d, 0x04, 0x20]) // sta $2004
         setProgramBytes([0xdb])             // stp
-        c02emuReset(emuState)
-        
-        let reason = c02emuRun(emuState)
-        XCTAssertEqual(reason.value, C02EMU_CPU_STOPPED.value, "reason")
+        if !resetAndRunUntilSTP() {
+            XCTFail("Unexpected return reason")
+            return
+        }
         
         let output = c02emuGetOutput(emuState)
         XCTAssertEqual(UInt8(output.display.data[0]), chr("H"), "H")
@@ -155,8 +215,10 @@ class c02emuTests: XCTestCase {
         setProgramBytes([0xa9, 0xc3])       // lda #$c3
         setProgramBytes([0x49, 0xc3, 0xe3]) // eor #$c3
         setProgramBytes([0xdb])             // stp
-        c02emuReset(emuState)
-        c02emuRun(emuState)
+        if !resetAndRunUntilSTP() {
+            XCTFail("Unexpected return reason")
+            return
+        }
         let regs = c02emuCPURegs(emuState)
         XCTAssertEqual(regs.a, UInt8(0), "A")
         XCTAssertEqual(regs.status & 0xdf, UInt8(0x02), "S")
@@ -172,8 +234,10 @@ class c02emuTests: XCTestCase {
         setProgramBytes([0x69, 0x99])       // adc #$99
         setProgramBytes([0x8d, 0x02, 0xef]) // sta $ef02
         setProgramBytes([0xdb])             // stp
-        c02emuReset(emuState)
-        c02emuRun(emuState)
+        if !resetAndRunUntilSTP() {
+            XCTFail("Unexpected return reason")
+            return
+        }
         let regs = c02emuCPURegs(emuState)
         XCTAssertEqual(regs.a, UInt8(0x99), "A")
         XCTAssertEqual(regs.status & 0x01, UInt8(0x01), "C")
@@ -188,8 +252,10 @@ class c02emuTests: XCTestCase {
         setProgramBytes([0xe9, 0x00])       // sbc #$00
         setProgramBytes([0x8d, 0x02, 0xef]) // sta $ef02
         setProgramBytes([0xdb])             // stp
-        c02emuReset(emuState)
-        c02emuRun(emuState)
+        if !resetAndRunUntilSTP() {
+            XCTFail("Unexpected return reason")
+            return
+        }
         let regs = c02emuCPURegs(emuState)
         XCTAssertEqual(regs.a, UInt8(0x98), "A")
         XCTAssertEqual(regs.status | 0x20, UInt8(0xad), "S")
@@ -203,8 +269,10 @@ class c02emuTests: XCTestCase {
         setProgramBytes([0xca])             // dex
         setProgramBytes([0x8d, 0x02, 0xef]) // sta $ef02
         setProgramBytes([0xdb])             // stp
-        c02emuReset(emuState)
-        c02emuRun(emuState)
+        if !resetAndRunUntilSTP() {
+            XCTFail("Unexpected return reason")
+            return
+        }
         let regs = c02emuCPURegs(emuState)
         XCTAssertEqual(regs.x, UInt8(0xff), "X")
         XCTAssertEqual(regs.status | 0x20, UInt8(0xa4), "S")
@@ -215,8 +283,10 @@ class c02emuTests: XCTestCase {
         for i in 0..<254 {
             setProgramBytes([0xdb])             // stp
         }
-        c02emuReset(emuState)
-        c02emuRun(emuState)
+        if !resetAndRunUntilSTP() {
+            XCTFail("Unexpected return reason")
+            return
+        }
         let regs = c02emuCPURegs(emuState)
         XCTAssertEqual(regs.pc, UInt16(0x1082), "PC")
     }
@@ -227,8 +297,10 @@ class c02emuTests: XCTestCase {
             setProgramBytes([0xdb])             // stp
         }
         setProgramBytes([0x80, 0x80])       // bra $0482
-        c02emuReset(emuState)
-        c02emuRun(emuState)
+        if !resetAndRunUntilSTP() {
+            XCTFail("Unexpected return reason")
+            return
+        }
         let regs = c02emuCPURegs(emuState)
         XCTAssertEqual(regs.pc, UInt16(0x1083), "PC")
     }
@@ -242,8 +314,10 @@ class c02emuTests: XCTestCase {
         setProgramBytes([0x36, 0x80])       // rol $80,x
         setProgramBytes([0x8d, 0x02, 0xef]) // sta $ef02
         setProgramBytes([0xdb])             // stp
-        c02emuReset(emuState)
-        c02emuRun(emuState)
+        if !resetAndRunUntilSTP() {
+            XCTFail("Unexpected return reason")
+            return
+        }
         let regs = c02emuCPURegs(emuState)
         XCTAssertEqual(regs.a, UInt8(0xff), "A")
         XCTAssertEqual(regs.status | 0x20, UInt8(0xa4), "S")
@@ -253,18 +327,13 @@ class c02emuTests: XCTestCase {
         for test in 0...14 {
             NSLog("Running HCM test \(test)")
             let name = String(format: "hcm-test%02d", test)
-            let bundle = NSBundle(forClass: self.dynamicType)
-            if let romData = NSData(contentsOfURL: bundle.URLForResource(name, withExtension: "bin")!) {
-                c02emuLoadROM(emuState, romData.bytes, UInt(romData.length))
-            } else {
-                XCTAssertTrue(false, "Couldn't load \(name).bin")
+            if !loadROM(name, ext: "bin") {
+                XCTFail("Couldn't load \(name).bin")
+                return
             }
-            c02emuReset(emuState)
-            if test == 15 {
-                c02emuSetCPUTrace(emuState, true)
-                c02emuSetRAMTrace(emuState, true)
-            }
-            while c02emuRun(emuState).value == C02EMU_FRAME_READY.value {
+            if !resetAndRunUntilSTP() {
+                XCTFail("Unexpected return reason")
+                return
             }
             let regs = c02emuCPURegs(emuState)
             XCTAssertEqual(regs.a, UInt8(0x00), "HCM test \(test) failed")
@@ -272,58 +341,37 @@ class c02emuTests: XCTestCase {
     }
     
     func test6502FuncTest() {
-        var frame = 0
-        
-        let bundle = NSBundle(forClass: self.dynamicType)
-        if let romData = NSData(contentsOfURL: bundle.URLForResource("6502_functional_test", withExtension: "bin")!) {
-            loadBin(0x1000, data: romData.bytes, length: romData.length)
-        } else {
-            XCTAssertTrue(false, "Couldn't load 6502_functional_test.bin")
+        if !loadProgram("6502_functional_test.bin") {
+            XCTFail("Couldn't load 6502_functional_test.bin")
+            return
         }
-        c02emuReset(emuState)
-        while c02emuRun(emuState).value == C02EMU_FRAME_READY.value {
-            //NSLog("Frame: \(frame++)")
+        if !resetAndRunUntilSTP() {
+            XCTFail("Unexpected return reason")
+            return
         }
     }
     
     func test65C02ExtendedOpcodes() {
-        var frame = 0
-        
-        let bundle = NSBundle(forClass: self.dynamicType)
-        if let romData = NSData(contentsOfURL: bundle.URLForResource("65C02_extended_opcodes_test", withExtension: "bin")!) {
-            loadBin(0x1000, data: romData.bytes, length: romData.length)
-        } else {
-            XCTAssertTrue(false, "Couldn't load 65C02_extended_opcodes_test.bin")
+        if !loadProgram("65C02_extended_opcodes_test.bin") {
+            XCTFail("Couldn't load 65C02_extended_opcodes_test.bin")
+            return
         }
-        c02emuReset(emuState)
-        while c02emuRun(emuState).value == C02EMU_FRAME_READY.value {
-            //NSLog("Frame: \(frame++)")
+        if !resetAndRunUntilSTP() {
+            XCTFail("Unexpected return reason")
+            return
         }
     }
     
     func testBruceClarkBCD() {
         var frame = 0
         
-        let bundle = NSBundle(forClass: self.dynamicType)
-        if let url = bundle.URLForResource("bcdtest", withExtension: "bin") {
-            if let romData = NSData(contentsOfURL: url) {
-                c02emuLoadROM(emuState, romData.bytes, UInt(romData.length))
-            } else {
-                XCTFail("Couldn't read bcdtest.bin")
-            }
-        } else {
-            XCTFail("Couldn't find bcdtest.bin")
+        if !loadROM("bcdtest.bin") {
+            XCTFail("Couldn't load bcdtest.bin")
+            return
         }
-        c02emuReset(emuState)
-        loop: for ;; {
-            switch c02emuRun(emuState).value {
-            case C02EMU_FRAME_READY.value:
-                continue
-            case C02EMU_CPU_STOPPED.value:
-                break loop
-            default:
-                XCTFail("Unexpected return reason")
-            }
+        if !resetAndRunUntilSTP() {
+            XCTFail("Unexpected return reason")
+            return
         }
         let error = Bool(c02emuCPURead(emuState, 0x0200) != 00)
         if error {
@@ -355,11 +403,9 @@ class c02emuTests: XCTestCase {
     }
     
     func testCPUEmulationPerformance() {
-        let bundle = NSBundle(forClass: self.dynamicType)
-        if let romData = NSData(contentsOfURL: bundle.URLForResource("6502_functional_test", withExtension: "bin")!) {
-            loadBin(0x1000, data: romData.bytes, length: romData.length)
-        } else {
-            XCTAssertTrue(false, "Couldn't load 6502_functional_test.bin")
+        if !loadProgram("6502_functional_test.bin") {
+            XCTFail("Couldn't load 6502_functional_test.bin")
+            return
         }
         self.measureBlock() {
             c02emuReset(self.emuState)

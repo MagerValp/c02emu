@@ -131,11 +131,11 @@ static void u_rmw_adx(C02EmuState *state) {
     if (state->cpu.op.address_fixup == true) {
         ALU = cpu_read(state, AD + X);
     } else {
-        if (((AD + X) & 0xff00) == (AD & 0xff00)) {
+        if (ADL + X < 256) {
             ALU = cpu_read(state, AD + X);
             state->cpu.op.cycle += 1;
         } else {
-            cpu_read(state, (AD & 0xff00) | ((AD + X) & 0xff));
+            cpu_read(state, PC - 1);
             state->cpu.op.address_fixup = true;
         }
     }
@@ -176,7 +176,8 @@ static void u_dum_adl(C02EmuState *state) {
 }
 
 static void u_dum_adx(C02EmuState *state) {
-    cpu_read(state, (ADH << 8) | ((ADL + X) & 0xff));
+    cpu_read(state, PC - 1);
+    //cpu_read(state, (ADH << 8) | ((ADL + X) & 0xff));
 }
 
 static void u_dum_adxreal(C02EmuState *state) {
@@ -188,7 +189,8 @@ static void u_dum_adlx(C02EmuState *state) {
 }
 
 static void u_dum_ady(C02EmuState *state) {
-    cpu_read(state, (ADH << 8) | ((ADL + Y) & 0xff));
+    cpu_read(state, PC - 1);
+    //cpu_read(state, (ADH << 8) | ((ADL + Y) & 0xff));
 }
 
 static void u_dum_bal(C02EmuState *state) {
@@ -237,7 +239,7 @@ static void u_##OP##_ad(C02EmuState *state) { \
 #define SYNTHESIZE_r_adx(OP) \
 static void u_##OP##_adx(C02EmuState *state) { \
     if (!state->cpu.op.address_fixup && X + ADL >= 256) { \
-        cpu_read(state, AD + X - 256); \
+        cpu_read(state, PC - 1); \
         state->cpu.op.address_fixup = true; \
     } else { \
         op_##OP(state, cpu_read(state, AD + X)); \
@@ -257,7 +259,7 @@ static void u_##OP##_adlx(C02EmuState *state) { \
 #define SYNTHESIZE_r_ady(OP) \
 static void u_##OP##_ady(C02EmuState *state) { \
     if (!state->cpu.op.address_fixup && Y + ADL >= 256) { \
-        cpu_read(state, AD + Y - 256); \
+        cpu_read(state, PC - 1); \
         state->cpu.op.address_fixup = true; \
     } else { \
         op_##OP(state, cpu_read(state, AD + Y)); \

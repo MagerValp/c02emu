@@ -377,27 +377,23 @@ static void op_ADC(C02EmuState *state, Byte byte) {
     }
     
     if (P & flag_d) {
+        // Calculate result of low nybble.
         lo = (A & 0x0f) + (byte & 0x0f) + carry;
-        if (lo > 9) {
-            lo += 6;
+        if (lo >= 0x0a) {
+            lo = ((lo + 0x06) & 0x0f) + 0x10;
         }
-        
-        if (~(A ^ byte) & (A ^ lo) & 0x80) {
+        // Partial result of both nybbles.
+        result = (A & 0xf0) + (byte & 0xf0) + lo;
+        // Calculate V before decimal adjusting high nybble.
+        if (~(A ^ byte) & (A ^ result) & 0x80) {
             SEV();
         } else {
             CLV();
         }
-        
-        result = (lo & 0x0f) + (A & 0xf0) + (byte & 0xf0);
-        if (lo >= 0x10) {
-            result += 0x10;
-        }
-        
+        // Decimal adjust high nybble.
         if (result >= 0xa0) {
-            result += 0x60;
+            result = result + 0x60;
         }
-        
-        A = result;
         
     } else {
         result = A + byte + carry;
@@ -406,8 +402,9 @@ static void op_ADC(C02EmuState *state, Byte byte) {
         } else {
             CLV();
         }
-        A = result;
     }
+    
+    A = result;
     SETNZ(A);
     if (result >= 0x100) {
         SEC();
@@ -1030,33 +1027,19 @@ static void u_RTS_incpc(C02EmuState *state) {
 
 static void op_SBC(C02EmuState *state, Byte byte) {
     int16_t result;
-    uint16_t hi, lo;
-    Byte carry = P & flag_c;
+    int16_t lo;
+    int16_t carry = P & flag_c;
     
     if (state->cpu.op.decimal_fixup == true) {
         OP_DONE();
         return;
     }
     
-    result = A - byte - 1 + carry;
     if (P & flag_d) {
-        lo = (A & 0x0f) - (byte & 0x0f) - 1 + carry;
-        hi = (A & 0xf0) - (byte & 0xf0);
         
-        if (lo & 0x10) {
-            lo -= 6;
-            hi -= 0x10;
-        }
+        // First perform a binary SBC to calculate V and C.
         
-        if (hi & 0x100) {
-            hi -= 0x60;
-        }
-        
-        if (hi & 0xf00) {
-            CLC();
-        } else {
-            SEC();
-        }
+        result = A - byte - 1 + carry;
         
         if ((A ^ byte) & (A ^ result) & 0x80) {
             SEV();
@@ -1064,12 +1047,26 @@ static void op_SBC(C02EmuState *state, Byte byte) {
             CLV();
         }
         
-        A = (hi & 0xf0) | (lo & 0x0f);
+        if (!(result & 0x100)) {
+            SEC();
+        } else {
+            CLC();
+        }
         
-        byte = result;
-        SETNZ(byte);
+        // Then perform decimal SBC to calculate actual result.
+        
+        lo = (A & 0x0f) - (byte & 0x0f) + carry - 1;
+        result = A - byte + carry - 1;
+        if (result < 0) {
+            result -= 0x60;
+        }
+        if (lo < 0) {
+            result -= 0x06;
+        }
         
     } else {
+        result = A - byte - 1 + carry;
+        
         if ((A ^ byte) & (A ^ result) & 0x80) {
             SEV();
         } else {
@@ -1081,9 +1078,9 @@ static void op_SBC(C02EmuState *state, Byte byte) {
         } else {
             SEC();
         }
-        A = result;
-        SETNZ(A);
     }
+    A = result;
+    SETNZ(A);
     
     if (state->cpu.op.decimal_fixup == false && (P & flag_d)) {
         state->cpu.op.decimal_fixup = true;

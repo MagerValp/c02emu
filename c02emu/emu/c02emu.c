@@ -96,36 +96,22 @@ void c02emuReset(C02EmuState *state) {
 }
 
 
-C02EmuReturnReason c02emuStepCycle(C02EmuState *state) {
-    C02EmuReturnReason reason;
-    
-    if (state->phase == C02EMU_PHASE_CPU) {
-        state->phase = C02EMU_PHASE_IO;
-        reason = cpu_step_cycle(state);
-        if (reason != C02EMU_CYCLE_STEPPED) {
-            return reason;
-        }
-    }
-    
-    if (state->phase == C02EMU_PHASE_IO) {
-        state->phase = C02EMU_PHASE_CPU;
-        reason = io_step_cycle(state);
-        if (reason != C02EMU_CYCLE_STEPPED) {
-            return reason;
-        }
-    }
-    
-    return C02EMU_CYCLE_STEPPED;
+void c02emuStepCycle(C02EmuState *state) {
+    cpu_step_cycle(state);
+    io_step_cycle(state);
 }
 
 
 C02EmuReturnReason c02emuRun(C02EmuState *state) {
-    C02EmuReturnReason reason;
+    unsigned int current_frame = state->frame_ctr;
     
     for (;;) {
-        reason = c02emuStepCycle(state);
-        if (reason != C02EMU_CYCLE_STEPPED) {
-            return reason;
+        cpu_step_cycle(state);
+        io_step_cycle(state);
+        if (state->cpu.op.cycle == C02EMU_OP_STOPPED) {
+            return C02EMU_CPU_STOPPED;
+        } else if (current_frame != state->frame_ctr) {
+            return C02EMU_FRAME_READY;
         }
     }
 }

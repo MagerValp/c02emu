@@ -67,20 +67,16 @@ void c02emuLoadROM(C02EmuState *state, const void *data, size_t size);
 /// @param state    Emulator state.
 void c02emuReset(C02EmuState *state);
 
+/// Execute a single cycle.
+///
+/// @param state    Emulator state.
+void c02emuStepCycle(C02EmuState *state);
+
 /// The reasons that c02emuRun may return.
 typedef enum {
     C02EMU_FRAME_READY=1,
     C02EMU_CPU_STOPPED,
-    C02EMU_CYCLE_STEPPED,
 } C02EmuReturnReason;
-
-/// Execute until a single cycle has passed.
-///
-/// May return early, check return reason.
-///
-/// @param state    Emulator state.
-/// @return The reason that the emulator stopped.
-C02EmuReturnReason c02emuStepCycle(C02EmuState *state);
 
 /// Execute until a stopping condition occurs.
 ///

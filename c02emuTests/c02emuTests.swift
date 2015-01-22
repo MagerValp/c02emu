@@ -421,6 +421,7 @@ class c02emuTests: XCTestCase {
             XCTFail("Couldn't load 6502_functional_test.bin")
             return
         }
+        c02emuSetDebugOutput(emuState, false)
         self.measureBlock() {
             c02emuReset(self.emuState)
             for i in 0..<120 {

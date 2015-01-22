@@ -57,6 +57,7 @@ C02EmuState *c02emuCreate(void) {
     
     state->monitor.trace_cpu = false;
     state->monitor.trace_ram = false;
+    state->monitor.debug_output = true;
     
     return state;
 }

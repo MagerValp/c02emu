@@ -84,4 +84,11 @@ bool c02emuSetRAMTrace(C02EmuState *state, bool enable) {
 }
 
 
+bool c02emuSetDebugOutput(C02EmuState *state, bool enable) {
+    bool old = state->monitor.debug_output;
+    state->monitor.debug_output = enable;
+    return old;
+}
+
+
 #endif

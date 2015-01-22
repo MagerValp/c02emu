@@ -105,6 +105,7 @@ struct _c02EmuState {
     struct {
         bool trace_cpu;
         bool trace_ram;
+        bool debug_output;
     } monitor;
 };
 

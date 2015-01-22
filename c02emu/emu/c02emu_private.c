@@ -241,7 +241,9 @@ static Byte io_read(C02EmuState *state, Addr addr) {
             return io_display_read(state, addr);
             
         case 0x0f00:
-            return io_debug_read(state, addr);
+            if (state->monitor.debug_output) {
+                return io_debug_read(state, addr);
+            }
             
         default:
             return 0xff;
@@ -256,7 +258,9 @@ static void io_write(C02EmuState *state, Addr addr, Byte byte) {
             return;
             
         case 0x0f00:
-            io_debug_write(state, addr, byte);
+            if (state->monitor.debug_output) {
+                io_debug_write(state, addr, byte);
+            }
             return;
         
         default:

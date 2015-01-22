@@ -87,6 +87,7 @@ static C02EmuReturnReason cpu_step_cycle(C02EmuState *state) {
             state->cpu.op.uop_list = op_table[op];
             
             if (state->cpu.op.uop_list[0] == NULL) {
+                evaluate_irqs(state);
                 state->cpu.op.cycle = C02EMU_OP_FETCH;
             } else {
                 state->cpu.op.cycle = C02EMU_OP_CYCLE_1;

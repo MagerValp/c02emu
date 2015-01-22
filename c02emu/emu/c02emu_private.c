@@ -404,6 +404,28 @@ static void io_debug_write(C02EmuState *state, Addr addr, Byte byte) {
             fprintf(stderr, "Running test %d\n", state->cpu.a);
             break;
             
+        case 0x04:
+            while ((byte = cpu_read(state, state->cpu.pc++)) != 0) {
+                fputc(byte, stderr);
+            }
+            break;
+            
+        case 0x0c:
+            state->monitor.trace_cpu = true;
+            break;
+            
+        case 0x0d:
+            state->monitor.trace_cpu = false;
+            break;
+            
+        case 0x0e:
+            state->monitor.trace_ram = true;
+            break;
+            
+        case 0x0f:
+            state->monitor.trace_ram = false;
+            break;
+            
         default:
             break;
     }

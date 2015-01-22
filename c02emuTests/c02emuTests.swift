@@ -160,6 +160,20 @@ class c02emuTests: XCTestCase {
         }
     }
     
+    func testDebugPRIMM() {
+        setProgramBytes([0xa9, 0x00])       // lda #$00
+        setProgramBytes([0x8d, 0x04, 0xef]) // sta $ef04
+        setProgramBytes([chr("H"), chr("e"), chr("l"), chr("l"), chr("o"), 0x0a, 0x00])   // "Hello\n\0"
+        setProgramBytes([0xa9, 0x01])       // lda #$01
+        setProgramBytes([0xdb])             // stp
+        if !resetAndRunUntilSTP() {
+            XCTFail("Unexpected return reason")
+            return
+        }
+        let regs = c02emuCPURegs(emuState)
+        XCTAssertEqual(regs.a, UInt8(1), "A")
+    }
+    
     func testDebugTrap() {
         setProgramBytes([0xa2, 0xff, 0x9a]) // ldx #$ff, txs
         setProgramBytes([0xa9, 0x12])       // lda #$12

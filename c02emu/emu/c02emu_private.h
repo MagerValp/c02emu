@@ -82,7 +82,7 @@ struct _c02EmuState {
     } cpu;
     struct {
         Byte ram[128 * 4096];   // 512 kB RAM at $00000-$7ffff
-        Byte rom[4096];         // 256 kB ROM at $c0000-$fffff
+        Byte rom[4 * 4096];     // 256 kB ROM at $c0000-$fffff
     } mem;
     struct {
         struct {

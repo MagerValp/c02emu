@@ -72,7 +72,7 @@ void c02emuLoadROM(C02EmuState *state, const void *data, size_t size) {
     if (size > sizeof(state->mem.rom)) {
         size = sizeof(state->mem.rom);
     }
-    memcpy(state->mem.rom, data, size);
+    memcpy(state->mem.rom + sizeof(state->mem.rom) - size, data, size);
 }
 
 

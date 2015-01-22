@@ -49,8 +49,8 @@ class EmulatorController: NSObject, DisassemblerDelegate {
         c02emuDestroy(emuState)
     }
     
-    func configure() {
-        loadROM()
+    func configure(ROM name: String) {
+        loadROM(name)
     }
     
     func start() {
@@ -137,8 +137,16 @@ class EmulatorController: NSObject, DisassemblerDelegate {
     
     // Configuration.
     
-    func loadROM() {
-        loadROM(NSData(contentsOfURL: NSBundle.mainBundle().URLForResource("rom", withExtension: "bin")!)!)
+    func splitExt(name: String) -> (String, String) {
+        let components = name.componentsSeparatedByString(".")
+        let name = ".".join(components[0..<components.count - 1])
+        let ext = components.last!
+        return (name, ext)
+    }
+    
+    func loadROM(name: String) {
+        let (name, ext) = splitExt(name)
+        loadROM(NSData(contentsOfURL: NSBundle.mainBundle().URLForResource(name, withExtension: ext)!)!)
     }
     
     func loadROM(romData: NSData) {

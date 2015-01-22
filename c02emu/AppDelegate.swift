@@ -36,7 +36,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     
     func applicationDidFinishLaunching(aNotification: NSNotification) {
         
-        emulator.configure()
+        emulator.configure(ROM: "rom.bin")
         
         /* Pick a size for the scene */
         if let scene = GameScene.unarchiveFromFile("GameScene") as? GameScene {

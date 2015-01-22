@@ -80,8 +80,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		053104181A6FA87900C1FFC8 /* 65C02_extended_opcodes_test.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; name = 65C02_extended_opcodes_test.bin; path = Software/Test/6502_65C02_functional_tests/65C02_extended_opcodes_test.bin; sourceTree = "<group>"; };
-		054CF0191A71045B00CBF596 /* bcdtest.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; name = bcdtest.bin; path = Software/Test/BruceClarkBCD/bcdtest.bin; sourceTree = "<group>"; };
+		053104181A6FA87900C1FFC8 /* 65C02_extended_opcodes_test.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; name = 65C02_extended_opcodes_test.bin; path = ../Software/Test/6502_65C02_functional_tests/65C02_extended_opcodes_test.bin; sourceTree = "<group>"; };
+		054CF0191A71045B00CBF596 /* bcdtest.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; name = bcdtest.bin; path = ../Software/Test/BruceClarkBCD/bcdtest.bin; sourceTree = "<group>"; };
 		05C14B5C1A691ECA00ED6C22 /* c02emu_util.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = c02emu_util.c; path = emu/c02emu_util.c; sourceTree = "<group>"; };
 		6609A1201A6166C300CA5B87 /* c02emu_util.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = c02emu_util.h; path = emu/c02emu_util.h; sourceTree = "<group>"; };
 		661BAC701A5FB3BC00202909 /* c02emu_uops.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = c02emu_uops.c; path = emu/c02emu_uops.c; sourceTree = "<group>"; };
@@ -157,8 +157,6 @@
 		6673C4041A5C709700D17696 = {
 			isa = PBXGroup;
 			children = (
-				054CF0191A71045B00CBF596 /* bcdtest.bin */,
-				053104181A6FA87900C1FFC8 /* 65C02_extended_opcodes_test.bin */,
 				6673C40F1A5C709700D17696 /* c02emu */,
 				6673C4241A5C709700D17696 /* c02emuTests */,
 				669FCCCC1A6AD58800E6299F /* Emulator Tests */,
@@ -216,6 +214,9 @@
 		6673C4251A5C709700D17696 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				66DE98E81A6324BF00AD860C /* 6502_functional_test.bin */,
+				053104181A6FA87900C1FFC8 /* 65C02_extended_opcodes_test.bin */,
+				054CF0191A71045B00CBF596 /* bcdtest.bin */,
 				666057071A6ECCF400B35343 /* hcm-test00.bin */,
 				666057081A6ECCF400B35343 /* hcm-test01.bin */,
 				666057091A6ECCF400B35343 /* hcm-test02.bin */,
@@ -231,7 +232,6 @@
 				666057131A6ECCF400B35343 /* hcm-test12.bin */,
 				666057141A6ECCF400B35343 /* hcm-test13.bin */,
 				666057151A6ECCF400B35343 /* hcm-test14.bin */,
-				66DE98E81A6324BF00AD860C /* 6502_functional_test.bin */,
 				6673C4261A5C709700D17696 /* Info.plist */,
 			);
 			name = "Supporting Files";

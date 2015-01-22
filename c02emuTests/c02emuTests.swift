@@ -301,6 +301,59 @@ class c02emuTests: XCTestCase {
         }
     }
     
+    func testBruceClarkBCD() {
+        var frame = 0
+        
+        let bundle = NSBundle(forClass: self.dynamicType)
+        if let url = bundle.URLForResource("bcdtest", withExtension: "bin") {
+            if let romData = NSData(contentsOfURL: url) {
+                c02emuLoadROM(emuState, romData.bytes, UInt(romData.length))
+            } else {
+                XCTFail("Couldn't read bcdtest.bin")
+            }
+        } else {
+            XCTFail("Couldn't find bcdtest.bin")
+        }
+        c02emuReset(emuState)
+        loop: for ;; {
+            switch c02emuRun(emuState).value {
+            case C02EMU_FRAME_READY.value:
+                continue
+            case C02EMU_CPU_STOPPED.value:
+                break loop
+            default:
+                XCTFail("Unexpected return reason")
+            }
+        }
+        let error = Bool(c02emuCPURead(emuState, 0x0200) != 00)
+        if error {
+            let regs = c02emuCPURegs(emuState)
+            if regs.a == 0x41 {
+                NSLog(String(format: "%@ ADC #$%02x SBC #$%02x", regs.y == 1 ? "SEC" : "CLC", c02emuCPURead(emuState, 0x0201), c02emuCPURead(emuState, 0x0202)))
+            } else {
+                NSLog(String(format: "%@ LDA #$%02x SBC #$%02x", regs.y == 1 ? "SEC" : "CLC", c02emuCPURead(emuState, 0x0201), c02emuCPURead(emuState, 0x0202)))
+            }
+            let DNVZC = c02emuCPURead(emuState, 0x0209)
+            let DA = c02emuCPURead(emuState, 0x0208)
+            let CF = c02emuCPURead(emuState, 0x0210)
+            let ZF = c02emuCPURead(emuState, 0x020f)
+            let VF = c02emuCPURead(emuState, 0x020e)
+            let NF = c02emuCPURead(emuState, 0x020d)
+            let AR = c02emuCPURead(emuState, 0x020c)
+            NSLog(String(format: "Expected: %02x %02x %@%@%@%@", AR, ((CF & 1) | (ZF & 2) | (VF & 0x40) | (NF & 0x80)),
+                NF & 0x80 != 0 ? "N" : "_",
+                VF & 0x40 != 0 ? "V" : "_",
+                ZF & 0x02 != 0 ? "Z" : "_",
+                CF & 0x01 != 0 ? "C" : "_"))
+            NSLog(String(format: "Actual:   %02x %02x %@%@%@%@", DA, DNVZC & 0xc3,
+                DNVZC & 0x80 != 0 ? "N" : "_",
+                DNVZC & 0x40 != 0 ? "V" : "_",
+                DNVZC & 0x02 != 0 ? "Z" : "_",
+                DNVZC & 0x01 != 0 ? "C" : "_"))
+        }
+        XCTAssertEqual(error, false, "BCD test failed")
+    }
+    
     func testCPUEmulationPerformance() {
         let bundle = NSBundle(forClass: self.dynamicType)
         if let romData = NSData(contentsOfURL: bundle.URLForResource("6502_functional_test", withExtension: "bin")!) {

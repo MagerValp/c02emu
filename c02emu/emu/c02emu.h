@@ -92,4 +92,11 @@ C02EmuReturnReason c02emuRun(C02EmuState *state);
 /// @return Data required for rendering the display.
 const C02EmuOutput c02emuGetOutput(C02EmuState *state);
 
+/// Insert bytes into the keyboard queue.
+///
+/// @param state    Emulator state.
+/// @param bytes    Pointer to a byte buffer.
+/// @param count    The number of bytes in the buffer.
+void c02emuKeyboardQueueInsert(C02EmuState *state, const Byte *bytes, size_t count);
+
 #endif /* defined(__c02emu__c02emu__) */

@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		053104191A6FA87900C1FFC8 /* 65C02_extended_opcodes_test.bin in Resources */ = {isa = PBXBuildFile; fileRef = 053104181A6FA87900C1FFC8 /* 65C02_extended_opcodes_test.bin */; };
+		054BC0711A72510F00B896BE /* Keyboard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 054BC0701A72510F00B896BE /* Keyboard.swift */; };
 		054CF01A1A71045B00CBF596 /* bcdtest.bin in Resources */ = {isa = PBXBuildFile; fileRef = 054CF0191A71045B00CBF596 /* bcdtest.bin */; };
 		6609A11D1A605D1D00CA5B87 /* c02emu.c in Sources */ = {isa = PBXBuildFile; fileRef = 668D3C431A5DBF0F00D9C4B9 /* c02emu.c */; settings = {COMPILER_FLAGS = "-ferror-limit=100"; }; };
 		6609A11E1A61424800CA5B87 /* c02emu.c in Sources */ = {isa = PBXBuildFile; fileRef = 668D3C431A5DBF0F00D9C4B9 /* c02emu.c */; };
@@ -83,6 +84,7 @@
 
 /* Begin PBXFileReference section */
 		053104181A6FA87900C1FFC8 /* 65C02_extended_opcodes_test.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; name = 65C02_extended_opcodes_test.bin; path = ../Software/Test/6502_65C02_functional_tests/65C02_extended_opcodes_test.bin; sourceTree = "<group>"; };
+		054BC0701A72510F00B896BE /* Keyboard.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Keyboard.swift; sourceTree = "<group>"; };
 		054CF0191A71045B00CBF596 /* bcdtest.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; name = bcdtest.bin; path = ../Software/Test/BruceClarkBCD/bcdtest.bin; sourceTree = "<group>"; };
 		05C14B5C1A691ECA00ED6C22 /* c02emu_util.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = c02emu_util.c; path = emu/c02emu_util.c; sourceTree = "<group>"; };
 		6609A1201A6166C300CA5B87 /* c02emu_util.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = c02emu_util.h; path = emu/c02emu_util.h; sourceTree = "<group>"; };
@@ -184,6 +186,7 @@
 				6673C4141A5C709700D17696 /* GameScene.swift */,
 				6673C4161A5C709700D17696 /* GameScene.sks */,
 				66FCD71A1A67DD07009A9421 /* EmulatorController.swift */,
+				054BC0701A72510F00B896BE /* Keyboard.swift */,
 				666551EC1A684812007CE683 /* Monitor.swift */,
 				6691FD121A69938A00DFF540 /* Disassembler.swift */,
 				663A67F71A65B9DF0000F38E /* MonitorWindowController.swift */,
@@ -448,6 +451,7 @@
 			files = (
 				663A67F81A65B9DF0000F38E /* MonitorWindowController.swift in Sources */,
 				6609A11D1A605D1D00CA5B87 /* c02emu.c in Sources */,
+				054BC0711A72510F00B896BE /* Keyboard.swift in Sources */,
 				66FCD71B1A67DD07009A9421 /* EmulatorController.swift in Sources */,
 				6673C4151A5C709700D17696 /* GameScene.swift in Sources */,
 				6691FD131A69938A00DFF540 /* Disassembler.swift in Sources */,

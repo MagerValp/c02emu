@@ -94,6 +94,11 @@ struct _c02EmuState {
             Byte irq_mask;
             Byte irq_status;
         } display;
+        struct {
+            Byte queue[16];
+            unsigned int index;
+            unsigned int size;
+        } keyboard;
     } io;
     
     C02EmuPhase phase;
@@ -124,6 +129,9 @@ static void io_mmu_write(C02EmuState *state, Addr addr, Byte byte);
 
 static Byte io_display_read(C02EmuState *state, Addr addr);
 static void io_display_write(C02EmuState *state, Addr addr, Byte byte);
+
+static Byte io_keyboard_read(C02EmuState *state, Addr addr);
+static void io_keyboard_write(C02EmuState *state, Addr addr, Byte byte);
 
 static Byte io_debug_read(C02EmuState *state, Addr addr);
 static void io_debug_write(C02EmuState *state, Addr addr, Byte byte);

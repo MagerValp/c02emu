@@ -83,6 +83,9 @@ void c02emuReset(C02EmuState *state) {
     state->io.mmu.page[0x0e] = 0xa0;
     state->io.mmu.page[0x0f] = 0xff;
     
+    state->io.keyboard.index = 0;
+    state->io.keyboard.size = 0;
+    
     state->cpu.op.opcode = 0;
     if (state->monitor.trace_cpu) {
         fprintf(stderr, "PC = %04x RESET\n", state->cpu.pc);
@@ -122,6 +125,20 @@ const C02EmuOutput c02emuGetOutput(C02EmuState *state) {
     output.display.mode = state->io.display.mode;
     output.display.data = &state->mem.ram[state->io.display.base];
     return output;
+}
+
+
+void c02emuKeyboardQueueInsert(C02EmuState *state, const Byte *bytes, size_t count) {
+    for (int i = 0; i < count; i++) {
+        if (state->io.keyboard.size == sizeof(state->io.keyboard.queue)) {
+            if (i > 0) {
+                state->io.keyboard.queue[state->io.keyboard.index - 1] = 0;
+            }
+            return;
+        }
+        state->io.keyboard.queue[state->io.keyboard.index + state->io.keyboard.size] = bytes[i];
+        state->io.keyboard.size += 1;
+    }
 }
 
 

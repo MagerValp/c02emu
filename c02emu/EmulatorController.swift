@@ -154,6 +154,20 @@ class EmulatorController: NSObject, DisassemblerDelegate {
     }
     
     
+    // Keyboard.
+    
+    func keyDown(key: Keyboard.KeyCode) {
+        if let bytes = Keyboard.ps2MakeCode(key) {
+            c02emuKeyboardQueueInsert(emuState, UnsafePointer<UInt8>(bytes), UInt(bytes.count))
+        }
+    }
+    
+    func keyUp(key: Keyboard.KeyCode) {
+        if let bytes = Keyboard.ps2BreakCode(key) {
+            c02emuKeyboardQueueInsert(emuState, UnsafePointer<UInt8>(bytes), UInt(bytes.count))
+        }
+    }
+    
     // Monitor support.
     
     enum CPUOPState: Int, Printable {

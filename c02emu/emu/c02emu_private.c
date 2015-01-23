@@ -229,6 +229,9 @@ static Byte io_read(C02EmuState *state, Addr addr) {
         case 0x0000:
             return io_display_read(state, addr);
             
+        case 0x0800:
+            return io_keyboard_read(state, addr);
+            
         case 0x0f00:
             if (state->monitor.debug_output) {
                 return io_debug_read(state, addr);
@@ -244,6 +247,10 @@ static void io_write(C02EmuState *state, Addr addr, Byte byte) {
     switch (addr & 0x0f00) {
         case 0x0000:
             io_display_write(state, addr, byte);
+            return;
+            
+        case 0x0800:
+            io_keyboard_write(state, addr, byte);
             return;
             
         case 0x0f00:
@@ -340,6 +347,36 @@ static void io_display_write(C02EmuState *state, Addr addr, Byte byte) {
             break;
     }
 }
+
+
+// Keyboard.
+
+
+static Byte io_keyboard_read(C02EmuState *state, Addr addr) {
+    Byte byte;
+    
+    switch (addr & 1) {
+        case 0:
+            byte = state->io.keyboard.queue[state->io.keyboard.index];
+            if (state->io.keyboard.size) {
+                state->io.keyboard.index = (state->io.keyboard.index + 1) & (sizeof(state->io.keyboard.queue) - 1);
+                state->io.keyboard.size -= 1;
+            }
+            return byte;
+            
+        case 1:
+            return state->io.keyboard.size;
+            
+        default:
+            return 0xff;
+    }
+}
+
+
+static void io_keyboard_write(C02EmuState *state, Addr addr, Byte byte) {
+    return;
+}
+
 
 
 // Debug.

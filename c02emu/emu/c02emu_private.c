@@ -11,6 +11,7 @@
 
 
 #include <stdio.h>
+#include "dis65c02.h"
 #include "c02emu_private.h"
 #include "c02emu_optable.h"
 
@@ -36,24 +37,24 @@ static void evaluate_irqs(C02EmuState *state) {
 
 static void cpu_step_cycle(C02EmuState *state) {
     Byte op;
+    char disasm_buf[80];
+    char trace_buf[80];
     
     if (state->cpu.op.cycle == C02EMU_OP_FETCH) {
         
-        if (state->monitor.trace_cpu) {
-            fputs("  PC   A  X  Y  S  nv1bdizc\n", stderr);
-            fprintf(stderr, ".;%04x %02x %02x %02x %02x %d%d1%d%d%d%d%d\n",
-                    state->cpu.pc,
+        if (state->monitor.trace & C02EMU_TRACE_CPU) {
+            sprintf(trace_buf, "A:%02x X:%02x Y:%02x S:%02x  %c%c1%c%c%c%c%c",
                     state->cpu.a,
                     state->cpu.x,
                     state->cpu.y,
                     state->cpu.stack,
-                    (state->cpu.status & flag_n) >> 7,
-                    (state->cpu.status & flag_v) >> 6,
-                    (state->cpu.status & flag_b) >> 4,
-                    (state->cpu.status & flag_d) >> 3,
-                    (state->cpu.status & flag_i) >> 2,
-                    (state->cpu.status & flag_z) >> 1,
-                    (state->cpu.status & flag_c));
+                    (state->cpu.status & flag_n) ? 'N' : '.',
+                    (state->cpu.status & flag_v) ? 'V' : '.',
+                    (state->cpu.status & flag_b) ? 'B' : '.',
+                    (state->cpu.status & flag_d) ? 'D' : '.',
+                    (state->cpu.status & flag_i) ? 'I' : '.',
+                    (state->cpu.status & flag_z) ? 'Z' : '.',
+                    (state->cpu.status & flag_c) ? 'C' : '.');
         }
         
         state->cpu.op.address_fixup = false;
@@ -63,13 +64,13 @@ static void cpu_step_cycle(C02EmuState *state) {
             op = 0;
             state->cpu.op.opcode = op;
             if (state->cpu.op.nmi_active) {
-                if (state->monitor.trace_cpu) {
-                    fprintf(stderr, "PC = %04x NMI\n", state->cpu.pc);
+                if (state->monitor.trace & C02EMU_TRACE_CPU) {
+                    fprintf(stderr, "%04x            NMI             %s\n", state->cpu.pc, trace_buf);
                 }
                 state->cpu.op.uop_list = irq_op_table[OP_NMI];
             } else if (state->cpu.op.irq_active) {
-                if (state->monitor.trace_cpu) {
-                    fprintf(stderr, "PC = %04x IRQ\n", state->cpu.pc);
+                if (state->monitor.trace & C02EMU_TRACE_CPU) {
+                    fprintf(stderr, "%04x            IRQ             %s\n", state->cpu.pc, trace_buf);
                 }
                 state->cpu.op.uop_list = irq_op_table[OP_IRQ];
             }
@@ -81,8 +82,9 @@ static void cpu_step_cycle(C02EmuState *state) {
         } else {
             op = cpu_read(state, (state->cpu.pc)++);
             state->cpu.op.opcode = op;
-            if (state->monitor.trace_cpu) {
-                fprintf(stderr, "PC = %04x OP = %02x\n", (state->cpu.pc - 1) & 0xffff, op);
+            if (state->monitor.trace & C02EMU_TRACE_CPU) {
+                disassemble(disasm_buf, sizeof(disasm_buf), (state->cpu.pc - 1), (Dis65C02MemReader)cpu_read, state);
+                fprintf(stderr, "%-30s  %s\n", disasm_buf, trace_buf);
             }
             state->cpu.op.uop_list = op_table[op];
             
@@ -109,7 +111,7 @@ static void cpu_step_cycle(C02EmuState *state) {
             } else {
                 // Jump to vector.
                 op = 0;
-                if (state->monitor.trace_cpu) {
+                if (state->monitor.trace & C02EMU_TRACE_CPU) {
                     fprintf(stderr, "PC = %04x %s\n", state->cpu.pc, state->cpu.op.nmi_active ? "NMI" : "IRQ");
                 }
                 state->cpu.op.uop_list = irq_op_table[OP_IRQ];
@@ -162,26 +164,26 @@ static Byte cpu_read(C02EmuState *state, Addr addr) {
     if (addr <= 0x000f) {
         // 00-0f are hardwired to the MMU registers.
         byte = io_mmu_read(state, addr);
-        if (state->monitor.trace_ram) {
-            fprintf(stderr, "MMU %04x R %02x\n", addr, byte);
+        if (state->monitor.trace & C02EMU_TRACE_READ) {
+            fprintf(stderr, "Read %04x > %02x (MMU)\n", addr, byte);
         }
     } else {
         // Others are translated by the MMU.
         la = mmu_addr(state, addr);
         if (la < 0x080000) {
             byte = state->mem.ram[la & (sizeof(state->mem.ram) - 1)];
-            if (state->monitor.trace_ram) {
-                fprintf(stderr, "RAM %04x R %02x\n", addr, byte);
+            if (state->monitor.trace & C02EMU_TRACE_READ) {
+                fprintf(stderr, "Read %04x > %02x (RAM)\n", addr, byte);
             }
         } else if (la < 0x0c0000) {
             byte = io_read(state, addr);
-            if (state->monitor.trace_ram) {
-                fprintf(stderr, "I/O %04x R %02x\n", addr, byte);
+            if (state->monitor.trace & C02EMU_TRACE_READ) {
+                fprintf(stderr, "Read %04x > %02x (I/O)\n", addr, byte);
             }
         } else {
             byte = state->mem.rom[la & (sizeof(state->mem.rom) - 1)];
-            if (state->monitor.trace_ram) {
-                fprintf(stderr, "ROM %04x R %02x\n", addr, byte);
+            if (state->monitor.trace & C02EMU_TRACE_READ) {
+                fprintf(stderr, "Read %04x > %02x (ROM)\n", addr, byte);
             }
         }
     }
@@ -196,25 +198,25 @@ static void cpu_write(C02EmuState *state, Addr addr, Byte byte) {
     if (addr <= 0x000f) {
         // 00-0f are hardwired to the MMU registers.
         io_mmu_write(state, addr, byte);
-        if (state->monitor.trace_ram) {
-            fprintf(stderr, "MMU %04x W %02x\n", addr, byte);
+        if (state->monitor.trace & C02EMU_TRACE_WRITE) {
+            fprintf(stderr, "Write %04x < %02x (MMU)\n", addr, byte);
         }
     } else {
         // Others are translated by the MMU.
         la = mmu_addr(state, addr);
         if (la < 0x080000) {
-            if (state->monitor.trace_ram) {
-                fprintf(stderr, "RAM %04x W %02x\n", addr, byte);
+            if (state->monitor.trace & C02EMU_TRACE_WRITE) {
+                fprintf(stderr, "Write %04x < %02x (RAM)\n", addr, byte);
             }
             state->mem.ram[la & (sizeof(state->mem.ram) - 1)] = byte;
         } else if (la < 0x0c0000) {
-            if (state->monitor.trace_ram) {
-                fprintf(stderr, "I/O %04x W %02x\n", addr, byte);
+            if (state->monitor.trace & C02EMU_TRACE_WRITE) {
+                fprintf(stderr, "Write %04x < %02x (I/O)\n", addr, byte);
             }
             io_write(state, addr, byte);
         } else {
-            if (state->monitor.trace_ram) {
-                fprintf(stderr, "ROM %04x W %02x\n", addr, byte);
+            if (state->monitor.trace & C02EMU_TRACE_WRITE) {
+                fprintf(stderr, "Write %04x < %02x (ROM, ignored)\n", addr, byte);
             }
         }
     }
@@ -441,20 +443,24 @@ static void io_debug_write(C02EmuState *state, Addr addr, Byte byte) {
             }
             break;
             
+        case 0x0b:
+            state->monitor.trace = byte;
+            break;
+            
         case 0x0c:
-            state->monitor.trace_cpu = true;
+            state->monitor.trace |= C02EMU_TRACE_CPU;
             break;
             
         case 0x0d:
-            state->monitor.trace_cpu = false;
+            state->monitor.trace &= ~C02EMU_TRACE_CPU;
             break;
             
         case 0x0e:
-            state->monitor.trace_ram = true;
+            state->monitor.trace |= C02EMU_TRACE_READ | C02EMU_TRACE_WRITE;
             break;
             
         case 0x0f:
-            state->monitor.trace_ram = false;
+            state->monitor.trace &= ~(C02EMU_TRACE_READ | C02EMU_TRACE_WRITE);
             break;
             
         default:

@@ -70,17 +70,13 @@ void c02emuCPUWrite(C02EmuState *state, Addr addr, Byte byte) {
 }
 
 
-bool c02emuSetCPUTrace(C02EmuState *state, bool enable) {
-    bool old = state->monitor.trace_cpu;
-    state->monitor.trace_cpu = enable;
-    return old;
+void c02emuEnableTrace(C02EmuState *state, C02EmuTraceMask flags) {
+    state->monitor.trace |= flags;
 }
 
 
-bool c02emuSetRAMTrace(C02EmuState *state, bool enable) {
-    bool old = state->monitor.trace_ram;
-    state->monitor.trace_ram = enable;
-    return old;
+void c02emuDisableTrace(C02EmuState *state, C02EmuTraceMask flags) {
+    state->monitor.trace &= ~flags;
 }
 
 

@@ -32,6 +32,13 @@ typedef enum {
     C02EMU_OP_WAITING,
 } C02EmuOpCycle;
 
+/// Debug trace flags.
+typedef enum {
+    C02EMU_TRACE_CPU =   1<<0,
+    C02EMU_TRACE_WRITE = 1<<1,
+    C02EMU_TRACE_READ =  1<<2,
+} C02EmuTraceMask;
+
 /// Display modes.
 typedef enum {
     C02EMU_DISPLAY_MODE_TEXT_80X50=0

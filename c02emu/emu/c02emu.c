@@ -32,8 +32,6 @@ C02EmuState *c02emuCreate(void) {
         return NULL;
     }
     
-    state->phase = C02EMU_PHASE_CPU;
-    
     state->cpu.a = 0xaa;
     state->cpu.x = 0x00;
     state->cpu.y = 0x00;
@@ -55,8 +53,7 @@ C02EmuState *c02emuCreate(void) {
     state->line_ctr = 0;
     state->frame_ctr = 0;
     
-    state->monitor.trace_cpu = false;
-    state->monitor.trace_ram = false;
+    state->monitor.trace = 0;
     state->monitor.debug_output = true;
     
     return state;
@@ -87,7 +84,7 @@ void c02emuReset(C02EmuState *state) {
     state->io.keyboard.size = 0;
     
     state->cpu.op.opcode = 0;
-    if (state->monitor.trace_cpu) {
+    if (state->monitor.trace & C02EMU_TRACE_CPU) {
         fprintf(stderr, "PC = %04x RESET\n", state->cpu.pc);
     }
     state->cpu.op.uop_list = irq_op_table[OP_RESET];

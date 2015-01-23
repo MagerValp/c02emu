@@ -36,11 +36,6 @@ typedef enum {
     C02EMU_DISPLAY_IRQ_ACTIVE = 1<<7,
 } C02EmuDisplayIRQMask;
 
-typedef enum {
-    C02EMU_PHASE_CPU,
-    C02EMU_PHASE_IO,
-} C02EmuPhase;
-
 #ifdef __LITTLE_ENDIAN__
 #define BYTE_LH Byte l, h
 #else
@@ -101,15 +96,12 @@ struct _c02EmuState {
         } keyboard;
     } io;
     
-    C02EmuPhase phase;
-    
     unsigned int cycle_ctr;
     unsigned int line_ctr;
     unsigned int frame_ctr;
     
     struct {
-        bool trace_cpu;
-        bool trace_ram;
+        C02EmuTraceMask trace;
         bool debug_output;
     } monitor;
 };

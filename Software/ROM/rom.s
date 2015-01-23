@@ -1,8 +1,13 @@
 	.include "macro.i"
+	.include "io.i"
 
-
-	.import display_init
 	
+	.import display_init
+	.import display_putchar
+	
+	.import keyboard_init
+	.import keyboard_scan
+
 
 	.bss
 
@@ -21,13 +26,13 @@ reset:
 	ldx #$0d
 @reset_mmu:
 	txa
-	sta $00,x		; Map RAM bank x at $x000.
+	sta mmu,x		; Map RAM bank x at $x000.
 	dex
 	bpl @reset_mmu
 	lda #$a0		; Map I/O at $e000.
-	sta $0e
+	sta mmu+$0e
 	lda #$ff		; Map ROM at $f000.
-	sta $0f
+	sta mmu+$0f
 	
 	ldx #0
 	txa
@@ -43,12 +48,13 @@ reset:
 	stax vec_irqh
 	
 	jsr display_init
+	jsr keyboard_init
 	
 	ldx #0
 @printmsg:
 	lda msg_startup,x
 	beq :+
-	sta $1000,x
+	jsr display_putchar
 	inx
 	bne @printmsg
 :	
@@ -68,9 +74,14 @@ j_irqh:
 	jmp (vec_irqh)
 rom_irqh:
 	pha
+	phx
+	phy
 	inc $104f
 	lda $e005
 	sta $e005
+	jsr keyboard_scan
+	ply
+	plx
 	pla
 	rti
 

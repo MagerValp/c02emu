@@ -214,9 +214,8 @@ static void cpu_write(C02EmuState *state, Addr addr, Byte byte) {
             io_write(state, addr, byte);
         } else {
             if (state->monitor.trace_ram) {
-                fprintf(stderr, "ROM %04x R %02x\n", addr, byte);
+                fprintf(stderr, "ROM %04x W %02x\n", addr, byte);
             }
-            state->mem.rom[la & (sizeof(state->mem.rom) - 1)] = byte;
         }
     }
 }

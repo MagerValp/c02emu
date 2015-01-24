@@ -39,7 +39,7 @@ rom.bin: $(ROM_OBJS) rom.cfg
 
 clean:
 	rm -f $(ROM_OBJS)
-	rm -f rom.bin rom.map rom.dbg
+	rm -f rom.bin rom.map rom.dbg rom.lst
 
 
 distclean: clean

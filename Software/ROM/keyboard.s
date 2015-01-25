@@ -4,6 +4,7 @@
 	
 
 	.export keyboard_init
+	.export keyboard_get_event
 	.export keyboard_scan
 	.export keyboard_mod_state
 	
@@ -47,8 +48,8 @@ keyboard_clear:
 	rts
 
 
-; Read codes from the PS/2 fifo, update modifier state, and generate
-; scancode up/down events.
+; Call from IRQ to read codes from the PS/2 fifo, update modifier state, and
+; generate scancode up/down events.
 keyboard_scan:
 @next:
 	lda keyboard_queue_size
@@ -176,9 +177,9 @@ keyboard_scan:
 	and #SQ_LENGTH - 1
 	tay
 	pla
-	sta scancode_key_queue,y
-	txa
 	sta scancode_mod_queue,y
+	txa
+	sta scancode_key_queue,y
 	inc scancode_queue_size
 @queue_full:
 	lda #0
@@ -186,3 +187,33 @@ keyboard_scan:
 	sta ext_e0
 	sta ext_e1
 	jmp @next
+
+
+; Return the next scancode up/down event in A/X.
+; Returns $0000 if no event is queued.
+keyboard_get_event:
+	lda scancode_queue_size
+	bne :+
+	tax
+	rts
+:
+	phy				; Disable IRQs and save Y.
+	php
+	sei
+	
+	lda scancode_queue_index	; Advance the queue index.
+	pha
+	ina
+	and #SQ_LENGTH - 1
+	sta scancode_queue_index
+	
+	dec scancode_queue_size
+	
+	ply
+	lda scancode_key_queue,y
+	tax
+	lda scancode_mod_queue,y
+
+	plp				; Restore Y and IRQ state.
+	ply
+	rts

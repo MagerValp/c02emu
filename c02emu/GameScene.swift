@@ -70,7 +70,7 @@ class GameScene: SKScene, NSWindowDelegate {
     }
     
     override func keyUp(theEvent: NSEvent) {
-        NSLog(String(format: "keyDown(0x%02x)", theEvent.keyCode))
+        NSLog(String(format: "keyUp(0x%02x)", theEvent.keyCode))
         if let keyCode = macKeyCodes[theEvent.keyCode] {
             emulator.keyUp(keyCode)
         }

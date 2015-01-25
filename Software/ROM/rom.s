@@ -6,6 +6,7 @@
 	.import display_putchar
 	
 	.import keyboard_init
+	.import keyboard_get_event
 	.import keyboard_scan
 
 
@@ -59,9 +60,19 @@ reset:
 	bne @printmsg
 :	
 	cli
-	
-:	wai
-	jmp :-
+
+loop:	
+	sta debug_trace_cpu_off
+	wai
+	jsr keyboard_get_event
+	cmp #0
+	beq loop
+	sta debug_trace_cpu_on
+	bit #$80
+	beq loop
+	txa
+	jsr display_putchar
+	jmp loop
 	
 	
 

@@ -1,7 +1,8 @@
 KM_Shift	= %00000001
-KM_Ctrl		= %00000010
-KM_Alt		= %00000100
+KM_Alt		= %00000010
+KM_Ctrl		= %00000100
 KM_Cmd		= %00001000
+KM_Caps		= %00010000
 
 KE_KeyDown	= %00000000
 KE_KeyUp	= %10000000

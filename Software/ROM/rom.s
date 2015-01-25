@@ -8,6 +8,8 @@
 	.import keyboard_init
 	.import keyboard_get_event
 	.import keyboard_scan
+	
+	.import keymap_translate
 
 
 	.bss
@@ -62,17 +64,20 @@ reset:
 	cli
 
 loop:	
-	sta debug_trace_cpu_off
 	wai
+	
 	jsr keyboard_get_event
 	cmp #0
 	beq loop
-	sta debug_trace_cpu_on
+	
 	bit #$80
 	beq loop
-	txa
+	
+	jsr keymap_translate
+	beq loop
+	
 	jsr display_putchar
-	jmp loop
+	bra loop
 	
 	
 
@@ -100,7 +105,7 @@ rom_irqh:
 	.rodata
 
 msg_startup:
-	.asciiz "c02emu"
+	.byte "c02emu", 10, 0
 
 
 	.segment "VECTORS"

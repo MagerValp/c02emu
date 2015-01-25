@@ -31,7 +31,8 @@ all: rom.bin
 ROM_OBJS = \
 	rom.o \
 	display.o \
-	keyboard.o
+	keyboard.o \
+	keymap.o
 
 rom.bin: $(ROM_OBJS) rom.cfg
 	$(LD) -o $@ -m rom.map -C rom.cfg --dbgfile rom.dbg $(LDFLAGS) $(ROM_OBJS)

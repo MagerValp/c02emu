@@ -108,6 +108,9 @@ keyboard_scan:
 	cpx #$a7
 	beq @mod_cmd
 	
+	cpx #$58
+	beq @mod_caps
+	
 	bra @make_break_key
 
 @clear:
@@ -145,6 +148,9 @@ keyboard_scan:
 	bra @mod
 @mod_cmd:
 	lda #KM_Cmd
+	bra @mod
+@mod_caps:
+	lda #KM_Caps
 @mod:
 	ldy break
 	bne @clearmod

@@ -13,7 +13,7 @@ def print8(*args):
 def bytelist(s):
     if not s:
         return "[]"
-    return "[%s]" % ", ".join("0x%s" % x.lower() for x in s.split(","))
+    return u"[%s]" % u", ".join(u"0x%s" % x.lower() for x in s.split(u","))
     
 
 def main(argv):
@@ -33,20 +33,20 @@ def main(argv):
             ps2make.append((name, bytelist(make)))
             ps2break.append((name, bytelist(brk)))
     
-    print8("    enum KeyCode {")
+    print8(u"    enum KeyCode {")
     for name in names:
-        print8("        case %s" % name)
-    print8("    }\n")
+        print8(u"        case %s" % name)
+    print8(u"    }\n")
     
-    print8("    let ps2make: [KeyCode:[UInt8]] = [")
+    print8(u"    let ps2make: [KeyCode:[UInt8]] = [")
     for name, bytes in ps2make:
-        print8("        %-16s%s," % (".%s:" % name, bytes))
-    print8("    ]\n")
+        print8(u"        %-16s%s," % (u".%s:" % name, bytes))
+    print8(u"    ]\n")
     
-    print8("    let ps2break: [KeyCode:[UInt8]] = [")
+    print8(u"    let ps2break: [KeyCode:[UInt8]] = [")
     for name, bytes in ps2break:
-        print8("        %-16s%s," % (".%s:" % name, bytes))
-    print8("    ]\n")
+        print8(u"        %-16s%s," % (u".%s:" % name, bytes))
+    print8(u"    ]\n")
     
     return 0
     

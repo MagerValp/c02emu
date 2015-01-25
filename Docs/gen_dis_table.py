@@ -11,7 +11,7 @@ def print8(*args):
 
 
 ADDRMODE = {
-    u"":        u"IMP",
+    u"1":        u"IMP",
     u"2":       u"IMP",
     u"3":       u"IMP",
     u"4":       u"IMP",
@@ -20,6 +20,7 @@ ADDRMODE = {
     u"abs 3":   u"ABS",
     u"abs 4":   u"ABS",
     u"abs 6":   u"ABS",
+    u"abs 8":   u"ABS",
     u"abx 4*":  u"ABX",
     u"abx 5":   u"ABX",
     u"abx 6*":  u"ABX",
@@ -58,10 +59,10 @@ def main(argv):
             opcodes.extend(x.lower() for x in f.readline().rstrip().split(u"\t"))
             addrmodes.extend(f.readline().rstrip().split(u"\t"))
 
-    print8("    enum AddrMode {")
+    print8(u"    enum AddrMode {")
     for addrmode in sorted(set(ADDRMODE[x] for x in addrmodes)):
-        print8("        case %s" % addrmode)
-    print8("    }\n")
+        print8(u"        case %s" % addrmode)
+    print8(u"    }\n")
     
     def adjustedcomma(s):
         if len(s) < 3:
@@ -69,15 +70,15 @@ def main(argv):
         else:
             return s + ","
     
-    print8("    let addrModes: [AddrMode] = [")
+    print8(u"    let addrModes: [AddrMode] = [")
     for offset in xrange(0, 255, 8):
         print8('        .%s' % ' .'.join(adjustedcomma(ADDRMODE[x]) for x in addrmodes[offset:offset + 8]))
-    print8("    ]\n")
+    print8(u"    ]\n")
     
-    print8("    let opCodes = [")
+    print8(u"    let opCodes = [")
     for offset in xrange(0, 255, 8):
         print8('        "%s",' % '", "'.join(opcodes[offset:offset + 8]))
-    print8("    ]")
+    print8(u"    ]")
     
     return 0
     

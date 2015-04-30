@@ -3,7 +3,7 @@
 //  c02emu
 //
 //  Created by Per Olofsson on 2015-01-16.
-//  Copyright (c) 2015 University of Gothenburg. All rights reserved.
+//  Copyright (c) 2015 Per Olofsson. All rights reserved.
 //
 
 

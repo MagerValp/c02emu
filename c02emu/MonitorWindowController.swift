@@ -9,6 +9,15 @@
 import Cocoa
 
 
+// FIXME: move to separate file.
+func +=<K, V> (inout left: Dictionary<K, V>, right: Dictionary<K, V>) -> Dictionary<K, V> {
+    for (k, v) in right {
+        left.updateValue(v, forKey: k)
+    }
+    return left
+}
+
+
 class MonitorWindowController: NSObject, NSTextFieldDelegate, MonitorDelegate {
 
     @IBOutlet weak var window: NSWindow!
@@ -20,11 +29,11 @@ class MonitorWindowController: NSObject, NSTextFieldDelegate, MonitorDelegate {
     
     let regularFont = NSFont(name: "Menlo-Regular", size: 10.0)
     let boldFont = NSFont(name: "Menlo-Bold", size: 10.0)
-    var commonAttr = NSMutableDictionary()
-    var promptAttr = NSMutableDictionary()
-    var inputAttr  = NSMutableDictionary()
-    var outputAttr = NSMutableDictionary()
-    var errorAttr  = NSMutableDictionary()
+    var commonAttr = [NSObject:AnyObject]()
+    var promptAttr = [NSObject:AnyObject]()
+    var inputAttr  = [NSObject:AnyObject]()
+    var outputAttr = [NSObject:AnyObject]()
+    var errorAttr  = [NSObject:AnyObject]()
     var printQueue = [NSAttributedString]()
     let printDispatchQueue = dispatch_queue_create("se.automac.MonitorWindowController", nil)
     var updateTimer: NSTimer?
@@ -43,14 +52,14 @@ class MonitorWindowController: NSObject, NSTextFieldDelegate, MonitorDelegate {
         
         commonAttr[NSFontAttributeName] = regularFont
         
-        promptAttr.addEntriesFromDictionary(commonAttr)
+        promptAttr += commonAttr
         
-        inputAttr.addEntriesFromDictionary(commonAttr)
+        inputAttr += commonAttr
         inputAttr[NSFontAttributeName] = boldFont
         
-        outputAttr.addEntriesFromDictionary(commonAttr)
+        outputAttr += commonAttr
         
-        errorAttr.addEntriesFromDictionary(commonAttr)
+        errorAttr += commonAttr
         errorAttr[NSForegroundColorAttributeName] = NSColor.redColor()
         
         updateTimer = NSTimer.scheduledTimerWithTimeInterval(1.0/30.0, target: self, selector: "flushPrintQueue", userInfo: nil, repeats: true)

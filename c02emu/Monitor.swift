@@ -176,7 +176,7 @@ class Monitor: NSObject {
     
     
     func cmdEnterMonitor(args: [String]?) {
-        outputLine(NSString(format: "***BREAK at frame %d line %d cycle %d",
+        outputLine(String(format: "***BREAK at frame %d line %d cycle %d",
             emulator.state.display.frame,
             emulator.state.display.line,
             emulator.state.display.cycle))
@@ -215,11 +215,11 @@ class Monitor: NSObject {
         let bytes = to &- from
         var addr = from
         while addr &- from <= bytes {
-            var output: String = NSString(format: "%04x  ", addr)
+            var output: String = String(format: "%04x  ", addr)
             var ascii = ""
             for i in 0..<16 {
                 let byte = emulator.readMemory(addr)
-                output += NSString(format: " %02x", byte)
+                output += String(format: " %02x", byte)
                 if byte >= 0x20 && byte < 0x7f {
                     ascii += String(UnicodeScalar(Int(byte)))
                 } else {
@@ -238,7 +238,7 @@ class Monitor: NSObject {
         
         outputLine("PC   A  X  Y  S  nv1bdizc  IR  CPU State    Line Cycle")
         let state = emulator.state
-        let status = NSString(format: "%d%d1%d%d%d%d%d",
+        let status = String(format: "%d%d1%d%d%d%d%d",
             (Int(state.cpu.status) & flag_n) >> 7,
             (Int(state.cpu.status) & flag_v) >> 6,
             (Int(state.cpu.status) & flag_b) >> 4,
@@ -248,7 +248,7 @@ class Monitor: NSObject {
             (Int(state.cpu.status) & flag_c))
         state.cpu.state.description.withCString {
             cpuState in
-            self.outputLine(NSString(format: "%04x %02x %02x %02x %02x %@  %02x  %-11s  %03d  %03d",
+            self.outputLine(String(format: "%04x %02x %02x %02x %02x %@  %02x  %-11s  %03d  %03d",
                 state.cpu.pc,
                 state.cpu.a,
                 state.cpu.x,
@@ -336,11 +336,11 @@ class Monitor: NSObject {
         let c02mmuState = c02emuMMUState(emulator.emuState)
         for (reg, bank) in enumerate(emulator.state.mmu.page) {
             if bank < 0x80 {
-                outputLine(NSString(format: "%04x RAM %05x", reg << 12, Int(bank) << 12))
+                outputLine(String(format: "%04x RAM %05x", reg << 12, Int(bank) << 12))
             } else if bank < 0xc0 {
-                outputLine(NSString(format: "%04x I/O %05x", reg << 12, Int(bank) << 12))
+                outputLine(String(format: "%04x I/O %05x", reg << 12, Int(bank) << 12))
             } else {
-                outputLine(NSString(format: "%04x ROM %05x", reg << 12, Int(bank) << 12))
+                outputLine(String(format: "%04x ROM %05x", reg << 12, Int(bank) << 12))
             }
         }
     }

@@ -182,11 +182,11 @@ class Disassembler: NSObject {
         var bytes = [UInt8]()
         var byte: UInt8
         var word: UInt16
-        var output: String = NSString(format: "%04x   ", pc & 0xffff)
+        var output: String = String(format: "%04x   ", pc & 0xffff)
         
         byte = readIncPC()
         bytes.append(byte)
-        output += NSString(format: "%02x ", byte)
+        output += String(format: "%02x ", byte)
         
         let code = opCodes[Int(byte)]
         let mode = addrModes[Int(byte)]
@@ -199,40 +199,40 @@ class Disassembler: NSObject {
         case .Byte:
             byte = readIncPC()
             bytes.append(byte)
-            output += NSString(format: "%02x    ", byte)
-            operand = NSString(format: "%02x", byte)
+            output += String(format: "%02x    ", byte)
+            operand = String(format: "%02x", byte)
         
         case .Word:
             byte = readIncPC()
             bytes.append(byte)
-            output += NSString(format: "%02x ", byte)
+            output += String(format: "%02x ", byte)
             word = UInt16(byte)
             
             byte = readIncPC()
             bytes.append(byte)
-            output += NSString(format: "%02x ", byte)
+            output += String(format: "%02x ", byte)
             word = word | (UInt16(byte) << 8)
             
-            operand = NSString(format: "%04x", word)
+            operand = String(format: "%04x", word)
         
         case .Relative:
             byte = readIncPC()
             bytes.append(byte)
-            output += NSString(format: "%02x    ", byte)
+            output += String(format: "%02x    ", byte)
             word = UInt16((Int(pc) + Int(unsafeBitCast(byte, Int8.self))) & 0xffff)
-            operand = NSString(format: "%04x", word)
+            operand = String(format: "%04x", word)
             
         case .ZPRelative:
             byte = readIncPC()
             bytes.append(byte)
-            output += NSString(format: "%02x ", byte)
-            operand = NSString(format: "%02x", byte)
+            output += String(format: "%02x ", byte)
+            operand = String(format: "%02x", byte)
             
             byte = readIncPC()
             bytes.append(byte)
-            output += NSString(format: "%02x ", byte)
+            output += String(format: "%02x ", byte)
             word = UInt16((Int(pc) + Int(unsafeBitCast(byte, Int8.self))) & 0xffff)
-            operand = NSString(format: "%@,$%04x", operand, word)
+            operand = String(format: "%@,$%04x", operand, word)
 
         case .None:
             output += "      "

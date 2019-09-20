@@ -372,6 +372,7 @@
 		6673C4051A5C709700D17696 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				LastSwiftUpdateCheck = 0710;
 				LastUpgradeCheck = 0610;
 				ORGANIZATIONNAME = "University of Gothenburg";
 				TargetAttributes = {

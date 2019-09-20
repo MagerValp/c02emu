@@ -50,7 +50,7 @@ class EmulatorController: NSObject, DisassemblerDelegate {
     }
     
     func configure(ROM name: String) {
-        loadROM(name)
+        loadROMFromPath(name)
     }
     
     func start() {
@@ -144,12 +144,12 @@ class EmulatorController: NSObject, DisassemblerDelegate {
         return (name, ext)
     }
     
-    func loadROM(name: String) {
+    func loadROMFromPath(name: String) {
         let (name, ext) = splitExt(name)
-        loadROM(NSData(contentsOfURL: NSBundle.mainBundle().URLForResource(name, withExtension: ext)!)!)
+        loadROMFromData(NSData(contentsOfURL: NSBundle.mainBundle().URLForResource(name, withExtension: ext)!)!)
     }
     
-    func loadROM(romData: NSData) {
+    func loadROMFromData(romData: NSData) {
         c02emuLoadROM(emuState, romData.bytes, UInt(romData.length))
     }
     
